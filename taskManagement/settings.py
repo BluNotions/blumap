@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-cpft9b!qc-%u=is@=*l!l--klt%+f(h(r+swrz5wkllb3*6@_t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['35.178.86.234','blumaps.com','www.blumaps.com']
 
 
 # Application definition
