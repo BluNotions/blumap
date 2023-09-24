@@ -1,7 +1,5 @@
 from django.contrib import admin
-
-# Register your models here.
-
-from .models import taskDb
+from .models import taskDb, LocationInterest
 
 admin.site.register(taskDb)
+admin.site.register(LocationInterest)

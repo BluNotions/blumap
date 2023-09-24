@@ -18,8 +18,6 @@ class taskDb(models.Model):
 
 
 
-
-
 #add
 
 class LocationInterest(models.Model):
