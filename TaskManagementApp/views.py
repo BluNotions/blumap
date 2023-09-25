@@ -63,3 +63,8 @@ def save_location(request):
 def get_location_interests(request):
     data = list(LocationInterest.objects.values('latitude', 'longitude', 'interest', 'need'))
     return JsonResponse(data, safe=False)
+
+
+def get_existing_data(request):
+    data = LocationInterest.objects.values('id', 'latitude', 'longitude', 'interest')
+    return JsonResponse(list(data), safe=False)
