@@ -35,12 +35,17 @@
         }
 
         #map {
-            height: 700px;
-            width: 700px;
-            margin: 20px auto;
-            border: 5px solid white;
-            border-radius: 95%;
+         height: 700px;
+         width: 700px;
+         margin-top: 20px;
+         margin-bottom: 20px;
+         margin-right: auto;
+         margin-left: 700px; /* Adjust this value as needed */
+         border: 5px solid white;
+         border-radius: 95%;
         }
+
+        
     </style>
 
 </head>
@@ -55,43 +60,51 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a id="my-profile" class="nav-link" href="#">Account</a>
+                    <a id="my-profile" class="nav-link" href="#">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a id="my-analysis" class="nav-link" href="#"> Commerce</a>
-                </li>
-                <li class="nav-item">
-                    <a id="my-ngo" class="nav-link" href="#">Community</a>
-                </li>
-                <li class="nav-item">
-                    <a id="my-friends" class="nav-link" href="#">Inner Circle</a>
+                    <a id="my-circle" class="nav-link" href="#">Add Inner Circle</a>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <h1 class="display-4" style="font-size: 18px;"> </h1>
-    <p style="font-size: 25px;">Click on map and insert your interest, want or need</p>
+    <p style="font-size: 25px;">Connecting Needs</p>
 
     
-
-
-
-
-
-
-
-
-
-
     <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 200px; z-index: 100;">
-        <button class="btn btn-primary btn-lg mb-2" id="zoom-business">Commerce</button>
-        <button class="btn btn-primary btn-lg mb-2" id="zoom-community">Community</button>
-        <button class="btn btn-primary btn-lg" id="zoom-inner-circle">Inner Circle</button>
+        <button class="btn btn-danger btn-lg mb-3" id="zoom-community">
+            Community<br>
+            <span style="font-size: small;">Urgent Need</span>
+        </button>
+        
+        <button class="btn btn-primary btn-lg mb-3" id="zoom-business">
+            Commerce<br>
+            <span style="font-size: small;">Ideas & Wants</span>
+        </button>
+        
+
+        <button class="btn btn-primary btn-lg" id="zoom-inner-circle" style="margin-bottom: 150px;">
+            Inner Circle<br>
+            <span style="font-size: small;">Family and Friends</span>
+        </button>
+        
+    
+        <button class="btn btn-danger btn-lg mb-3" id="zoom-community-2"> 
+            Community Needs<br>
+        </button>
+        
+        <button class="btn btn-primary btn-lg mb-3" id="zoom-business-2"> 
+            Business Ideas<br>
+        </button>
+        
+        <button class="btn btn-primary btn-lg mb-3" id="zoom-inner-circle-2">
+            Inner Circle interest<br>
+        </button>
     </div>
     
-
-
+    
+    
 
 
     <div id="map"></div>
@@ -102,17 +115,6 @@
             <a class="nav-item nav-link" href="#">Settings</a>
         </div>
     </nav>
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -136,16 +138,6 @@
     </script>
     
 
-
-
-
-
-
-
-
-
-
-
     <script>
   var blueStyles = [
             {
@@ -165,14 +157,21 @@
 
  var map;
 
-function initMap() {
+ function initMap() {
     var defaultLoc = {lat: -0.7193, lng: 8.7815};
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: defaultLoc,
-        zoom: 3, // Set initial zoom level
-        styles: blueStyles
+        zoom: 3,
+        styles: blueStyles,
+        draggable: false,
+        zoomControl: false,
+        scrollwheel: false,
+        disableDoubleClickZoom: true,
+        navigationControl: false
     });
+
+
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -192,8 +191,7 @@ function initMap() {
 
     google.maps.event.addListener(map, 'click', function(event) {
         placeMarkerAndPrompt(event.latLng);
-    });
-}
+    });  }
 
 function placeMarkerAndPrompt(location) {
     var userText = prompt("Insert interest, want or need");
@@ -243,71 +241,28 @@ function placeMarkerAndPrompt(location) {
     .catch((error) => {
         console.error('Error:', error);
     });
+
+
+
+    function makeMapInteractive() {
+    map.setOptions({
+        draggable: true,
+        zoomControl: true,
+        scrollwheel: true,
+        disableDoubleClickZoom: false,
+        navigationControl: true
+    });
+}
+document.getElementById('zoom-community').addEventListener('click', makeMapInteractive);
+document.getElementById('zoom-business').addEventListener('click', makeMapInteractive);
+document.getElementById('zoom-inner-circle').addEventListener('click', makeMapInteractive);
+document.getElementById('zoom-community-2').addEventListener('click', makeMapInteractive);
+document.getElementById('zoom-business-2').addEventListener('click', makeMapInteractive);
+document.getElementById('zoom-inner-circle-2').addEventListener('click', makeMapInteractive);
+
+
 }
 
-        // Added event listeners for navbar items
-        document.getElementById("my-analysis").addEventListener('click', function() {
-            document.getElementById('background').style.backgroundImage = "url('{% static 'logo3.jpg' %}')";
-
-
-        
-
-            
-        });
-
-        document.getElementById("my-ngo").addEventListener('click', function() {
-            document.getElementById('background').style.backgroundImage = "url('{% static 'logo3.jpg' %}')";
-
-            fetch('/get_location_interests')
-    .then(response => response.json())
-    .then(data => {
-        data.forEach(item => {
-            const position = new google.maps.LatLng(item.latitude, item.longitude);
-            const marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: item.interest || ''
-            });
-
-            if(item.need) {
-                const infowindow = new google.maps.InfoWindow({
-                    content: item.need
-                });
-                
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                });
-            }
-        });
-    })
-    .catch((error) => {
-        console.error('Error fetching location interests:', error);
-    });
-
-
-        });
-
-        document.getElementById("my-profile").addEventListener('click', function() {
-            document.getElementById('background').style.backgroundImage = "url('{% static 'Logo3.jpg' %}')";
-        });
-
-        document.getElementById("my-friends").addEventListener('click', function() {
-            document.getElementById('background').style.backgroundImage = "url('{% static 'logo3.jpg' %}')";
-        });
-        
-
-        document.getElementById("zoom-business").addEventListener('click', function() {
-        map.setZoom(18);
-         });
-
-        document.getElementById("zoom-community").addEventListener('click', function() {
-        map.setZoom(19);
-        });
-
-        document.getElementById("zoom-inner-circle").addEventListener('click', function() {
-        map.setZoom(20);
-        });
-  
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
