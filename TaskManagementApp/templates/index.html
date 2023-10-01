@@ -1,14 +1,10 @@
 <html>
 <head>
-    <title>blumaps</title>
+    <title>Blumaps</title>
     {% load static %}  
-    
     <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
-
-    <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0&callback=initMap" async defer></script>
-
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -18,7 +14,6 @@
             position: relative;
             background-color: rgb(0, 255, 213);
         }
-
         #background {
             content: '';
             position: absolute;
@@ -26,14 +21,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('{% static "Logo3.jpg" %}');
-
+            background-image: url('{% static "Logo35.jpeg" %}');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
             z-index: -1;
         }
-
         #map {
          height: 700px;
          width: 700px;
@@ -42,19 +35,16 @@
          margin-top: 20px;
          margin-bottom: 20px;
          margin-right: auto;
-          border: 5px solid white;
+         border: 5px solid white;
          border-radius: 95%;
+         display: none
         }
-
-        
     </style>
-
 </head>
 <body class="text-center">
     <div id="background"></div>
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">blumaps</a>
+        <a class="navbar-brand" href="#">Blumaps</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -72,59 +62,37 @@
             </ul>
         </div>
     </nav>
-
     <p style="font-size: 25px;">Connecting Needs, Ideas, and Interests</p>
-
-
-
-
-    
     <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 200px; z-index: 100;">
         <button class="btn btn-danger btn-lg mb-3" id="zoom-community">
             Community<br>
             <span style="font-size: small;">Urgent Need</span>
         </button>
-        
         <button class="btn btn-primary btn-lg mb-3" id="zoom-business">
             Commerce<br>
             <span style="font-size: small;">Ideas & Wants</span>
         </button>
-        
-
         <button class="btn btn-primary btn-lg" id="zoom-inner-circle" style="margin-bottom: 150px;">
             Inner Circle<br>
             <span style="font-size: small;">Family and Friends</span>
         </button>
-        
-    
         <button class="btn btn-danger btn-lg mb-3" id="zoom-community-2"> 
             Community Needs<br>
         </button>
-        
         <button class="btn btn-primary btn-lg mb-3" id="zoom-business-2"> 
             Business Ideas<br>
         </button>
-        
         <button class="btn btn-primary btn-lg mb-3" id="zoom-inner-circle-2">
             Inner Circle interest<br>
         </button>
     </div>
-    
-    
-    
-
-
     <div id="map"></div>
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
         <div class="navbar-nav ml-auto">
             <a class="nav-item nav-link" href="#">Contact</a>
             <a class="nav-item nav-link" href="#">Settings</a>
         </div>
     </nav>
-
-
-
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -140,11 +108,8 @@
             }
             return cookieValue;
         }
-    
         const csrftoken = getCookie('csrftoken');
     </script>
-    
-
     <script>
   var blueStyles = [
             {
@@ -154,33 +119,32 @@
                 ]
             },
             {
-                "featureType": "water",
+                "featureType": "road",
+                "elementType": "geometry",
                 "stylers": [
-                    { "visibility": "simplified" },
-                    { "color": "#ffffff" }
+                    { "lightness": 100 },
+                    { "visibility": "simplified" }
+                ]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels",
+                "stylers": [
+                    { "visibility": "off" }
                 ]
             }
         ];
 
- var map;
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8,
+                styles: blueStyles,
+                mapTypeId: 'terrain'
+            });
 
- function initMap() {
-    var defaultLoc = {lat: -0.7193, lng: 8.7815};
-
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: defaultLoc,
-        zoom: 3,
-        styles: blueStyles,
-        draggable: false,
-        zoomControl: false,
-        scrollwheel: false,
-        disableDoubleClickZoom: true,
-        navigationControl: false
-    });
-
-
-
-    if (navigator.geolocation) {
+            if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var userLoc = {
                 lat: position.coords.latitude,
@@ -196,114 +160,103 @@
         console.error("Browser doesn't support geolocation. Using default.");
     }
 
-    google.maps.event.addListener(map, 'click', function(event) {
-        placeMarkerAndPrompt(event.latLng);
-    });  }
+            
+        }
 
-
-
-// Fetch existing data and add markers
-fetch('/get_existing_data/')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(item => {
-                    const location = new google.maps.LatLng(item.latitude, item.longitude);
-                    const marker = new google.maps.Marker({
+        function placeMarkerAndPrompt(location) {
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map
+            });
+            var userText = prompt("Insert interest, want or need");
+                if (userText) {
+                    var marker = new google.maps.Marker({
                         position: location,
                         map: map,
-                        title: item.interest
+                        title: userText
                     });
-
-                    const infowindow = new google.maps.InfoWindow({
-                        content: item.interest
+                    var infowindow = new google.maps.InfoWindow({
+                        content: userText
                     });
-
                     marker.addListener('click', function() {
                         infowindow.open(map, marker);
                     });
+                    sendDataToServer(location.lat(), location.lng(), userText);
+                }
+            }
+
+        function sendDataToServer(lat, lng, need) {
+                fetch('/save_location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
+                })
+                .then(response => {
+                    if (response.headers.get('Content-Type').includes('json')) {
+                        return response.json();
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error(text);
+                        });
+                    }
+                })
+                .then(data => {
+                })
+                .catch(error => {
                 });
-            })
-            .catch(error => console.error('Error fetching data:', error));
+            }
+            
+        
 
-
-
-function placeMarkerAndPrompt(location) {
-    var userText = prompt("Insert interest, want or need");
-    if (userText) {
-        var marker = new google.maps.Marker({
-            position: location,
-            map: map,
-            title: userText
-        });
-
-        var infowindow = new google.maps.InfoWindow({
-            content: userText
-        });
-
-        marker.addListener('click', function() {
-            infowindow.open(map, marker);
-        });
-
-        // Send data to the backend
-        sendDataToServer(location.lat(), location.lng(), userText);
-    }
-}
-
-
-      function sendDataToServer(lat, lng, need) {
-        fetch('/save_location', {
-        method: 'POST',
-     headers: {
-    'Content-Type': 'application/json',
-    'X-CSRFToken': csrftoken  // This line adds the CSRF token to your request headers
-},
-
-        body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
-    })
-    .then(response => {
-        // Checking if the response is a JSON object before trying to parse it
-        if (response.headers.get('Content-Type').includes('application/json')) {
-            return response.json();
-        } else {
-            // If it's not JSON, just return the raw response text
-            return response.text();
+        function fullFunctionality() {
+            initMap();
+            google.maps.event.addListener(map, 'click', function(event) {
+                placeMarkerAndPrompt(event.latLng);
+            });
+            sendDataToServer(location.lat(), location.lng(), userText);
         }
-    })
-    .then(data => {
-        console.log('Data saved:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
 
+        function limitedFunctionality() {
+            initMap();
+            fetch('/get_existing_data/')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const location = new google.maps.LatLng(item.latitude, item.longitude);
+                        const marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                            title: item.interest
+                        });
 
+                        const infowindow = new google.maps.InfoWindow({
+                            content: item.interest
+                        });
 
-    function makeMapInteractive() {
-    map.setOptions({
-        draggable: true,
-        zoomControl: true,
-        scrollwheel: true,
-        disableDoubleClickZoom: false,
-        navigationControl: true
-    });
-}
-document.getElementById('zoom-community').addEventListener('click', makeMapInteractive);
-document.getElementById('zoom-business').addEventListener('click', makeMapInteractive);
-document.getElementById('zoom-inner-circle').addEventListener('click', makeMapInteractive);
-document.getElementById('zoom-community-2').addEventListener('click', makeMapInteractive);
-document.getElementById('zoom-business-2').addEventListener('click', makeMapInteractive);
-document.getElementById('zoom-inner-circle-2').addEventListener('click', makeMapInteractive);
+                        marker.addListener('click', function() {
+                            infowindow.open(map, marker);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
 
+        function showMap() {
+        document.getElementById('map').style.display = 'block';
+                           }
 
-}
+        document.getElementById('zoom-community').addEventListener('click', function() {showMap(); fullFunctionality();});
+        document.getElementById('zoom-business').addEventListener('click', function() {showMap(); fullFunctionality();});
+        document.getElementById('zoom-inner-circle').addEventListener('click', function() {showMap(); fullFunctionality();});
 
+        document.getElementById('zoom-community-2').addEventListener('click', function() {showMap(); limitedFunctionality();});
+        document.getElementById('zoom-business-2').addEventListener('click', function() {showMap(); limitedFunctionality();});
+        document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap();limitedFunctionality();});
+
+        
     </script>
-
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 </body>
 </html>
