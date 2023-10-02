@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Blumaps</title>
+    <title>blumaps</title>
     {% load static %}  
     <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -10,7 +10,6 @@
             font-family: 'Arial', sans-serif;
             color: white;
             margin: 0;
-            height: 100vh;
             position: relative;
             background-color: rgb(0, 255, 213);
         }
@@ -21,7 +20,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('{% static "Logo35.jpeg" %}');
+            background-image: url('{% static "Logo32.jpeg" %}');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -39,12 +38,127 @@
          border-radius: 95%;
          display: none
         }
+
+        .shiny-heading {
+        margin-bottom: 5px; 
+        text-align: center; 
+        font-family: 'Raleway', sans-serif;
+        background: linear-gradient(90deg, darkblue, darkblue, darkblue);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.0);
+    }
+
+    .shiny-button {
+        font-family: 'Raleway', sans-serif;
+        background: linear-gradient(90deg, #e74c3c, #c0392b, #e74c3c);
+        border: none;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        border-radius: 20px;
+    }
+
+   
+    .shiny-button:hover, .shiny-button-blue:hover {
+        transform: translateY(-2px);  
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .shiny-button:active, .shiny-button-blue:active {
+        transform: translateY(0); 
+        box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5); 
+    }
+
+    .shiny-button:focus, .shiny-button-blue:focus {
+        outline: none; 
+        box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5); 
+    }
+
+    .shiny-button-blue:active {
+        transform: translateY(0); 
+        box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5); 
+    }
+
+    .shiny-button-blue:focus {
+        outline: none;
+        box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5); 
+    }
+
+     #zoom-community {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    #zoom-inner-circle-2 {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    
+    .shiny-button-blue {
+        font-family: 'Raleway', sans-serif;
+        background: linear-gradient(90deg, #b19cd9 #b19cd9, #b19cd9); /* Blue gradient */
+        border: none;
+        color: white; /* Ensuring text is readable */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .shiny-button-blue:hover {
+        transform: translateY(-2px);  
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .shiny-button-blue:active {
+        transform: translateY(0); 
+    }
+
+    #about-section {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);  /* Optional: This gives a semi-transparent dark background */
+    color: #fff;
+    margin-bottom: 50px;  /* Space above the bottom navbar */
+}
+
+.space-before {
+    padding-left: 20px; /* Adjust this value to your preference */
+}
+
+#about-section {
+    font-size: 20px; /* Default size for the section, adjust as needed */
+}
+
+#about-section h2 {
+    font-size: 20px; /* Adjust to your preference for h2 headers */
+}
+
+#about-section h3 {
+    font-size: 20px; /* Adjust to your preference for h3 headers */
+}
+
+#about-section .space-before {
+    font-size: 15px; /* Adjust to your preference for paragraphs with space-before class */
+}
+
+#about-section > p:last-child {
+    font-size: 15px; /* Adjust to your preference for the last paragraph */
+}
+
+.spacer {
+    height: 10px; /* Adjust to your preference to control the space */
+}
+
+
     </style>
 </head>
 <body class="text-center">
     <div id="background"></div>
+    
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Blumaps</a>
+        <a class="navbar-brand" href="#">blumaps</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -56,44 +170,104 @@
                 <li class="nav-item">
                     <a id="my-circle" class="nav-link" href="#">Add Inner Circle</a>
                 </li>
-                <li class="nav-item">
-                    <a id="About" class="nav-link" href="#">About</a>
-                </li>
             </ul>
-        </div>
+        </div>       
     </nav>
-    <p style="font-size: 25px;">Connecting Needs, Ideas, and Interests</p>
+
+    
+  
+
+  
+        <h1 class="display-4 shiny-heading">blumaps</h1>
+      
+        <p style="font-size: 18px; color: grey;">mapping needs & ideas</p>
+
+
+
     <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 200px; z-index: 100;">
-        <button class="btn btn-danger btn-lg mb-3" id="zoom-community">
-            Community<br>
-            <span style="font-size: small;">Urgent Need</span>
-        </button>
-        <button class="btn btn-primary btn-lg mb-3" id="zoom-business">
-            Commerce<br>
-            <span style="font-size: small;">Ideas & Wants</span>
-        </button>
-        <button class="btn btn-primary btn-lg" id="zoom-inner-circle" style="margin-bottom: 150px;">
-            Inner Circle<br>
-            <span style="font-size: small;">Family and Friends</span>
-        </button>
-        <button class="btn btn-danger btn-lg mb-3" id="zoom-community-2"> 
-            Community Needs<br>
-        </button>
-        <button class="btn btn-primary btn-lg mb-3" id="zoom-business-2"> 
-            Business Ideas<br>
-        </button>
-        <button class="btn btn-primary btn-lg mb-3" id="zoom-inner-circle-2">
-            Inner Circle interest<br>
-        </button>
-    </div>
+
+        
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap" rel="stylesheet">             
+            <p class="shiny-heading">add</p>
+
+
+            <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community">
+                community<br>
+                <span style="font-size: small;">Urgent Need</span>
+            </button>
+            
+            <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business">
+                commerce<br>
+                <span style="font-size: small;">Ideas & Wants</span>
+            </button>
+            
+            <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" style="margin-bottom: 150px;">
+                inner circle<br>
+                <span style="font-size: small;">Family and Friends</span>
+            </button>
+            
+            <p class="shiny-heading">view</p>
+
+            <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2">
+                community needs<br>
+            </button>
+            
+            <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2">
+                business ideas<br>
+            </button>
+             
+            <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2">
+                inner circle interest<br>
+            </button>
+
+
+            
+        </div>
+
+     
+          
+    
     <div id="map"></div>
+
+    <div id="about-section">
+        <h3> Add community urgent needs</h3>
+        <p class="space-before"> In times of crises, uniting communities is vital. </p>
+        <p class="space-before"> Use this feature to pinpoint immediate needs, ensuring timely and essential assistance. </p>
+        <p class="spacer"></p>
+
+        <h3> Add commerce ideas & wants</h3>
+        <p class="space-before"> Communities flourish through shared aspirations and innovation.</p>
+        <p class="space-before"> pinpoint your business idea or a want for local establishment </p>
+        <p class="spacer"></p>
+
+        <h3>Add inner circle</h3>
+        <p class="space-before"> Valuable insights often stem from close connections.</p>
+        <p class="space-before"> Pinpoint only your Inner Circle invited family and friends can view, maintaining intimacy and security</p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        
+        <h3> view, explore & engage</h3>
+        <p class="space-before"> View our map interface to swiftly discern community needs or business interests </p>
+        <p class="space-before"> Offer assistance, discover aspirations, or engage within your Inner Circle </p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
         <div class="navbar-nav ml-auto">
             <a class="nav-item nav-link" href="#">Contact</a>
             <a class="nav-item nav-link" href="#">Settings</a>
         </div>
     </nav>
+</div>
+
+
+
     <script>
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -110,6 +284,9 @@
         }
         const csrftoken = getCookie('csrftoken');
     </script>
+
+
+
     <script>
   var blueStyles = [
             {
@@ -258,5 +435,6 @@
 
         
     </script>
+    
 </body>
 </html>
