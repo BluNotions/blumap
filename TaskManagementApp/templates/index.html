@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>blumaps</title>
+    <title>Blumaps</title>
     {% load static %}  
     <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('{% static "Logo32.jpeg" %}');
+            background-image: url('{% static "LogoDarkBlue.jpg" %}');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -43,7 +43,7 @@
         margin-bottom: 5px; 
         text-align: center; 
         font-family: 'Raleway', sans-serif;
-        background: linear-gradient(90deg, darkblue, darkblue, darkblue);
+        background: linear-gradient(90deg, white, rgb(196, 231, 230), rgb(212, 227, 236));
         background-clip: text;
         -webkit-background-clip: text;
         color: transparent;
@@ -158,7 +158,7 @@
     <div id="background"></div>
     
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">blumaps</a>
+        <a class="navbar-brand" href="#">Blumaps</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -178,9 +178,9 @@
   
 
   
-        <h1 class="display-4 shiny-heading">blumaps</h1>
+        <h1 class="display-4 shiny-heading">Blumaps</h1>
       
-        <p style="font-size: 18px; color: grey;">mapping needs & ideas</p>
+        <p style="font-size: 18px; color: white;">mapping needs & ideas</p>
 
 
 
@@ -192,32 +192,32 @@
 
 
             <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community">
-                community<br>
+                Community<br>
                 <span style="font-size: small;">Urgent Need</span>
             </button>
             
             <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business">
-                commerce<br>
+                Commerce<br>
                 <span style="font-size: small;">Ideas & Wants</span>
             </button>
             
             <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" style="margin-bottom: 150px;">
-                inner circle<br>
+                Private<br>
                 <span style="font-size: small;">Family and Friends</span>
             </button>
             
             <p class="shiny-heading">view</p>
 
             <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2">
-                community needs<br>
+                Community needs<br>
             </button>
             
             <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2">
-                business ideas<br>
+                Business ideas<br>
             </button>
              
             <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2">
-                inner circle interest<br>
+                Private interest<br>
             </button>
 
 
@@ -230,26 +230,32 @@
     <div id="map"></div>
 
     <div id="about-section">
-        <h3> Add community urgent needs</h3>
+        <h3> Community - Urgent needs</h3>
         <p class="space-before"> In times of crises, uniting communities is vital. </p>
         <p class="space-before"> Use this feature to pinpoint immediate needs, ensuring timely and essential assistance. </p>
         <p class="spacer"></p>
 
-        <h3> Add commerce ideas & wants</h3>
+        <h3> Commerce - Ideas & Wants</h3>
         <p class="space-before"> Communities flourish through shared aspirations and innovation.</p>
-        <p class="space-before"> pinpoint your business idea or a want for local establishment </p>
+        <p class="space-before"> Pinpoint your business idea or a want for local establishment </p>
         <p class="spacer"></p>
 
-        <h3>Add inner circle</h3>
+        <h3>Private</h3>
         <p class="space-before"> Valuable insights often stem from close connections.</p>
-        <p class="space-before"> Pinpoint only your Inner Circle invited family and friends can view, maintaining intimacy and security</p>
+        <p class="space-before"> Pinpoint privately, so that only invited family and friends can view.</p>
         <p class="spacer"></p>
         <p class="spacer"></p>
         <p class="spacer"></p>
         
-        <h3> view, explore & engage</h3>
-        <p class="space-before"> View our map interface to swiftly discern community needs or business interests </p>
-        <p class="space-before"> Offer assistance, discover aspirations, or engage within your Inner Circle </p>
+        <h3> View, Explore & Engage</h3>
+        <p class="space-before"> View maps to swiftly discern community needs or business interests </p>
+        <p class="space-before"> Offer assistance, discover aspirations, or engage </p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
         <p class="spacer"></p>
         <p class="spacer"></p>
         <p class="spacer"></p>
@@ -267,6 +273,9 @@
 
 
     <script>
+
+    var map, marker;
+
 
         function getCookie(name) {
             let cookieValue = null;
@@ -341,7 +350,7 @@
         }
 
         function placeMarkerAndPrompt(location) {
-            var marker = new google.maps.Marker({
+         marker = new google.maps.Marker({
                 position: location,
                 map: map
             });
@@ -388,13 +397,16 @@
             
         
 
-        function fullFunctionality() {
-            initMap();
-            google.maps.event.addListener(map, 'click', function(event) {
-                placeMarkerAndPrompt(event.latLng);
-            });
-            sendDataToServer(location.lat(), location.lng(), userText);
-        }
+            function fullFunctionality() {
+             initMap();
+              google.maps.event.addListener(map, 'click', function(event) {
+              placeMarkerAndPrompt(event.latLng);
+               });
+               if (marker && marker.position) {
+                sendDataToServer(marker.position.lat(), marker.position.lng(), userText);
+               }
+            }
+
 
         function limitedFunctionality() {
             initMap();
