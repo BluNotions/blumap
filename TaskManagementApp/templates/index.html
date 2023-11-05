@@ -48,7 +48,7 @@
          margin-right: auto;
          border: 5px solid white;
          border-radius: 95%;
-         display: none
+         /* display: none */
         }
 
         .shiny-heading {
@@ -163,8 +163,30 @@
     height: 10px; /* Adjust to your preference to control the space */
 }
 
+.cookie-consent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+ .cookie-consent button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: inline-block; /* Add this line */
+    margin-top: 10px; /* Add this line to create some space between text and button */
+}
 
     </style>
+
+
 </head>
 <body class="text-center">
     <div id="background"></div>
@@ -236,20 +258,24 @@
             
         </div>
 
-    
+        <div class="cookie-consent">
+            This website uses cookies to enhance your experience. <a href="/privacy-policy">Learn more</a>
+            <button id="accept-cookies">Accept</button>
+        </div>
+     
     
     <div id="map"></div>
 
- 
+   
     <div id="about-section">
   
         <h3> Uniting Communities for Innovation and Vital Assistance</h3>
         <p class="spacer"></p>
         <p class="space-before"> In today's rapidly changing world, community solidarity is more critical than ever. </p>
         <p class="space-before"> At BluMaps, we firmly believe in the transformative power of obtaining data directly from individuals.
-        <p class="space-before"> And offering assistance to those in need, knowing that your support is going directly to that specific person.</p>
+        <p class="space-before"> And offering assistance to those in need, knowing that your support is going directly to that person.</p>
         <p class="space-before"> Our mission is simple yet profound: mapping needs and ideas, guaranteeing prompt and vital assistance directly. </p>
-        <p class="space-before"> While also fostering shared aspirations and propelling innovation that will uplift communities into enduring prosperity. </p>
+        <p class="space-before"> While also fostering shared aspirations and propelling innovation that will uplift communities. </p>
         <p class="space-before"> In addition, we offer a private space for sharing valuable insights with close connections. </p>
         <p class="space-before"> Whether you're seeking assistance, eager to lend a hand, or in search of new aspirations, </p>
         <p class="space-before"> BluMaps serves as your ultimate hub for community support. </p>
@@ -288,12 +314,15 @@
         <p class="spacer"></p>
 
         
+
     
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/Rco1QQShM1Y?si=PhYCW0gaNbKKAW5e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-       
+         
         <p class="spacer"></p>
 
         <a href="https://www.freepik.com/free-photo/artistic-blurry-colorful-wallpaper-background_38129003.htm#query=blue%20night%20plain&position=8&from_view=search&track=ais" style="font-size: 8px;">Background image by user3802032</a>
+
+        
+
 
     </body>
    
@@ -331,6 +360,19 @@
 
     </script>
 
+
+    <script>
+        if (!localStorage.getItem('cookieConsent')) {
+            const cookieConsentBanner = document.querySelector('.cookie-consent');
+            cookieConsentBanner.style.display = 'block';
+
+            const acceptCookiesButton = document.getElementById('accept-cookies');
+            acceptCookiesButton.addEventListener('click', () => {
+                localStorage.setItem('cookieConsent', 'true');
+                cookieConsentBanner.style.display = 'none';
+            });
+        }
+    </script>
 
     <script>
   var blueStyles = [
