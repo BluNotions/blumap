@@ -14,10 +14,6 @@ class taskDb(models.Model):
         return "%s %s"%(self.task, self.completed)
     
 
-
-
-
-
 #add
 
 class LocationInterest(models.Model):
@@ -27,3 +23,13 @@ class LocationInterest(models.Model):
 
     def __str__(self):
         return self.interest
+
+class BlumapsTable(models.Model):
+    id_number = models.CharField(max_length=255)
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    community_need = models.TextField(null=True, blank=True)
+    commerce_need = models.TextField(null=True, blank=True)
+    private_need = models.TextField(null=True, blank=True)
