@@ -1,24 +1,24 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <html lang="en"></html>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blumaps</title>
     {% load static %}  
     <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-   
     
     <!-- Include Mapbox GL JS and CSS -->
-     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
-     <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
-   
-   <style>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+    
+    <style>
         body {
             font-family: 'Arial', sans-serif;
             color: white;
             margin: 0;
             position: relative;
-             background-color: rgb(35, 0, 131);
+            background-color: rgb(35, 0, 131);
         }
         #background {
             content: '';
@@ -32,138 +32,130 @@
             background-position: center;
             z-index: -1;
             background-image: url('{% static "atributeBlue.jpg" %}');
-
-/* atribute for atributeblue color */
-/*<a href="https://www.freepik.com/free-photo/artistic-blurry-colorful-wallpaper-background_38129003.htm#query=blue%20night%20plain&position=8&from_view=search&track=ais">Image by user3802032</a> on Freepik */
-
-
         }
         #map {
-         height: 700px;
-         width: 700px;
-         margin-left: auto;
-         margin-left: 250px;
-         margin-top: 20px;
-         margin-bottom: 20px;
-         margin-right: auto;
-         border: 5px solid white;
-         border-radius: 95%;
-         /* display: none */
+            height: 700px;
+            width: 700px;
+            margin-left: auto;
+            margin-left: 250px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-right: auto;
+            border: 5px solid white;
+            border-radius: 95%;
         }
 
         .shiny-heading {
-        margin-bottom: 5px; 
-        text-align: center; 
-        font-family: 'Raleway', sans-serif;
-        background: linear-gradient(90deg, white, rgb(196, 231, 230), rgb(212, 227, 236));
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.0);
-    }
+            margin-bottom: 5px;
+            text-align: center;
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(90deg, white, rgb(196, 231, 230), rgb(212, 227, 236));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.0);
+        }
 
-    .shiny-button {
-        font-family: 'Raleway', sans-serif;
-        background: linear-gradient(90deg, #e74c3c, #c0392b, #e74c3c);
-        border: none;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-        border-radius: 20px;
-    }
+        .shiny-button {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(90deg, #e74c3c, #c0392b, #e74c3c);
+            border: none;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border-radius: 20px;
+        }
 
-   
-    .shiny-button:hover, .shiny-button-blue:hover {
-        transform: translateY(-2px);  
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    }
+        .shiny-button:hover, .shiny-button-blue:hover {
+            transform: translateY(-2px);
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
 
-    .shiny-button:active, .shiny-button-blue:active {
-        transform: translateY(0); 
-        box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5); 
-    }
+        .shiny-button:active, .shiny-button-blue:active {
+            transform: translateY(0);
+            box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5);
+        }
 
-    .shiny-button:focus, .shiny-button-blue:focus {
-        outline: none; 
-        box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5); 
-    }
+        .shiny-button:focus, .shiny-button-blue:focus {
+            outline: none;
+            box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5);
+        }
 
-    .shiny-button-blue:active {
-        transform: translateY(0); 
-        box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5); 
-    }
+        .shiny-button-blue:active {
+            transform: translateY(0);
+            box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5);
+        }
 
-    .shiny-button-blue:focus {
-        outline: none;
-        box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5); 
-    }
+        .shiny-button-blue:focus {
+            outline: none;
+            box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5);
+        }
 
-     #zoom-community {
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-    }
+        #zoom-community {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
 
-    #zoom-inner-circle-2 {
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-    }
+        #zoom-inner-circle-2 {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
 
-    
-    .shiny-button-blue {
-        font-family: 'Raleway', sans-serif;
-        background: linear-gradient(90deg, #b19cd9 #b19cd9, #b19cd9); /* Blue gradient */
-        border: none;
-        color: white; /* Ensuring text is readable */
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
+        .shiny-button-blue {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(90deg, #3c56cc, #6425da, #4b13b4); /* Blue gradient */
+            border: none;
+            color: white; /* Ensuring text is readable */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
 
-    .shiny-button-blue:hover {
-        transform: translateY(-2px);  
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    }
+        .shiny-button-blue:hover {
+            transform: translateY(-2px);
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
 
-    .shiny-button-blue:active {
-        transform: translateY(0); 
-    }
+        .shiny-button-blue:active {
+            transform: translateY(0);
+        }
 
-    #about-section {
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);  /* Optional: This gives a semi-transparent dark background */
-    color: #fff;
-    margin-bottom: 50px;  /* Space above the bottom navbar */
-}
+        #about-section {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            margin-bottom: 50px;
+        }
 
-.space-before {
-    padding-left: 20px; /* Adjust this value to your preference */
-}
+        .space-before {
+            padding-left: 20px;
+        }
 
-#about-section {
-    font-size: 20px; /* Default size for the section, adjust as needed */
-}
+        #about-section {
+            font-size: 20px;
+        }
 
-#about-section h2 {
-    font-size: 20px; /* Adjust to your preference for h2 headers */
-}
+        #about-section h2 {
+            font-size: 20px;
+        }
 
-#about-section h3 {
-    font-size: 20px; /* Adjust to your preference for h3 headers */
-}
+        #about-section h3 {
+            font-size: 20px;
+        }
 
-#about-section .space-before {
-    font-size: 15px; /* Adjust to your preference for paragraphs with space-before class */
-}
+        #about-section .space-before {
+            font-size: 15px;
+        }
 
-#about-section > p:last-child {
-    font-size: 15px; /* Adjust to your preference for the last paragraph */
-}
+        #about-section > p:last-child {
+            font-size: 15px;
+        }
 
-.spacer {
-    height: 10px; /* Adjust to your preference to control the space */
-}
+        .spacer {
+            height: 10px;
+        }
 
-.cookie-consent {
+        .cookie-consent {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -174,23 +166,20 @@
             text-align: center;
         }
 
- .cookie-consent button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    display: inline-block; /* Add this line */
-    margin-top: 10px; /* Add this line to create some space between text and button */
-}
-
+        .cookie-consent button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+        }
     </style>
-
-
 </head>
 <body class="text-center">
     <div id="background"></div>
-    
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Blumaps</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -205,129 +194,89 @@
                     <a id="my-circle" class="nav-link" href="#">Add Private</a>
                 </li>
             </ul>
-        </div>       
+        </div>
     </nav>
 
-    
-  
-
-  
-        <h1 class="display-4 shiny-heading">Blumaps</h1>
-      
-        <p style="font-size: 18px; color: white;">mapping needs & ideas</p>
-
-
+    <h1 class="display-4 shiny-heading">Blumaps</h1>
+    <p style="font-size: 18px; color: white;">mapping needs & ideas</p>
 
     <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 200px; z-index: 100;">
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap" rel="stylesheet">
+        <p class="shiny-heading">add</p>
+        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community">
+            Community<br>
+            <span style="font-size: small;">Urgent Need</span>
+        </button>
+        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business">
+            Commerce<br>
+            <span style="font-size: small;">Ideas & Wants</span>
+        </button>
+        <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" style="margin-bottom: 150px;">
+            Private<br>
+            <span style="font-size: small;">Family and Friends</span>
+        </button>
+        <p class="shiny-heading">view</p>
+        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2">
+            Community needs<br>
+        </button>
+        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2">
+            Business ideas<br>
+        </button>
+        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2">
+            Private interest<br>
+        </button>
+    </div>
 
-        
-        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap" rel="stylesheet">             
-            <p class="shiny-heading">add</p>
+    <div class="cookie-consent">
+        This website uses cookies to enhance your experience. <a href="/privacy-policy">Learn more</a>
+        <button id="accept-cookies">Accept</button>
+    </div>
 
-
-            <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community">
-                Community<br>
-                <span style="font-size: small;">Urgent Need</span>
-            </button>
-            
-            <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business">
-                Commerce<br>
-                <span style="font-size: small;">Ideas & Wants</span>
-            </button>
-            
-            <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" style="margin-bottom: 150px;">
-                Private<br>
-                <span style="font-size: small;">Family and Friends</span>
-            </button>
-            
-            <p class="shiny-heading">view</p>
-
-            <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2">
-                Community needs<br>
-            </button>
-            
-            <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2">
-                Business ideas<br>
-            </button>
-             
-            <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2">
-                Private interest<br>
-            </button>
-
-
-            
-        </div>
-
-        <div class="cookie-consent">
-            This website uses cookies to enhance your experience. <a href="/privacy-policy">Learn more</a>
-            <button id="accept-cookies">Accept</button>
-        </div>
-     
-    
     <div id="map"></div>
 
-   
     <div id="about-section">
-  
-        <h3> Uniting Communities for Innovation and Vital Assistance</h3>
+        <h3>Uniting Communities for Innovation and Vital Assistance</h3>
         <p class="spacer"></p>
-        <p class="space-before"> In today's rapidly changing world, community solidarity is more critical than ever. </p>
-        <p class="space-before"> At BluMaps, we firmly believe in the transformative power of obtaining data directly from individuals.
-        <p class="space-before"> And offering assistance to those in need, knowing that your support is going directly to that person.</p>
-        <p class="space-before"> Our mission is simple yet profound: mapping needs and ideas, guaranteeing prompt and vital assistance directly. </p>
-        <p class="space-before"> While also fostering shared aspirations and propelling innovation that will uplift communities. </p>
-        <p class="space-before"> In addition, we offer a private space for sharing valuable insights with close connections. </p>
-        <p class="space-before"> Whether you're seeking assistance, eager to lend a hand, or in search of new aspirations, </p>
-        <p class="space-before"> BluMaps serves as your ultimate hub for community support. </p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-
-        <h3> Commerce - Ideas & Wants: Fueling Community Prosperity</h3>
-        <p class="spacer"></p>
-        <p class="space-before"> Communities flourish through shared aspirations and innovation.</p>
-        <p class="space-before"> With Commerce - Ideas & Wants, you can pinpoint your business idea </p>
-        <p class="space-before"> Or express a desire for a local establishment. </p>
-        <p class="space-before"> Together, we can help transform ideas into reality and boost the local economy. </p>
+        <p class="space-before">In today's rapidly changing world, community solidarity is more critical than ever.</p>
+        <p class="space-before">At BluMaps, we firmly believe in the transformative power of obtaining data directly from individuals.</p>
+        <p class="space-before">And offering assistance to those in need, knowing that your support is going directly to that person.</p>
+        <p class="space-before">Our mission is simple yet profound: mapping needs and ideas, guaranteeing prompt and vital assistance directly.</p>
+        <p class="space-before">While also fostering shared aspirations and propelling innovation that will uplift communities.</p>
+        <p class="space-before">In addition, we offer a private space for sharing valuable insights with close connections.</p>
+        <p class="space-before">Whether you're seeking assistance, eager to lend a hand, or in search of new aspirations,</p>
+        <p class="space-before">BluMaps serves as your ultimate hub for community support.</p>
         <p class="spacer"></p>
         <p class="spacer"></p>
-
+        <h3>Commerce - Ideas & Wants: Fueling Community Prosperity</h3>
+        <p class="spacer"></p>
+        <p class="space-before">Communities flourish through shared aspirations and innovation.</p>
+        <p class="space-before">With Commerce - Ideas & Wants, you can pinpoint your business idea</p>
+        <p class="space-before">Or express a desire for a local establishment.</p>
+        <p class="space-before">Together, we can help transform ideas into reality and boost the local economy.</p>
+        <p class="spacer"></p>
+        <p class="spacer"></p>
         <h3>Private: Share Valuable Insights with Close Connections</h3>
         <p class="spacer"></p>
-        <p class="space-before"> We understand that valuable insights often stem from close connections.</p>
-        <p class="space-before"> That's why BluMaps' Private access allows you to pinpoint your needs and wants privately.</p>
-        <p class="space-before"> Share your requests with only invited family and friends who can provide the support and guidance you need.</p>
+        <p class="space-before">We understand that valuable insights often stem from close connections.</p>
+        <p class="space-before">That's why BluMaps' Private access allows you to pinpoint your needs and wants privately.</p>
+        <p class="space-before">Share your requests with only invited family and friends who can provide the support and guidance you need.</p>
         <p class="spacer"></p>
         <p class="spacer"></p>
-        
-        <h3> View, Explore & Engage: A Hub for Community Support</h3>
+        <h3>View, Explore & Engage: A Hub for Community Support</h3>
         <p class="spacer"></p>
-        <p class="space-before"> Our platform makes it easy to view maps and swiftly discern community needs or business interests </p>
-        <p class="space-before"> Whether you want to assist an urgent need, pursue business aspirations, or become an impactful community builder.</p>
-        <p class="space-before"> Viewing Community needs, Bussiness ideas is your hub for building stronger, more resilient communities.</p>
-        <p class="spacer"></p>
+        <p class="space-before">Our platform makes it easy to view maps and swiftly discern community needs or business interests.</p>
+        <p class="space-before">Whether you want to assist an urgent need, pursue business aspirations, or become an impactful community builder.</p>
+        <p class="space-before">Viewing Community needs, Business ideas is your hub for building stronger, more resilient communities.</p>
         <p class="spacer"></p>
         <p class="spacer"></p>
-
-        <p class="space-before"> Join us in our mission to connect, support, and uplift one another during challenging times.</p>
-        <p class="space-before"> Together, with BluMaps, we can make a difference when it matters most, for absoluty everybody.</p>
+        <p class="spacer"></p>
+        <p class="space-before">Join us in our mission to connect, support, and uplift one another during challenging times.</p>
+        <p class="space-before">Together, with BluMaps, we can make a difference when it matters most, for absolutely everybody.</p>
         <p class="spacer"></p>
         <p class="spacer"></p>
-
-        
-
-    
-         
         <p class="spacer"></p>
-
         <a href="https://www.freepik.com/free-photo/artistic-blurry-colorful-wallpaper-background_38129003.htm#query=blue%20night%20plain&position=8&from_view=search&track=ais" style="font-size: 8px;">Background image by user3802032</a>
-
-        
-
-
-    </body>
-   
-    
-</div>
+    </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
         <div class="navbar-nav ml-auto">
@@ -335,11 +284,9 @@
             <a class="nav-item nav-link" href="#">Settings</a>
         </div>
     </nav>
-</div>
 
     <script>
-
-    var map, marker;
+        var map, marker;
 
         function getCookie(name) {
             let cookieValue = null;
@@ -358,10 +305,6 @@
         const csrftoken = getCookie('csrftoken');
         console.log('CSRF Token:', csrftoken);
 
-    </script>
-
-
-    <script>
         if (!localStorage.getItem('cookieConsent')) {
             const cookieConsentBanner = document.querySelector('.cookie-consent');
             cookieConsentBanner.style.display = 'block';
@@ -372,10 +315,8 @@
                 cookieConsentBanner.style.display = 'none';
             });
         }
-    </script>
 
-    <script>
-  var blueStyles = [
+        var blueStyles = [
             {
                 "stylers": [
                     { "hue": "#0000ff" },
@@ -399,7 +340,6 @@
             }
         ];
 
-        var map;
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -34.397, lng: 150.644 },
@@ -409,129 +349,116 @@
             });
 
             if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var userLoc = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            map.setCenter(userLoc);
-            map.setZoom(18); // Set zoom level when locating
-        }, function() {
-            console.error("Error getting location. Using default.");
-            map.setZoom(5); // Reset zoom level if geolocation fails
-        });
-    } else {
-        console.error("Browser doesn't support geolocation. Using default.");
-    }
-
-            
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLoc = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map.setCenter(userLoc);
+                    map.setZoom(18);
+                }, function() {
+                    console.error("Error getting location. Using default.");
+                    map.setZoom(5);
+                });
+            } else {
+                console.error("Browser doesn't support geolocation. Using default.");
+            }
         }
 
         function placeMarkerAndPrompt(location) {
-         marker = new google.maps.Marker({
+            marker = new google.maps.Marker({
                 position: location,
                 map: map
             });
             var userText = prompt("Insert interest, want or need");
-                if (userText) {
-                    var marker = new google.maps.Marker({
-                        position: location,
-                        map: map,
-                        title: userText
-                    });
-                    var infowindow = new google.maps.InfoWindow({
-                        content: userText
-                    });
-                    marker.addListener('click', function() {
-                        infowindow.open(map, marker);
-                    });
-                    sendDataToServer(location.lat(), location.lng(), userText);
-                }
+            if (userText) {
+                var marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: userText
+                });
+                var infowindow = new google.maps.InfoWindow({
+                    content: userText
+                });
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+                sendDataToServer(location.lat(), location.lng(), userText);
             }
+        }
 
         function sendDataToServer(lat, lng, need) {
-                fetch('/save_location', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
-                })
-                .then(response => {
-                    if (response.headers.get('Content-Type').includes('json')) {
-                        return response.json();
-                    } else {
-                        return response.text().then(text => {
-                            throw new Error(text);
-                        });
-                    }
-                })
-                .then(data => {
-                })
-                .catch(error => {
-                });
-            }
-            
-        
+            fetch('/save_location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
+            })
+            .then(response => {
+                if (response.headers.get('Content-Type').includes('json')) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text);
+                    });
+                }
+            })
+            .then(data => {
+            })
+            .catch(error => {
+            });
+        }
 
-            function fullFunctionality() {
-             initMap();
-              google.maps.event.addListener(map, 'click', function(event) {
-              placeMarkerAndPrompt(event.latLng);
-               });
-               if (marker && marker.position) {
+        function fullFunctionality() {
+            initMap();
+            google.maps.event.addListener(map, 'click', function(event) {
+                placeMarkerAndPrompt(event.latLng);
+            });
+            if (marker && marker.position) {
                 sendDataToServer(marker.position.lat(), marker.position.lng(), userText);
-               }
             }
-
+        }
 
         function limitedFunctionality() {
             initMap();
             fetch('/get_existing_data/')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(item => {
-                        const location = new google.maps.LatLng(item.latitude, item.longitude);
-                        const marker = new google.maps.Marker({
-                            position: location,
-                            map: map,
-                            title: item.interest
-                        });
-
-                        const infowindow = new google.maps.InfoWindow({
-                            content: item.interest
-                        });
-
-                        marker.addListener('click', function() {
-                            infowindow.open(map, marker);
-                        });
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(item => {
+                    const location = new google.maps.LatLng(item.latitude, item.longitude);
+                    const marker = new google.maps.Marker({
+                        position: location,
+                        map: map,
+                        title: item.interest
                     });
-                })
-                .catch(error => console.error('Error fetching data:', error));
+
+                    const infowindow = new google.maps.InfoWindow({
+                        content: item.interest
+                    });
+
+                    marker.addListener('click', function() {
+                        infowindow.open(map, marker);
+                    });
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
         }
 
         function showMap() {
-        document.getElementById('map').style.display = 'block';
-                           }
+            document.getElementById('map').style.display = 'block';
+        }
 
-        document.getElementById('zoom-community').addEventListener('click', function() {showMap(); fullFunctionality();});
-        document.getElementById('zoom-business').addEventListener('click', function() {showMap(); fullFunctionality();});
-        document.getElementById('zoom-inner-circle').addEventListener('click', function() {showMap(); fullFunctionality();});
+        document.getElementById('zoom-community').addEventListener('click', function() { showMap(); fullFunctionality(); });
+        document.getElementById('zoom-business').addEventListener('click', function() { showMap(); fullFunctionality(); });
+        document.getElementById('zoom-inner-circle').addEventListener('click', function() { showMap(); fullFunctionality(); });
 
-        document.getElementById('zoom-community-2').addEventListener('click', function() {showMap(); limitedFunctionality();});
-        document.getElementById('zoom-business-2').addEventListener('click', function() {showMap(); limitedFunctionality();});
-        document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap();limitedFunctionality();});
-
-        
+        document.getElementById('zoom-community-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
+        document.getElementById('zoom-business-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
+        document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
     </script>
 
-        
-
-    </body><script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0&callback=initMap" async defer></script>
-
-
-
-
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0&callback=initMap" async defer></script>
 </body>
 </html>
