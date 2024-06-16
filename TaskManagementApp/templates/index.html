@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blumaps</title>
-    {% load static %}  
+    {% load static %}
     <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Include Mapbox GL JS and CSS -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
-    
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -235,46 +235,29 @@
     <div id="map"></div>
 
     <div id="about-section">
-        <h3>Uniting Communities for Innovation and Vital Assistance</h3>
-        <p class="spacer"></p>
-        <p class="space-before">In today's rapidly changing world, community solidarity is more critical than ever.</p>
-        <p class="space-before">At BluMaps, we firmly believe in the transformative power of obtaining data directly from individuals.</p>
-        <p class="space-before">And offering assistance to those in need, knowing that your support is going directly to that person.</p>
-        <p class="space-before">Our mission is simple yet profound: mapping needs and ideas, guaranteeing prompt and vital assistance directly.</p>
-        <p class="space-before">While also fostering shared aspirations and propelling innovation that will uplift communities.</p>
-        <p class="space-before">In addition, we offer a private space for sharing valuable insights with close connections.</p>
-        <p class="space-before">Whether you're seeking assistance, eager to lend a hand, or in search of new aspirations,</p>
-        <p class="space-before">BluMaps serves as your ultimate hub for community support.</p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-        <h3>Commerce - Ideas & Wants: Fueling Community Prosperity</h3>
-        <p class="spacer"></p>
-        <p class="space-before">Communities flourish through shared aspirations and innovation.</p>
-        <p class="space-before">With Commerce - Ideas & Wants, you can pinpoint your business idea</p>
-        <p class="space-before">Or express a desire for a local establishment.</p>
-        <p class="space-before">Together, we can help transform ideas into reality and boost the local economy.</p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-        <h3>Private: Share Valuable Insights with Close Connections</h3>
-        <p class="spacer"></p>
-        <p class="space-before">We understand that valuable insights often stem from close connections.</p>
-        <p class="space-before">That's why BluMaps' Private access allows you to pinpoint your needs and wants privately.</p>
-        <p class="space-before">Share your requests with only invited family and friends who can provide the support and guidance you need.</p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-        <h3>View, Explore & Engage: A Hub for Community Support</h3>
-        <p class="spacer"></p>
-        <p class="space-before">Our platform makes it easy to view maps and swiftly discern community needs or business interests.</p>
-        <p class="space-before">Whether you want to assist an urgent need, pursue business aspirations, or become an impactful community builder.</p>
-        <p class="space-before">Viewing Community needs, Business ideas is your hub for building stronger, more resilient communities.</p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-        <p class="space-before">Join us in our mission to connect, support, and uplift one another during challenging times.</p>
-        <p class="space-before">Together, with BluMaps, we can make a difference when it matters most, for absolutely everybody.</p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
-        <p class="spacer"></p>
+        <h1 style="font-size: 2em; margin-bottom: 0.5em;">Empowering Communities: A Journey of Innovation and Transformation</h1>
+        <p class="spacer" style="font-size: 1em; line-height: 1.6em;">
+            BluMaps bridges the gap between those with resources and those in need.
+        </p>
+        <p class="spacer" style="font-size: 1em; line-height: 1.6em;">
+            Using Web3 development, NFTs, and cryptocurrency EFTs, donations reach the poorest directly and securely via cellphone wallets.
+        </p>
+        <p class="spacer" style="font-size: 1em; line-height: 1.6em;">
+            Even small contributions can uplift entire communities and transform lives.
+        </p>
+        <p class="spacer" style="font-size: 1em; line-height: 2.6em;">
+        </p>
+        <p class="spacer" style="font-size: 1em; line-height: 1.6em;">
+            Join BluMaps in fostering innovation, supporting communities, and making a real difference.
+        </p>
+        <p class="spacer" style="font-size: 1em; line-height: 1.6em;">
+            Donate today to create a wave of positive impact that transcends boundaries and fosters lasting change.
+        </p>
+    </div>
+    
+
+    </div>
+    
         <a href="https://www.freepik.com/free-photo/artistic-blurry-colorful-wallpaper-background_38129003.htm#query=blue%20night%20plain&position=8&from_view=search&track=ais" style="font-size: 8px;">Background image by user3802032</a>
     </div>
 
@@ -305,12 +288,17 @@
         const csrftoken = getCookie('csrftoken');
         console.log('CSRF Token:', csrftoken);
 
+        if (!csrftoken) {
+            document.cookie = "csrftoken=" + csrftoken + "; path=/";
+        }
+
         function sendDataToServer(lat, lng, need) {
             fetch('/save_location', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'  // Custom header
                 },
                 body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
             })
@@ -413,30 +401,6 @@
             }
         }
 
-        function sendDataToServer(lat, lng, need) {
-            fetch('/save_location', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
-            })
-            .then(response => {
-                if (response.headers.get('Content-Type').includes('json')) {
-                    return response.json();
-                } else {
-                    return response.text().then(text => {
-                        throw new Error(text);
-                    });
-                }
-            })
-            .then(data => {
-            })
-            .catch(error => {
-            });
-        }
-
         function fullFunctionality() {
             initMap();
             google.maps.event.addListener(map, 'click', function(event) {
@@ -483,8 +447,15 @@
         document.getElementById('zoom-community-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
         document.getElementById('zoom-business-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
         document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
-    </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0&callback=initMap" async defer></script>
+        window.onload = function() {
+            const apiKey = "{{ google_maps_api_key }}";
+            const scriptTag = document.createElement('script');
+            scriptTag.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+            scriptTag.async = true;
+            scriptTag.defer = true;
+            document.head.appendChild(scriptTag);
+        };
+    </script>
 </body>
 </html>
