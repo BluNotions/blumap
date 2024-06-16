@@ -57,15 +57,9 @@ WSGI_APPLICATION = 'taskManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-<<<<<<< HEAD
-        'NAME': 'BlumapFinal',
-        'USER': 'postgres',  # or the user you have configured
-        'PASSWORD': 'yourpassword',  # the password for your database user
-=======
         'NAME': 'blumapfinal',
         'USER': 'blumaps_user',
         'PASSWORD': 'p',
->>>>>>> ec6a910 (Update settings.py with new configurations)
         'HOST': 'localhost',
         'PORT': '5432',
     }
