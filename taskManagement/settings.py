@@ -4,16 +4,13 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cpft9b!qc-%u=is@=*l!l--klt%+f(h(r+swrz5wkllb3*6@_t'
+SECRET_KEY = ')mhr(jqjluqws2r6s=%_@598n5c0b=g+d002_inew9%8-y$2m-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['35.178.86.234', 'blumaps.com', 'www.blumaps.com', '127.0.0.1']
+ALLOWED_HOSTS = ['35.178.86.234', 'localhost']
 
 # Application definition
 INSTALLED_APPS = [
@@ -24,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TaskManagementApp',
+   # Add your apps here
 ]
 
 MIDDLEWARE = [
@@ -41,7 +39,7 @@ ROOT_URLCONF = 'taskManagement.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'TaskManagementApp/templates')],
+        'DIRS': ['TaskManagementApp/templates'],
         'APP_DIRS': True,  # This line should be inside this dictionary
         'OPTIONS': {
             'context_processors': [
@@ -57,22 +55,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'taskManagement.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'BlumapFinal',
-        'USER': 'postgres',  # or the user you have configured
-        'PASSWORD': 'yourpassword',  # the password for your database user
+        'NAME': 'blumapfinal',
+        'USER': 'blumaps_user',
+        'PASSWORD': 'p',
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -89,8 +83,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -102,20 +94,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+import os.path
+
 STATIC_URL = '/static/'
 
-# Add this line to specify the directory for static files
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+TaskManagementAPP_DIRS=(os.path.join('static'))
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Security settings
 CSRF_COOKIE_SECURE = True
-CSRF_USE_SESSIONS = False
-SESSION_COOKIE_SECURE = True
 
-# Google Maps API Key
-GOOGLE_MAPS_API_KEY = 'AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0'
+CSRF_USE_SESSIONS = False
+
+SESSION_COOKIE_SECURE = True
