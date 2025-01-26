@@ -1,6 +1,10 @@
 import os
 from pathlib import Path
 
+
+GOOGLE_MAPS_API_KEY='AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0'
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -57,8 +61,16 @@ WSGI_APPLICATION = 'taskManagement.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'blumap_db',
+        'USER': 'blumapdbmaster',
+        'PASSWORD': '2025BlumapDBmaster#',
+        'HOST': 'blumap-database-1.cfdjwarrwgrc.eu-west-2.rds.amazonaws.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'connect_timeout': 10,  # Connection timeout in seconds
+            'options': '-c statement_timeout=30000',  # Statement timeout (30 seconds)
+        },
     }
 }
 

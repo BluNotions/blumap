@@ -234,6 +234,51 @@
 
     <div id="map"></div>
 
+    <!-- Modal Structure -->
+    <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dataModalLabel">Add Location Data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="locationForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" class="form-control" id="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select class="form-control" id="category" required>
+                                <option value="Community">Community</option>
+                                <option value="Commerce">Commerce</option>
+                                <option value="Private">Private</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="latitude">
+                        <input type="hidden" id="longitude">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -316,24 +361,43 @@
             document.cookie = "csrftoken=" + csrftoken + "; path=/";
         }
 
-        function sendDataToServer(lat, lng, need) {
+        function sendDataToServer() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+
+            if (!name) {
+                alert('Name is required.');
+                return;
+            }
+
+            const data = {
+                name: name,
+                email: email,
+                phone: phone,
+                latitude: latitude,
+                longitude: longitude,
+                description: description,
+                category: category
+            };
+
             fetch('/save_location', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken,
-                    'X-Requested-With': 'XMLHttpRequest'  // Custom header
+                    'X-CSRFToken': csrftoken
                 },
-                body: JSON.stringify({ latitude: lat, longitude: lng, need: need })
+                body: JSON.stringify(data)
             })
             .then(response => {
-                if (response.headers.get('Content-Type').includes('json')) {
-                    return response.json();
-                } else {
-                    return response.text().then(text => {
-                        throw new Error(text);
-                    });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+                return response.json();
             })
             .then(data => {
                 console.log('Success:', data);
@@ -408,21 +472,13 @@
                 position: location,
                 map: map
             });
-            var userText = prompt("Insert interest, want or need");
-            if (userText) {
-                var marker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    title: userText
-                });
-                var infowindow = new google.maps.InfoWindow({
-                    content: userText
-                });
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                });
-                sendDataToServer(location.lat(), location.lng(), userText);
-            }
+
+            // Set latitude and longitude in hidden fields
+            document.getElementById('latitude').value = location.lat();
+            document.getElementById('longitude').value = location.lng();
+
+            // Show the modal
+            $('#dataModal').modal('show');
         }
 
         function fullFunctionality() {
@@ -431,25 +487,26 @@
                 placeMarkerAndPrompt(event.latLng);
             });
             if (marker && marker.position) {
-                sendDataToServer(marker.position.lat(), marker.position.lng(), userText);
+                sendDataToServer();
             }
         }
 
-        function limitedFunctionality() {
+        function limitedFunctionality(val) {
             initMap();
             fetch('/get_existing_data/')
             .then(response => response.json())
             .then(data => {
-                data.forEach(item => {
-                    const location = new google.maps.LatLng(item.latitude, item.longitude);
+                data.filter(d=> d.Category === val).forEach(item => {
+                    const location = new google.maps.LatLng(item.Latitude, item.Longitude);
                     const marker = new google.maps.Marker({
                         position: location,
                         map: map,
-                        title: item.interest
+                        title: item.Category
                     });
 
                     const infowindow = new google.maps.InfoWindow({
-                        content: item.interest
+                        content: `${item.Name}
+                        ${item.Description}`
                     });
 
                     marker.addListener('click', function() {
@@ -468,9 +525,9 @@
         document.getElementById('zoom-business').addEventListener('click', function() { showMap(); fullFunctionality(); });
         document.getElementById('zoom-inner-circle').addEventListener('click', function() { showMap(); fullFunctionality(); });
 
-        document.getElementById('zoom-community-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
-        document.getElementById('zoom-business-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
-        document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap(); limitedFunctionality(); });
+        document.getElementById('zoom-community-2').addEventListener('click', function() { showMap(); limitedFunctionality('Community'); });
+        document.getElementById('zoom-business-2').addEventListener('click', function() { showMap(); limitedFunctionality('Business'); });
+        document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap(); limitedFunctionality('Private'); });
 
         window.onload = function() {
             const apiKey = "{{ google_maps_api_key }}";
@@ -480,6 +537,19 @@
             scriptTag.defer = true;
             document.head.appendChild(scriptTag);
         };
+
+        // Handle form submission
+        document.getElementById('locationForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            sendDataToServer();
+
+            // Close the modal
+            $('#dataModal').modal('hide');
+
+            // Reset the form
+            document.getElementById('locationForm').reset();
+        });
     </script>
 </body>
 </html>
