@@ -11,7 +11,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     
-
+   
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -34,9 +34,10 @@
             background-image: url('{% static "atributeBlue.jpg" %}');
         }
         #map {
-            height: 700px;
+            height: 500px;
             width: 45%;
             margin: 10px auto;
+            margin-bottom: 10px;
             float: center;
             border: 3px solid white;
             border-radius: 20px;
@@ -201,37 +202,71 @@
     <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 200px; z-index: 100;">
         <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap" rel="stylesheet">
         <p class="shiny-heading">add</p>
-        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community">
+        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community" data-category="Community">
             Community<br>
             <span style="font-size: small;">Urgent Need</span>
         </button>
-        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business">
+        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business" data-category="Commerce">
             Commerce<br>
             <span style="font-size: small;">Ideas & Wants</span>
         </button>
-        <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" style="margin-bottom: 150px;">
+        <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" data-category="Private" style="margin-bottom: 150px;">
             Private<br>
             <span style="font-size: small;">Family and Friends</span>
         </button>
+    </div>
+
+    <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 500px; z-index: 100;">
         <p class="shiny-heading">view</p>
-        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2">
+        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2" data-category="Community">
             Community needs<br>
         </button>
-        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2">
+        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2" data-category="Commerce">
             Business ideas<br>
         </button>
-        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2">
+        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2" data-category="Private">
             Private interest<br>
         </button>
+    </div>
+
+   
+
+    <div id="map"></div>
+
+    <div id="about-section" class="container mt-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 mb-4">Empowering Communities: A Journey of Innovation and Transformation</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <p class="lead">
+                    BluMaps bridges the gap between those with resources and those in need.
+                </p>
+                <p class="lead">
+                    Currently, our platform focuses on capturing data directly from individuals to identify urgent needs and entrepreneurial ideas.
+                </p>
+                <p class="lead">
+                    With the hope of incorporating Web3 development, NFTs, and cryptocurrency EFTs in the near future, we aim to ensure donations reach the poorest directly and securely via cellphone wallets.
+                </p>
+                <p class="lead">
+                    Even small contributions can uplift entire communities and transform lives.
+                </p>
+                <p class="lead">
+                    Join BluMaps in fostering innovation, supporting communities, and making a real difference.
+                </p>
+                <p class="lead">
+                    Donate today to create a wave of positive impact that transcends boundaries and fosters lasting change.
+                </p>
+            </div>
+        </div>
     </div>
 
     <div class="cookie-consent">
         This website uses cookies to enhance your experience. <a href="/privacy-policy">Learn more</a>
         <button id="accept-cookies">Accept</button>
     </div>
-
-    <div id="map"></div>
-
     <!-- Modal Structure -->
     <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -244,24 +279,25 @@
                 </div>
                 <div class="modal-body">
                     <form id="locationForm">
+                        <h5 style="color:black;">Add New Category Listing</h5>
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" required>
+                            <input type="text" class="form-control" id="name" placeholder="Enter name" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email">
+                            <input type="email" class="form-control" id="email" placeholder="Enter email">
                         </div>
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
-                            <input type="text" class="form-control" id="phone">
+                            <input type="text" class="form-control" id="phone" placeholder="Enter phone number">
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea class="form-control" id="description" required></textarea>
+                            <textarea class="form-control" id="description" placeholder="Enter description" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="category">Category</label>
+                            <label for="category">Category Selected</label>
                             <select class="form-control" id="category" required>
                                 <option value="Community">Community</option>
                                 <option value="Commerce">Commerce</option>
@@ -277,106 +313,113 @@
         </div>
     </div>
 
-
-   <!-- Scripts -->
-   <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoibW9ybmVncmVlbiIsImEiOiJjamJsNWJtc3oxbDl6MzFvYnpoe';
-    
-     map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [18.4233, -33.9189], // Cape Town
-        zoom: 10
-    });
-
-    map.addControl(new mapboxgl.NavigationControl());
-    map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }));
-
-</script>
-
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Empowering Communities: A Journey of Innovation and Transformation</title>
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body>
-        <div id="about-section" class="container mt-5">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h1 class="display-4 mb-4">Empowering Communities: A Journey of Innovation and Transformation</h1>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8 offset-md-2">
-                    <p class="lead">
-                        BluMaps bridges the gap between those with resources and those in need.
-                    </p>
-                    <p class="lead">
-                        Currently, our platform focuses on capturing data directly from individuals to identify urgent needs and entrepreneurial ideas.
-                    </p>
-                    <p class="lead">
-                        With the hope of incorporating Web3 development, NFTs, and cryptocurrency EFTs in the near future, we aim to ensure donations reach the poorest directly and securely via cellphone wallets.
-                    </p>
-                    <p class="lead">
-                        Even small contributions can uplift entire communities and transform lives.
-                    </p>
-                    <p class="lead">
-                        Join BluMaps in fostering innovation, supporting communities, and making a real difference.
-                    </p>
-                    <p class="lead">
-                        Donate today to create a wave of positive impact that transcends boundaries and fosters lasting change.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    </body>
-    </html>
-
-
-
-    </div>
-
-        <a href="https://www.freepik.com/free-photo/artistic-blurry-colorful-wallpaper-background_38129003.htm#query=blue%20night%20plain&position=8&from_view=search&track=ais" style="font-size: 8px;">Background image by user3802032</a>
-    </div>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
-        <div class="navbar-nav ml-auto">
-            <a class="nav-item nav-link" href="#">Contact</a>
-            <a class="nav-item nav-link" href="#">Settings</a>
-        </div>
-    </nav>
-
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        var map, marker;
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZnNkZXZjb3phIiwiYSI6ImNtNmkxZ3UwazAzdW8ycXNoN2RwOHdqYTUifQ.vvRayCj-1_i-4Yih7ChKfw';
+        
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [18.4233, -33.9189], // Cape Town
+            zoom: 10
+        });
 
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
+        map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }));
+
+        let canAddMarker = false; // Flag to control marker placement
+        let markers = []; // Array to store markers
+
+        // Set category and allow marker placement when "Add" buttons are clicked
+        document.querySelectorAll('#zoom-community, #zoom-business, #zoom-inner-circle').forEach(button => {
+            button.addEventListener('click', function() {
+                const category = this.getAttribute('data-category');
+                document.getElementById('category').value = category; // Set the category in the form
+                canAddMarker = true; // Enable marker placement
+
+                // Allow the user to click on the map to place a marker
+                map.once('click', function(event) {
+                    if (canAddMarker) {
+                        const coordinates = event.lngLat;
+                        placeMarker(coordinates, category); // Pass category to placeMarker
+
+                        // Set latitude and longitude in the hidden inputs
+                        document.getElementById('latitude').value = coordinates.lat;
+                        document.getElementById('longitude').value = coordinates.lng;
+
+                        // Open the modal after placing the marker
+                        $('#dataModal').modal('show');
                     }
-                }
-            }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
-        console.log('CSRF Token:', csrftoken);
+                });
+            });
+        });
 
-        if (!csrftoken) {
-            document.cookie = "csrftoken=" + csrftoken + "; path=/";
+        // Disable marker placement and show listings when "View" buttons are clicked
+        document.querySelectorAll('#zoom-community-2, #zoom-business-2, #zoom-inner-circle-2').forEach(button => {
+            button.addEventListener('click', function() {
+                canAddMarker = false; // Disable marker placement
+                const category = this.getAttribute('data-category');
+
+                // Clear existing markers
+                clearMarkers();
+
+                // Fetch and display existing data based on category
+                limitedFunctionality(category);
+            });
+        });
+
+        // Function to place a marker on the map
+        function placeMarker(location, category) {
+            const marker = new mapboxgl.Marker()
+                .setLngLat(location)
+                .addTo(map);
+
+            // Store the marker in the global array
+            markers.push(marker);
+
+            // Store the title and description in the marker's element
+            marker.getElement().dataset.category = category;
+
+            const popup = new mapboxgl.Popup()
+                .setHTML(`<strong style="color: black;">${category}</strong><p style="color: black;">Details about this listing.</p>`) // Set font color to black
+                .setLngLat(location);
+
+            // Toggle the popup on marker click
+            marker.getElement().addEventListener('click', () => {
+                popup.toggle(); // Show/hide the popup on marker click
+            });
+
+            // Add the popup to the marker
+            marker.setPopup(popup); // Attach the popup to the marker
         }
 
-        function sendDataToServer() {
+        // Function to clear existing markers from the map
+        function clearMarkers() {
+            markers.forEach(marker => marker.remove());
+            markers = []; // Reset the markers array
+        }
+
+        // Function to fetch and display existing data based on category
+        function limitedFunctionality(val) {
+            fetch('/get_existing_data/')
+            .then(response => response.json())
+            .then(data => {
+                data.filter(d => d.Category === val).forEach(item => {
+                    const location = [item.Longitude, item.Latitude]; // Mapbox uses [lng, lat]
+                    placeMarker(location, item.Name); // Pass name or category for popup
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Handle form submission
+        document.getElementById('locationForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Collect data and send to server
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const phone = document.getElementById('phone').value;
@@ -384,11 +427,6 @@
             const longitude = document.getElementById('longitude').value;
             const description = document.getElementById('description').value;
             const category = document.getElementById('category').value;
-
-            if (!name) {
-                alert('Name is required.');
-                return;
-            }
 
             const data = {
                 name: name,
@@ -404,7 +442,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
+                    'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify(data)
             })
@@ -416,10 +454,34 @@
             })
             .then(data => {
                 console.log('Success:', data);
+                console.log('CSRF Token:', getCookie('csrftoken')); // Log the CSRF token
+                // Place the marker with the listing details
+                placeMarker([longitude, latitude], category);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
+
+            // Close the modal
+            $('#dataModal').modal('hide');
+
+            // Reset the form
+            document.getElementById('locationForm').reset();
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
         if (!localStorage.getItem('cookieConsent')) {
@@ -433,138 +495,18 @@
             });
         }
 
-        var blueStyles = [
-            {
-                "stylers": [
-                    { "hue": "#0000ff" },
-                    { "saturation": 100 }
-                ]
+        // Request location permission and center the map on the user's location
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const userLocation = [position.coords.longitude, position.coords.latitude];
+                map.setCenter(userLocation); // Center the map on user's location
+                map.setZoom(12); // Optional: Set a zoom level
             },
-            {
-                "featureType": "road",
-                "elementType": "geometry",
-                "stylers": [
-                    { "lightness": 100 },
-                    { "visibility": "simplified" }
-                ]
-            },
-            {
-                "featureType": "road",
-                "elementType": "labels",
-                "stylers": [
-                    { "visibility": "off" }
-                ]
+            function(error) {
+                console.error('Error getting location:', error);
+                // Handle error (e.g., show a message to the user)
             }
-        ];
-
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 8,
-                styles: blueStyles,
-                mapTypeId: 'terrain'
-            });
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var userLoc = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    map.setCenter(userLoc);
-                    map.setZoom(18);
-                }, function() {
-                    console.error("Error getting location. Using default.");
-                    map.setZoom(5);
-                });
-            } else {
-                console.error("Browser doesn't support geolocation. Using default.");
-            }
-        }
-
-        function placeMarkerAndPrompt(location) {
-            marker = new google.maps.Marker({
-                position: location,
-                map: map
-            });
-
-            // Set latitude and longitude in hidden fields
-            document.getElementById('latitude').value = location.lat();
-            document.getElementById('longitude').value = location.lng();
-
-            // Show the modal
-            $('#dataModal').modal('show');
-        }
-
-        function fullFunctionality() {
-            initMap();
-            google.maps.event.addListener(map, 'click', function(event) {
-                placeMarkerAndPrompt(event.latLng);
-            });
-            if (marker && marker.position) {
-                sendDataToServer();
-            }
-        }
-
-        function limitedFunctionality(val) {
-            initMap();
-            fetch('/get_existing_data/')
-            .then(response => response.json())
-            .then(data => {
-                data.filter(d=> d.Category === val).forEach(item => {
-                    const location = new google.maps.LatLng(item.Latitude, item.Longitude);
-                    const marker = new google.maps.Marker({
-                        position: location,
-                        map: map,
-                        title: item.Category
-                    });
-
-                    const infowindow = new google.maps.InfoWindow({
-                        content: `${item.Name}
-                        ${item.Description}`
-                    });
-
-                    marker.addListener('click', function() {
-                        infowindow.open(map, marker);
-                    });
-                });
-            })
-            .catch(error => console.error('Error fetching data:', error));
-        }
-
-        function showMap() {
-            document.getElementById('map').style.display = 'block';
-        }
-
-        document.getElementById('zoom-community').addEventListener('click', function() { showMap(); fullFunctionality(); });
-        document.getElementById('zoom-business').addEventListener('click', function() { showMap(); fullFunctionality(); });
-        document.getElementById('zoom-inner-circle').addEventListener('click', function() { showMap(); fullFunctionality(); });
-
-        document.getElementById('zoom-community-2').addEventListener('click', function() { showMap(); limitedFunctionality('Community'); });
-        document.getElementById('zoom-business-2').addEventListener('click', function() { showMap(); limitedFunctionality('Business'); });
-        document.getElementById('zoom-inner-circle-2').addEventListener('click', function() { showMap(); limitedFunctionality('Private'); });
-
-        window.onload = function() {
-            const apiKey = "{{ google_maps_api_key }}";
-            const scriptTag = document.createElement('script');
-            scriptTag.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
-            scriptTag.async = true;
-            scriptTag.defer = true;
-            document.head.appendChild(scriptTag);
-        };
-
-        // Handle form submission
-        document.getElementById('locationForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            sendDataToServer();
-
-            // Close the modal
-            $('#dataModal').modal('hide');
-
-            // Reset the form
-            document.getElementById('locationForm').reset();
-        });
+        );
     </script>
 </body>
 </html>
