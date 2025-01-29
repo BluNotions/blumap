@@ -23,20 +23,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Run tests
+        run: |
+          python -m unittest discover  # Adjust based on testing framework
+
       - name: Deploy to EC2
         env:
-          HOST: ${{ secrets.EC2_HOST }}  # Your EC2 instance public IP or DNS
-          USER: ${{ secrets.EC2_USER }}    # Your EC2 username (e.g., ec2-user)
-          KEY: ${{ secrets.EC2_SSH_KEY }}   # Your private SSH key
+          HOST: ${{ secrets.EC2_HOST }}  # ip
+          USER: ${{ secrets.EC2_USER }}    # username 
+          KEY: ${{ secrets.EC2_SSH_KEY }}   # private SSH key
         run: |
-          echo "${KEY}" > ec2_key.pem
-          chmod 600 ec2_key.pem
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${USER}@${HOST} << 'EOF'
-            cd /path/to/your/project  # Change to your project directory
-            git pull origin main       # Pull the latest changes
-            source venv/bin/activate    # Activate your virtual environment
-            pip install -r requirements.txt  # Install dependencies
-            python manage.py migrate    # Apply migrations
-            python manage.py collectstatic --noinput  # Collect static files
-            sudo systemctl restart your_service  # Restart your service (if applicable)
+          echo "${KEY}" > ../U2.pem  
+          chmod 600 ../U2.pem         
+          ssh -o StrictHostKeyChecking=no -i ../ec2_key.pem ${USER}@${HOST} << 'EOF'
+            cd /blumap  
+            git pull origin main  
+            source venv/bin/activate 
+            pip install -r requirements.txt
+            python manage.py migrate
+            python manage.py collectstatic --noinput  
+            sudo systemctl restart your_service 
           EOF
