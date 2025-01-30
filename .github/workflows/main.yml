@@ -37,10 +37,12 @@ jobs:
           chmod 600 ../U2.pem         
           ssh -o StrictHostKeyChecking=no -i ../U2.pem ${USER}@${HOST} << 'EOF'
             cd blumap  
-            git pull origin main  
+            git pull origin master  
             source venv/bin/activate 
             pip install -r requirements.txt
             python manage.py migrate
             python manage.py collectstatic --noinput  
-            sudo systemctl restart your_service 
-          EOF
+            sudo systemctl daemon-reload
+            sudo systemctl start gunicorn
+            sudo systemctl enable gunicorn
+            EOF
