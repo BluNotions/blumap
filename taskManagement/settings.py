@@ -14,8 +14,7 @@ SECRET_KEY = ')mhr(jqjluqws2r6s=%_@598n5c0b=g+d002_inew9%8-y$2m-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
+ALLOWED_HOSTS = ['www.blumaps.com', 'blumaps.com', '127.0.0.1', 'localhost']
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
