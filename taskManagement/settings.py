@@ -104,9 +104,19 @@ USE_TZ = True
 
 import os.path
 
+import os
+
+# Ensure that STATIC_URL is defined
 STATIC_URL = '/static/'
 
-TaskManagementAPP_DIRS=(os.path.join('static'))
+# Add the directories where Django will look for static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'TaskManagementApp/static'),  # Adjust the path if needed
+]
+
+# Define where to collect static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collected files will go
+
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
