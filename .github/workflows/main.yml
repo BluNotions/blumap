@@ -36,7 +36,7 @@ jobs:
           echo "${KEY}" > ../U2.pem  
           chmod 600 ../U2.pem         
           ssh -o StrictHostKeyChecking=no -i ../U2.pem ${USER}@${HOST} << 'EOF'
-            cd /blumap  
+            cd blumap  
             git pull origin main  
             source venv/bin/activate 
             pip install -r requirements.txt
