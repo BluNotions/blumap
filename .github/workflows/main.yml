@@ -29,20 +29,23 @@ jobs:
 
       - name: Deploy to EC2
         env:
-          HOST: ${{ secrets.EC2_HOST }}  # ip
-          USER: ${{ secrets.EC2_USER }}    # username 
-          KEY: ${{ secrets.EC2_SSH_KEY }}   # private SSH key
+          HOST: ${{ secrets.EC2_HOST }}  # EC2 IP address
+          USER: ${{ secrets.EC2_USER }}  # EC2 Username (e.g., 'ubuntu')
+          KEY: ${{ secrets.EC2_SSH_KEY }}  # Private SSH key (stored as secret)
         run: |
-          echo "${KEY}" > ../U2.pem  
-          chmod 600 ../U2.pem         
-          ssh -o StrictHostKeyChecking=no -i ../U2.pem ${USER}@${HOST} << 'EOF'
-            cd blumap  
+          # Save the private key to a file
+          echo "${KEY}" > private_key.pem
+          chmod 600 private_key.pem
+          
+          # SSH into EC2 and deploy
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER}@${HOST} << 'EOF'
+            cd /path/to/your/project  # Update with your actual project path
             git pull origin master  
-            source venv/bin/activate 
+            source venv/bin/activate  # Adjust if necessary
             pip install -r requirements.txt
             python manage.py migrate
             python manage.py collectstatic --noinput  
             sudo systemctl daemon-reload
-            sudo systemctl start gunicorn
+            sudo systemctl restart gunicorn  # Restart gunicorn to apply changes
             sudo systemctl enable gunicorn
-            EOF
+          EOF
