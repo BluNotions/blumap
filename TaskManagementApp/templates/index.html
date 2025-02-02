@@ -1,512 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blumaps</title>
-    {% load static %}
-    <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blumaps</title>
+  {% load static %}
+  <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
 
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-    
-   
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            color: white;
-            margin: 0;
-            position: relative;
-            background-color: rgb(35, 0, 131);
-        }
-        #background {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            z-index: -1;
-            background-image: url('{% static "atributeBlue.jpg" %}');
-        }
-        #map {
-            height: 500px;
-            width: 45%;
-            margin: 10px auto;
-            margin-bottom: 10px;
-            float: center;
-            border: 3px solid white;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        .shiny-heading {
-            margin-bottom: 5px;
-            text-align: center;
-            font-family: 'Raleway', sans-serif;
-            background: linear-gradient(90deg, white, rgb(196, 231, 230), rgb(212, 227, 236));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.0);
-        }
+  <!-- Mapbox CSS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
 
-        .shiny-button {
-            font-family: 'Raleway', sans-serif;
-            background: linear-gradient(90deg, #e74c3c, #c0392b, #e74c3c);
-            border: none;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            border-radius: 20px;
-        }
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-        .shiny-button:hover, .shiny-button-blue:hover {
-            transform: translateY(-2px);
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .shiny-button:active, .shiny-button-blue:active {
-            transform: translateY(0);
-            box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5);
-        }
-
-        .shiny-button:focus, .shiny-button-blue:focus {
-            outline: none;
-            box-shadow: 0px 0px 15px rgba(255, 0, 0, 0.5);
-        }
-
-        .shiny-button-blue:active {
-            transform: translateY(0);
-            box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5);
-        }
-
-        .shiny-button-blue:focus {
-            outline: none;
-            box-shadow: 0px 0px 15px rgba(52, 152, 219, 0.5);
-        }
-
-        #zoom-community {
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-        }
-
-        #zoom-inner-circle-2 {
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-
-        .shiny-button-blue {
-            font-family: 'Raleway', sans-serif;
-            background: linear-gradient(90deg, #3c56cc, #6425da, #4b13b4); /* Blue gradient */
-            border: none;
-            color: white; /* Ensuring text is readable */
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .shiny-button-blue:hover {
-            transform: translateY(-2px);
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .shiny-button-blue:active {
-            transform: translateY(0);
-        }
-
-        #about-section {
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            margin-bottom: 50px;
-        }
-
-        .space-before {
-            padding-left: 20px;
-        }
-
-        #about-section {
-            font-size: 20px;
-        }
-
-        #about-section h2 {
-            font-size: 20px;
-        }
-
-        #about-section h3 {
-            font-size: 20px;
-        }
-
-        #about-section .space-before {
-            font-size: 15px;
-        }
-
-        #about-section > p:last-child {
-            font-size: 15px;
-        }
-
-        .spacer {
-            height: 10px;
-        }
-
-        .cookie-consent {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .cookie-consent button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 10px;
-        }
-    </style>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #002D62, #005BB5);
+      color: #ffffff;
+      position: relative;
+    }
+    /* Navbar */
+    .navbar {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    /* Map Container */
+    #map {
+      height: 500px;
+      border: 3px solid #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+    }
+    /* Header */
+    header {
+      padding: 2rem 0;
+      text-align: center;
+    }
+    .professional-heading {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    /* Sidebar for Controls */
+    .sidebar {
+      position: fixed;
+      top: 20%;
+      left: 2%;
+      width: 220px;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .sidebar h5 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .sidebar .btn {
+      width: 100%;
+      margin-bottom: 0.75rem;
+    }
+    /* Professional Button Styles */
+    .btn-professional {
+      font-family: 'Roboto', sans-serif;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+    }
+    .btn-professional.btn-add {
+      background-color: #005BB5;
+      color: #ffffff;
+    }
+    .btn-professional.btn-add:hover {
+      background-color: #004a9e;
+    }
+    .btn-professional.btn-view {
+      background-color: #003f7f;
+      color: #ffffff;
+    }
+    .btn-professional.btn-view:hover {
+      background-color: #003469;
+    }
+    /* About Section */
+    #about-section {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    /* Cookie Consent */
+    .cookie-consent {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: #ffffff;
+      padding: 1rem;
+      text-align: center;
+      z-index: 1100;
+    }
+  </style>
 </head>
-<body class="text-center">
-    <div id="background"></div>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Blumaps</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a id="my-profile" class="nav-link" href="#">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a id="my-circle" class="nav-link" href="#">Add Private</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <h1 class="display-4 shiny-heading">Blumaps</h1>
-    <p style="font-size: 18px; color: white;">mapping needs & ideas</p>
-
-    <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 200px; z-index: 100;">
-        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap" rel="stylesheet">
-        <p class="shiny-heading">add</p>
-        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community" data-category="Community">
-            Community<br>
-            <span style="font-size: small;">Urgent Need</span>
-        </button>
-        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business" data-category="Commerce">
-            Commerce<br>
-            <span style="font-size: small;">Ideas & Wants</span>
-        </button>
-        <button class="btn btn-primary btn-lg shiny-button-blue" id="zoom-inner-circle" data-category="Private" style="margin-bottom: 150px;">
-            Private<br>
-            <span style="font-size: small;">Family and Friends</span>
-        </button>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Blumaps</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a id="my-profile" class="nav-link" href="#">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a id="my-circle" class="nav-link" href="#">Add Private</a>
+          </li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <div class="btn-group-vertical" style="position: absolute; left: 20px; top: 500px; z-index: 100;">
-        <p class="shiny-heading">view</p>
-        <button class="btn btn-danger btn-lg mb-3 shiny-button" id="zoom-community-2" data-category="Community">
-            Community needs<br>
-        </button>
-        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-business-2" data-category="Commerce">
-            Business ideas<br>
-        </button>
-        <button class="btn btn-primary btn-lg mb-3 shiny-button-blue" id="zoom-inner-circle-2" data-category="Private">
-            Private interest<br>
-        </button>
+  <!-- Page Header -->
+  <header>
+    <h1 class="professional-heading">Blumaps</h1>
+    <p class="lead">Mapping Needs & Ideas</p>
+  </header>
+
+  <!-- Sidebar for "Add" and "View" Controls -->
+  <div class="sidebar">
+    <div class="mb-4">
+      <h5>Add</h5>
+      <button class="btn btn-professional btn-add" id="zoom-community" data-category="Community">
+        Community<br>
+        <small>Urgent Need</small>
+      </button>
+      <button class="btn btn-professional btn-add" id="zoom-business" data-category="Commerce">
+        Commerce<br>
+        <small>Ideas & Wants</small>
+      </button>
+      <button class="btn btn-professional btn-add" id="zoom-inner-circle" data-category="Private">
+        Private<br>
+        <small>Family & Friends</small>
+      </button>
     </div>
+    <div>
+      <h5>View</h5>
+      <button class="btn btn-professional btn-view" id="zoom-community-2" data-category="Community">
+        Community Needs
+      </button>
+      <button class="btn btn-professional btn-view" id="zoom-business-2" data-category="Commerce">
+        Business Ideas
+      </button>
+      <button class="btn btn-professional btn-view" id="zoom-inner-circle-2" data-category="Private">
+        Private Interest
+      </button>
+    </div>
+  </div>
 
-   
-
+  <!-- Map Container -->
+  <div class="container my-4">
     <div id="map"></div>
+  </div>
 
-    <div id="about-section" class="container mt-5">
-        <div class="row">
-            <div class="col-12 text-center">
-                <h1 class="display-4 mb-4">Empowering Communities: A Journey of Innovation and Transformation</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <p class="lead">
-                    BluMaps bridges the gap between those with resources and those in need.
-                </p>
-                <p class="lead">
-                    Currently, our platform focuses on capturing data directly from individuals to identify urgent needs and entrepreneurial ideas.
-                </p>
-                <p class="lead">
-                    With the hope of incorporating Web3 development, NFTs, and cryptocurrency EFTs in the near future, we aim to ensure donations reach the poorest directly and securely via cellphone wallets.
-                </p>
-                <p class="lead">
-                    Even small contributions can uplift entire communities and transform lives.
-                </p>
-                <p class="lead">
-                    Join BluMaps in fostering innovation, supporting communities, and making a real difference.
-                </p>
-                <p class="lead">
-                    Donate today to create a wave of positive impact that transcends boundaries and fosters lasting change.
-                </p>
-            </div>
-        </div>
+  <!-- About Section -->
+  <section id="about-section" class="container">
+    <div class="text-center mb-4">
+      <h2 class="professional-heading" style="font-size: 2rem;">Empowering Communities</h2>
+      <p class="lead">A Journey of Innovation and Transformation</p>
     </div>
-
-    <div class="cookie-consent">
-        This website uses cookies to enhance your experience. <a href="/privacy-policy">Learn more</a>
-        <button id="accept-cookies">Accept</button>
+    <div class="mx-auto" style="max-width: 800px;">
+      <p class="lead">BluMaps bridges the gap between those with resources and those in need.</p>
+      <p class="lead">Our platform captures data directly from individuals to identify urgent needs and entrepreneurial ideas.</p>
+      <p class="lead">With plans to incorporate advanced technologies like Web3, NFTs, and cryptocurrency EFTs, we ensure secure donations that reach the poorest directly via cellphone wallets.</p>
+      <p class="lead">Even small contributions can uplift entire communities and transform lives.</p>
+      <p class="lead">Join BluMaps in fostering innovation, supporting communities, and making a real difference.</p>
+      <p class="lead">Donate today to create a wave of positive impact that transcends boundaries and fosters lasting change.</p>
     </div>
-    <!-- Modal Structure -->
-    <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dataModalLabel">Add Location Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="locationForm">
-                        <h5 style="color:black;">Add New Category Listing</h5>
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Enter name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter email">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="text" class="form-control" id="phone" placeholder="Enter phone number">
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea class="form-control" id="description" placeholder="Enter description" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="category">Category Selected</label>
-                            <select class="form-control" id="category" required>
-                                <option value="Community">Community</option>
-                                <option value="Commerce">Commerce</option>
-                                <option value="Private">Private</option>
-                            </select>
-                        </div>
-                        <input type="hidden" id="latitude">
-                        <input type="hidden" id="longitude">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-            </div>
+  </section>
+
+  <!-- Cookie Consent Banner -->
+  <div class="cookie-consent" id="cookieConsentBanner">
+    This website uses cookies to enhance your experience. 
+    <a href="/privacy-policy" class="text-decoration-underline text-light">Learn more</a>
+    <button id="accept-cookies" class="btn btn-primary btn-sm">Accept</button>
+  </div>
+
+  <!-- Modal Structure -->
+  <div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dataModalLabel">Add Location Data</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+          <form id="locationForm">
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="name" placeholder="Enter name" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="Enter email">
+            </div>
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="phone" placeholder="Enter phone number">
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" placeholder="Enter description" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="category" class="form-label">Category Selected</label>
+              <select class="form-select" id="category" required>
+                <option value="Community">Community</option>
+                <option value="Commerce">Commerce</option>
+                <option value="Private">Private</option>
+              </select>
+            </div>
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZnNkZXZjb3phIiwiYSI6ImNtNmkxZ3UwazAzdW8ycXNoN2RwOHdqYTUifQ.vvRayCj-1_i-4Yih7ChKfw';
-        
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [18.4233, -33.9189], // Cape Town
-            zoom: 10
+  <!-- Mapbox and Bootstrap JS Bundle (includes Popper) -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Initialize Mapbox with a professional blue-themed style
+    mapboxgl.accessToken = 'pk.eyJ1IjoibW9ybmVncmVlbiIsImEiOiJjamJsNWJtc3oxbDl6MzFvYnpoeHNucHNkIn0.F8OjEDmrkseIRVMOt32Fcw';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mornegreen/cm6kon7vb00l001saaltfal2i',
+      center: [18.4233, -33.9189], // Cape Town
+      zoom: 10
+    });
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true
+    }));
+
+    let canAddMarker = false;
+    let markers = [];
+
+    // Place a marker on the map
+    function placeMarker(location, category) {
+      const marker = new mapboxgl.Marker()
+        .setLngLat(location)
+        .addTo(map);
+      markers.push(marker);
+      marker.getElement().dataset.category = category;
+
+      const popup = new mapboxgl.Popup({ offset: 25 })
+        .setHTML(`<strong style="color: black;">${category}</strong><p style="color: black;">Details about this listing.</p>`)
+        .setLngLat(location);
+
+      marker.getElement().addEventListener('click', () => popup.toggle());
+      marker.setPopup(popup);
+    }
+
+    // Clear all markers
+    function clearMarkers() {
+      markers.forEach(marker => marker.remove());
+      markers = [];
+    }
+
+    // "Add" buttons – enable marker placement and open the modal on map click
+    document.querySelectorAll('#zoom-community, #zoom-business, #zoom-inner-circle').forEach(button => {
+      button.addEventListener('click', function() {
+        const category = this.getAttribute('data-category');
+        document.getElementById('category').value = category;
+        canAddMarker = true;
+        map.once('click', function(event) {
+          if (canAddMarker) {
+            const coordinates = event.lngLat;
+            placeMarker(coordinates, category);
+            document.getElementById('latitude').value = coordinates.lat;
+            document.getElementById('longitude').value = coordinates.lng;
+            // Show the modal using Bootstrap 5's modal API
+            new bootstrap.Modal(document.getElementById('dataModal')).show();
+          }
         });
+      });
+    });
 
-        map.addControl(new mapboxgl.NavigationControl());
-        map.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }));
+    // "View" buttons – disable marker placement and display listings by category
+    document.querySelectorAll('#zoom-community-2, #zoom-business-2, #zoom-inner-circle-2').forEach(button => {
+      button.addEventListener('click', function() {
+        canAddMarker = false;
+        const category = this.getAttribute('data-category');
+        clearMarkers();
+        limitedFunctionality(category);
+      });
+    });
 
-        let canAddMarker = false; // Flag to control marker placement
-        let markers = []; // Array to store markers
+    // Fetch and display existing data based on category
+    function limitedFunctionality(category) {
+      fetch('/get_existing_data/')
+        .then(response => response.json())
+        .then(data => {
+          data.filter(item => item.Category === category).forEach(item => {
+            const location = [item.Longitude, item.Latitude];
+            placeMarker(location, item.Name);
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
 
-        // Set category and allow marker placement when "Add" buttons are clicked
-        document.querySelectorAll('#zoom-community, #zoom-business, #zoom-inner-circle').forEach(button => {
-            button.addEventListener('click', function() {
-                const category = this.getAttribute('data-category');
-                document.getElementById('category').value = category; // Set the category in the form
-                canAddMarker = true; // Enable marker placement
+    // Handle form submission
+    document.getElementById('locationForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const latitude = document.getElementById('latitude').value;
+      const longitude = document.getElementById('longitude').value;
+      const description = document.getElementById('description').value;
+      const category = document.getElementById('category').value;
 
-                // Allow the user to click on the map to place a marker
-                map.once('click', function(event) {
-                    if (canAddMarker) {
-                        const coordinates = event.lngLat;
-                        placeMarker(coordinates, category); // Pass category to placeMarker
+      const data = { name, email, phone, latitude, longitude, description, category };
 
-                        // Set latitude and longitude in the hidden inputs
-                        document.getElementById('latitude').value = coordinates.lat;
-                        document.getElementById('longitude').value = coordinates.lng;
+      fetch('/save_location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(responseData => {
+        console.log('Success:', responseData);
+        placeMarker([longitude, latitude], category);
+      })
+      .catch(error => console.error('Error:', error));
 
-                        // Open the modal after placing the marker
-                        $('#dataModal').modal('show');
-                    }
-                });
-            });
-        });
+      // Hide the modal
+      const modalInstance = bootstrap.Modal.getInstance(document.getElementById('dataModal'));
+      modalInstance.hide();
+      this.reset();
+    });
 
-        // Disable marker placement and show listings when "View" buttons are clicked
-        document.querySelectorAll('#zoom-community-2, #zoom-business-2, #zoom-inner-circle-2').forEach(button => {
-            button.addEventListener('click', function() {
-                canAddMarker = false; // Disable marker placement
-                const category = this.getAttribute('data-category');
-
-                // Clear existing markers
-                clearMarkers();
-
-                // Fetch and display existing data based on category
-                limitedFunctionality(category);
-            });
-        });
-
-        // Function to place a marker on the map
-        function placeMarker(location, category) {
-            const marker = new mapboxgl.Marker()
-                .setLngLat(location)
-                .addTo(map);
-
-            // Store the marker in the global array
-            markers.push(marker);
-
-            // Store the title and description in the marker's element
-            marker.getElement().dataset.category = category;
-
-            const popup = new mapboxgl.Popup()
-                .setHTML(`<strong style="color: black;">${category}</strong><p style="color: black;">Details about this listing.</p>`) // Set font color to black
-                .setLngLat(location);
-
-            // Toggle the popup on marker click
-            marker.getElement().addEventListener('click', () => {
-                popup.toggle(); // Show/hide the popup on marker click
-            });
-
-            // Add the popup to the marker
-            marker.setPopup(popup); // Attach the popup to the marker
+    // Helper function to get CSRF token from cookies
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          cookie = cookie.trim();
+          if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
         }
+      }
+      return cookieValue;
+    }
 
-        // Function to clear existing markers from the map
-        function clearMarkers() {
-            markers.forEach(marker => marker.remove());
-            markers = []; // Reset the markers array
+    // Cookie consent
+    if (!localStorage.getItem('cookieConsent')) {
+      const cookieConsentBanner = document.getElementById('cookieConsentBanner');
+      cookieConsentBanner.style.display = 'block';
+      document.getElementById('accept-cookies').addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'true');
+        cookieConsentBanner.style.display = 'none';
+      });
+    }
+
+    // Center the map on the user's current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const userLocation = [position.coords.longitude, position.coords.latitude];
+          map.setCenter(userLocation);
+          map.setZoom(12);
+        },
+        function(error) {
+          console.error('Error getting location:', error);
         }
-
-        // Function to fetch and display existing data based on category
-        function limitedFunctionality(val) {
-            fetch('/get_existing_data/')
-            .then(response => response.json())
-            .then(data => {
-                data.filter(d => d.Category === val).forEach(item => {
-                    const location = [item.Longitude, item.Latitude]; // Mapbox uses [lng, lat]
-                    placeMarker(location, item.Name); // Pass name or category for popup
-                });
-            })
-            .catch(error => console.error('Error fetching data:', error));
-        }
-
-        // Handle form submission
-        document.getElementById('locationForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            // Collect data and send to server
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const latitude = document.getElementById('latitude').value;
-            const longitude = document.getElementById('longitude').value;
-            const description = document.getElementById('description').value;
-            const category = document.getElementById('category').value;
-
-            const data = {
-                name: name,
-                email: email,
-                phone: phone,
-                latitude: latitude,
-                longitude: longitude,
-                description: description,
-                category: category
-            };
-
-            fetch('/save_location', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                console.log('CSRF Token:', getCookie('csrftoken')); // Log the CSRF token
-                // Place the marker with the listing details
-                placeMarker([longitude, latitude], category);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-            // Close the modal
-            $('#dataModal').modal('hide');
-
-            // Reset the form
-            document.getElementById('locationForm').reset();
-        });
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        if (!localStorage.getItem('cookieConsent')) {
-            const cookieConsentBanner = document.querySelector('.cookie-consent');
-            cookieConsentBanner.style.display = 'block';
-
-            const acceptCookiesButton = document.getElementById('accept-cookies');
-            acceptCookiesButton.addEventListener('click', () => {
-                localStorage.setItem('cookieConsent', 'true');
-                cookieConsentBanner.style.display = 'none';
-            });
-        }
-
-        // Request location permission and center the map on the user's location
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                const userLocation = [position.coords.longitude, position.coords.latitude];
-                map.setCenter(userLocation); // Center the map on user's location
-                map.setZoom(12); // Optional: Set a zoom level
-            },
-            function(error) {
-                console.error('Error getting location:', error);
-                // Handle error (e.g., show a message to the user)
-            }
-        );
-    </script>
+      );
+    }
+  </script>
 </body>
 </html>
