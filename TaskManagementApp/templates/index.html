@@ -47,7 +47,7 @@
       font-weight: 700;
       margin-bottom: 1rem;
     }
-    /* Sidebar for Controls */
+    /* Desktop Sidebar for Controls */
     .sidebar {
       position: fixed;
       top: 20%;
@@ -138,32 +138,87 @@
     <p class="lead">Mapping Needs & Ideas</p>
   </header>
 
-  <!-- Sidebar for "Add" and "View" Controls -->
-  <div class="sidebar">
+  <!-- Mobile Controls Toggle Buttons (Visible only on mobile) -->
+  <div class="d-lg-none text-center my-3">
+    <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileAdd" aria-controls="mobileAdd">
+      Add Need/Idea
+    </button>
+    <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileView" aria-controls="mobileView">
+      View Need/Idea
+    </button>
+  </div>
+
+  <!-- Offcanvas for Mobile Add Controls -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileAdd" aria-labelledby="mobileAddLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="mobileAddLabel">Add Need/Idea</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="mb-4">
+        <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community-mobile" data-category="Community">
+          Community<br>
+          <small>Urgent Need</small>
+        </button>
+        <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business-mobile" data-category="Commerce">
+          Commerce<br>
+          <small>Ideas & Wants</small>
+        </button>
+        <button class="btn btn-professional btn-add control-add mb-2" id="zoom-inner-circle-mobile" data-category="Private">
+          Private<br>
+          <small>Family & Friends</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offcanvas for Mobile View Controls -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileView" aria-labelledby="mobileViewLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="mobileViewLabel">View Need/Idea</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div>
+        <button class="btn btn-professional btn-view control-view mb-2" id="zoom-community-2-mobile" data-category="Community">
+          Community Needs
+        </button>
+        <button class="btn btn-professional btn-view control-view mb-2" id="zoom-business-2-mobile" data-category="Commerce">
+          Business Ideas
+        </button>
+        <button class="btn btn-professional btn-view control-view mb-2" id="zoom-inner-circle-2-mobile" data-category="Private">
+          Private Interest
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Sidebar for Controls (Visible on larger screens) -->
+  <div class="sidebar d-none d-lg-block">
     <div class="mb-4">
       <h5>Add</h5>
-      <button class="btn btn-professional btn-add" id="zoom-community" data-category="Community">
+      <button class="btn btn-professional btn-add control-add" id="zoom-community" data-category="Community">
         Community<br>
         <small>Urgent Need</small>
       </button>
-      <button class="btn btn-professional btn-add" id="zoom-business" data-category="Commerce">
+      <button class="btn btn-professional btn-add control-add" id="zoom-business" data-category="Commerce">
         Commerce<br>
         <small>Ideas & Wants</small>
       </button>
-      <button class="btn btn-professional btn-add" id="zoom-inner-circle" data-category="Private">
+      <button class="btn btn-professional btn-add control-add" id="zoom-inner-circle" data-category="Private">
         Private<br>
         <small>Family & Friends</small>
       </button>
     </div>
     <div>
       <h5>View</h5>
-      <button class="btn btn-professional btn-view" id="zoom-community-2" data-category="Community">
+      <button class="btn btn-professional btn-view control-view" id="zoom-community-2" data-category="Community">
         Community Needs
       </button>
-      <button class="btn btn-professional btn-view" id="zoom-business-2" data-category="Commerce">
+      <button class="btn btn-professional btn-view control-view" id="zoom-business-2" data-category="Commerce">
         Business Ideas
       </button>
-      <button class="btn btn-professional btn-view" id="zoom-inner-circle-2" data-category="Private">
+      <button class="btn btn-professional btn-view control-view" id="zoom-inner-circle-2" data-category="Private">
         Private Interest
       </button>
     </div>
@@ -192,7 +247,7 @@
 
   <!-- Cookie Consent Banner -->
   <div class="cookie-consent" id="cookieConsentBanner">
-    This website uses cookies to enhance your experience. 
+    This website uses cookies to enhance your experience.
     <a href="/privacy-policy" class="text-decoration-underline text-light">Learn more</a>
     <button id="accept-cookies" class="btn btn-primary btn-sm">Accept</button>
   </div>
@@ -250,8 +305,9 @@
     var map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mornegreen/cm6kon7vb00l001saaltfal2i',
-      center: [18.4233, -33.9189], // Cape Town
-      zoom: 10
+      center: [0, 20],  // Rough center; adjust as needed
+      zoom: 1           // Zoom level 1 shows most of the world
+
     });
     map.addControl(new mapboxgl.NavigationControl());
     map.addControl(new mapboxgl.GeolocateControl({
@@ -259,10 +315,30 @@
       trackUserLocation: true
     }));
 
+    // When the user's location is available, smoothly fly to it.
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      var userLocation = [position.coords.longitude, position.coords.latitude];
+      // Use flyTo for a smooth animated transition
+      map.flyTo({
+        center: userLocation,
+        zoom: 15,      // Desired zoom level once the location is reached
+        speed: 0.8,    // Adjust speed (default is ~1.2) for a slower/faster animation
+        curve: 1.42,   // The curvature of the flight path (higher = more curve)
+        easing: function(t) { return t; } // A linear easing function; customize if desired
+      });
+    },
+    function(error) {
+      console.error('Error getting location:', error);
+    }
+  );
+}
+
     let canAddMarker = false;
     let markers = [];
 
-    // Place a marker on the map
+    // Function to place a marker on the map
     function placeMarker(location, category) {
       const marker = new mapboxgl.Marker()
         .setLngLat(location)
@@ -278,14 +354,14 @@
       marker.setPopup(popup);
     }
 
-    // Clear all markers
+    // Function to clear all markers from the map
     function clearMarkers() {
       markers.forEach(marker => marker.remove());
       markers = [];
     }
 
-    // "Add" buttons – enable marker placement and open the modal on map click
-    document.querySelectorAll('#zoom-community, #zoom-business, #zoom-inner-circle').forEach(button => {
+    // Attach event listeners to all "Add" controls (both desktop and mobile)
+    document.querySelectorAll('.control-add').forEach(button => {
       button.addEventListener('click', function() {
         const category = this.getAttribute('data-category');
         document.getElementById('category').value = category;
@@ -296,20 +372,41 @@
             placeMarker(coordinates, category);
             document.getElementById('latitude').value = coordinates.lat;
             document.getElementById('longitude').value = coordinates.lng;
-            // Show the modal using Bootstrap 5's modal API
+            // If any offcanvas is open, hide it
+            let offcanvasAddEl = document.getElementById('mobileAdd');
+            let offcanvasViewEl = document.getElementById('mobileView');
+            if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
+              let offcanvasAdd = bootstrap.Offcanvas.getInstance(offcanvasAddEl);
+              offcanvasAdd.hide();
+            }
+            if (offcanvasViewEl && offcanvasViewEl.classList.contains('show')) {
+              let offcanvasView = bootstrap.Offcanvas.getInstance(offcanvasViewEl);
+              offcanvasView.hide();
+            }
             new bootstrap.Modal(document.getElementById('dataModal')).show();
           }
         });
       });
     });
 
-    // "View" buttons – disable marker placement and display listings by category
-    document.querySelectorAll('#zoom-community-2, #zoom-business-2, #zoom-inner-circle-2').forEach(button => {
+    // Attach event listeners to all "View" controls (both desktop and mobile)
+    document.querySelectorAll('.control-view').forEach(button => {
       button.addEventListener('click', function() {
         canAddMarker = false;
         const category = this.getAttribute('data-category');
         clearMarkers();
         limitedFunctionality(category);
+        // If any offcanvas is open, hide it
+        let offcanvasAddEl = document.getElementById('mobileAdd');
+        let offcanvasViewEl = document.getElementById('mobileView');
+        if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
+          let offcanvasAdd = bootstrap.Offcanvas.getInstance(offcanvasAddEl);
+          offcanvasAdd.hide();
+        }
+        if (offcanvasViewEl && offcanvasViewEl.classList.contains('show')) {
+          let offcanvasView = bootstrap.Offcanvas.getInstance(offcanvasViewEl);
+          offcanvasView.hide();
+        }
       });
     });
 
@@ -357,7 +454,7 @@
       })
       .catch(error => console.error('Error:', error));
 
-      // Hide the modal
+      // Hide the modal and reset the form
       const modalInstance = bootstrap.Modal.getInstance(document.getElementById('dataModal'));
       modalInstance.hide();
       this.reset();
