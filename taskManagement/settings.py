@@ -19,7 +19,7 @@ ALLOWED_HOSTS = [
     'blumaps.com',
     '127.0.0.1',
     'localhost',
-    '3048-41-198-143-102.ngrok-free.app',  # Added ngrok URL
+    '952b-41-198-143-102.ngrok-free.app'  # Added ngrok URL
 ]
 
 INSTALLED_APPS = [

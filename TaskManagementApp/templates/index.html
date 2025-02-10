@@ -25,9 +25,14 @@
       color: #ffffff;
       position: relative;
     }
-    /* Navbar */
+    /* Navbar with Authentication Status */
     .navbar {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Status text (hidden until logged in) */
+    #statusNav {
+      margin-right: 1rem;
     }
     /* Map Container */
     #map {
@@ -37,7 +42,7 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       margin-bottom: 2rem;
     }
-    /* Header */
+    /* Page Header */
     header {
       padding: 2rem 0;
       text-align: center;
@@ -47,7 +52,7 @@
       font-weight: 700;
       margin-bottom: 1rem;
     }
-    /* Desktop Sidebar for Controls */
+    /* Sidebar for Desktop Controls (Draggable) */
     .sidebar {
       position: fixed;
       top: 20%;
@@ -57,6 +62,7 @@
       padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      cursor: move;
     }
     .sidebar h5 {
       font-size: 1.25rem;
@@ -108,24 +114,45 @@
       text-align: center;
       z-index: 1100;
     }
+
+    #tapMessage {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  z-index: 1500;
+  display: none;
+}
+
+
   </style>
 </head>
 <body>
-  <!-- Navigation Bar -->
+  <!-- Navigation Bar with Status -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Blumaps</a>
+      <!-- Brand: Initially "Blumaps"; on login, replaced by the user's name -->
+      <a class="navbar-brand" href="#" id="brandName">Blumaps</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+      <!-- Navbar collapse: Status and Auth link -->
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <!-- User status; initially hidden -->
           <li class="nav-item">
-            <a id="my-profile" class="nav-link" href="#">Profile</a>
+            <span class="navbar-text d-none" id="statusNav">
+              Community Builder: <span id="userStars">-</span>
+            </span>
           </li>
           <li class="nav-item">
-            <a id="my-circle" class="nav-link" href="#">Add Private</a>
+            <a id="auth-link" class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#authModal">Log In</a>
           </li>
         </ul>
       </div>
@@ -138,14 +165,81 @@
     <p class="lead">Mapping Needs & Ideas</p>
   </header>
 
-  <!-- Mobile Controls Toggle Buttons (Visible only on mobile) -->
-  <div class="d-lg-none text-center my-3">
-    <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileAdd" aria-controls="mobileAdd">
-      Add Need/Idea
-    </button>
-    <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileView" aria-controls="mobileView">
-      View Need/Idea
-    </button>
+  <!-- Authentication Modal (Login/Register) -->
+  <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="authModalLabel" style="color: #6c757d;">Community Access</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Nav Pills for Login/Register -->
+          <ul class="nav nav-pills mb-3 justify-content-center" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button">Login</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="register-tab" data-bs-toggle="pill" data-bs-target="#register" type="button">Register</button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <!-- Login Tab -->
+            <div class="tab-pane fade show active" id="login">
+              <form id="loginForm">
+                <div class="mb-3">
+                  <input type="text" class="form-control" id="loginUsername" placeholder="Username" required>
+                </div>
+                <div class="mb-3">
+                  <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+              </form>
+            </div>
+            <!-- Register Tab -->
+            <div class="tab-pane fade" id="register">
+              <form id="registerForm">
+                <div class="mb-3">
+                  <input type="text" class="form-control" id="registerUsername" placeholder="Choose Username" required>
+                </div>
+                <div class="mb-3">
+                  <input type="password" class="form-control" id="registerPassword" placeholder="Create Password" required>
+                </div>
+                <button type="submit" class="btn btn-secondary w-100">Create Account</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar for Desktop Controls (Draggable) -->
+  <div class="sidebar d-none d-lg-block">
+    <div class="mb-4">
+      <h5>Add</h5>
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community" data-category="Community">
+        Community<br><small>Urgent Need</small>
+      </button>
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business" data-category="Commerce">
+        Commerce<br><small>Ideas & Wants</small>
+      </button>
+      <button class="btn btn-professional btn-add control-add" id="zoom-inner-circle" data-category="Private">
+        Private<br><small>Family & Friends</small>
+      </button>
+    </div>
+    <div>
+      <h5>View</h5>
+      <button class="btn btn-professional btn-view control-view" id="zoom-community-2" data-category="Community">
+        Community Needs
+      </button>
+      <button class="btn btn-professional btn-view control-view" id="zoom-business-2" data-category="Commerce">
+        Business Ideas
+      </button>
+      <button class="btn btn-professional btn-view control-view" id="zoom-inner-circle-2" data-category="Private">
+        Private Interest
+      </button>
+    </div>
   </div>
 
   <!-- Offcanvas for Mobile Add Controls -->
@@ -157,16 +251,13 @@
     <div class="offcanvas-body">
       <div class="mb-4">
         <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community-mobile" data-category="Community">
-          Community<br>
-          <small>Urgent Need</small>
+          Community<br><small>Urgent Need</small>
         </button>
         <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business-mobile" data-category="Commerce">
-          Commerce<br>
-          <small>Ideas & Wants</small>
+          Commerce<br><small>Ideas & Wants</small>
         </button>
         <button class="btn btn-professional btn-add control-add mb-2" id="zoom-inner-circle-mobile" data-category="Private">
-          Private<br>
-          <small>Family & Friends</small>
+          Private<br><small>Family & Friends</small>
         </button>
       </div>
     </div>
@@ -193,36 +284,18 @@
     </div>
   </div>
 
-  <!-- Fixed Sidebar for Controls (Visible on larger screens) -->
-  <div class="sidebar d-none d-lg-block">
-    <div class="mb-4">
-      <h5>Add</h5>
-      <button class="btn btn-professional btn-add control-add" id="zoom-community" data-category="Community">
-        Community<br>
-        <small>Urgent Need</small>
-      </button>
-      <button class="btn btn-professional btn-add control-add" id="zoom-business" data-category="Commerce">
-        Commerce<br>
-        <small>Ideas & Wants</small>
-      </button>
-      <button class="btn btn-professional btn-add control-add" id="zoom-inner-circle" data-category="Private">
-        Private<br>
-        <small>Family & Friends</small>
-      </button>
-    </div>
-    <div>
-      <h5>View</h5>
-      <button class="btn btn-professional btn-view control-view" id="zoom-community-2" data-category="Community">
-        Community Needs
-      </button>
-      <button class="btn btn-professional btn-view control-view" id="zoom-business-2" data-category="Commerce">
-        Business Ideas
-      </button>
-      <button class="btn btn-professional btn-view control-view" id="zoom-inner-circle-2" data-category="Private">
-        Private Interest
-      </button>
-    </div>
-  </div>
+
+  <!-- Mobile Controls Toggle Buttons (Visible only on mobile) -->
+<div class="d-lg-none text-center my-3">
+  <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileAdd" aria-controls="mobileAdd">
+    Add Need/Idea
+  </button>
+  <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileView" aria-controls="mobileView">
+    View Need/Idea
+  </button>
+</div>
+
+
 
   <!-- Map Container -->
   <div class="container my-4">
@@ -252,7 +325,7 @@
     <button id="accept-cookies" class="btn btn-primary btn-sm">Accept</button>
   </div>
 
-  <!-- Modal Structure -->
+  <!-- Modal for Adding Marker Data -->
   <div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -286,6 +359,7 @@
                 <option value="Private">Private</option>
               </select>
             </div>
+            <!-- Hidden fields for coordinates -->
             <input type="hidden" id="latitude">
             <input type="hidden" id="longitude">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -295,19 +369,146 @@
     </div>
   </div>
 
+  <div id="tapMessage">Tap on map to add</div>
+
   <!-- Mapbox and Bootstrap JS Bundle (includes Popper) -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Initialize Mapbox with a professional blue-themed style
+   // ================================================
+// Authentication System with Points & Stars
+// ================================================
+class AuthSystem {
+  constructor() {
+    this.currentUser = null;
+    this.users = JSON.parse(localStorage.getItem('users') || '{}');
+  }
+
+  register(username, password) {
+    if (this.users[username]) {
+      return { success: false, message: 'Username already exists' };
+    }
+    // New users start with 0 points & 0 stars
+    this.users[username] = { password, points: 0, stars: 0 };
+    localStorage.setItem('users', JSON.stringify(this.users));
+    return { success: true, user: username, stars: 0 };
+  }
+
+  login(username, password) {
+    const user = this.users[username];
+    if (!user || user.password !== password) {
+      return { success: false, message: 'Invalid credentials' };
+    }
+    this.currentUser = username;
+    return { success: true, user: username, stars: user.stars };
+  }
+
+  logout() {
+    this.currentUser = null;
+  }
+
+  // Update user points and convert to stars
+  updateUserPoints(username, points) {
+    if (!this.users[username]) return;
+    
+    let user = this.users[username];
+    user.points += points;
+
+    // Convert every 10 points into 1 star
+    while (user.points >= 10) {
+      user.stars += 1;
+      user.points -= 10;
+    }
+
+    this.users[username] = user;
+    localStorage.setItem('users', JSON.stringify(this.users));
+
+    // Update UI
+    document.getElementById("userStars").textContent = "★".repeat(user.stars);
+  }
+
+  // Get user's current stars
+  getUserStars(username) {
+    return this.users[username]?.stars || 0;
+  }
+}
+
+const authSystem = new AuthSystem();
+
+// ================================================
+// Handle Login Form
+// ================================================
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  const result = authSystem.login(username, password);
+  handleAuthResult(result);
+});
+
+// ================================================
+// Handle Registration Form
+// ================================================
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const username = document.getElementById('registerUsername').value;
+  const password = document.getElementById('registerPassword').value;
+  const result = authSystem.register(username, password);
+  handleAuthResult(result);
+});
+
+// ================================================
+// Handle Auth Result
+// ================================================
+function handleAuthResult(result) {
+  if (result.success) {
+    document.getElementById('auth-link').textContent = 'Log Out';
+    document.getElementById('brandName').textContent = result.user;
+    document.getElementById('statusNav').classList.remove('d-none');
+    
+    // Show stars for logged-in user
+    document.getElementById("userStars").textContent = "★".repeat(result.stars);
+
+    // Hide auth modal
+    bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
+  } else {
+    alert(result.message);
+  }
+}
+
+// ================================================
+// Handle Logout
+// ================================================
+document.getElementById('auth-link').addEventListener('click', function(e) {
+  if (authSystem.currentUser) {
+    e.preventDefault();
+    authSystem.logout();
+    this.textContent = 'Log In';
+    document.getElementById('brandName').textContent = 'Blumaps';
+    document.getElementById('statusNav').classList.add('d-none');
+  }
+});
+
+// ================================================
+// Load User's Stars When Page Loads
+// ================================================
+document.addEventListener("DOMContentLoaded", function() {
+  const loggedInUser = authSystem.currentUser;
+  if (loggedInUser) {
+    document.getElementById("userStars").textContent = "★".repeat(authSystem.getUserStars(loggedInUser));
+  }
+});
+
+    // ================================================
+    // Mapbox Initialization with Fly-To Animation
+    // ================================================
     mapboxgl.accessToken = 'pk.eyJ1IjoibW9ybmVncmVlbiIsImEiOiJjamJsNWJtc3oxbDl6MzFvYnpoeHNucHNkIn0.F8OjEDmrkseIRVMOt32Fcw';
     var map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mornegreen/cm6kon7vb00l001saaltfal2i',
-      center: [0, 20],  // Rough center; adjust as needed
-      zoom: 1           // Zoom level 1 shows most of the world
-
+      center: [0, 20],
+      zoom: 1
     });
     map.addControl(new mapboxgl.NavigationControl());
     map.addControl(new mapboxgl.GeolocateControl({
@@ -315,88 +516,134 @@
       trackUserLocation: true
     }));
 
-    // When the user's location is available, smoothly fly to it.
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    function(position) {
-      var userLocation = [position.coords.longitude, position.coords.latitude];
-      // Use flyTo for a smooth animated transition
-      map.flyTo({
-        center: userLocation,
-        zoom: 15,      // Desired zoom level once the location is reached
-        speed: 0.8,    // Adjust speed (default is ~1.2) for a slower/faster animation
-        curve: 1.42,   // The curvature of the flight path (higher = more curve)
-        easing: function(t) { return t; } // A linear easing function; customize if desired
-      });
-    },
-    function(error) {
-      console.error('Error getting location:', error);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          var userLocation = [position.coords.longitude, position.coords.latitude];
+          map.flyTo({
+            center: userLocation,
+            zoom: 15,
+            speed: 1.8,
+            curve: 1.42,
+            easing: function(t) { return t; }
+          });
+        },
+        function(error) {
+          console.error('Error getting location:', error);
+        }
+      );
     }
-  );
-}
 
+    // ================================================
+    // Marker and Control Functionality
+    // ================================================
     let canAddMarker = false;
     let markers = [];
 
-    // Function to place a marker on the map
-    function placeMarker(location, category) {
-      const marker = new mapboxgl.Marker()
-        .setLngLat(location)
-        .addTo(map);
-      markers.push(marker);
-      marker.getElement().dataset.category = category;
+function placeMarker(location, category, name = "Unnamed", description = "No details available.", email = "Not provided", phone = "Not provided") {
+  const popupContent = `
+    <strong style="color: black;">${name}</strong>
+    <p style="color: black;">${description}</p>
+    <p style="color: black;"><strong>Email:</strong> ${email}</p>
+    <p style="color: black;"><strong>Phone:</strong> ${phone}</p>
+    <div style="margin-top: 10px;">
+      <button class="btn btn-primary btn-sm popup-help" data-email="${email}" data-phone="${phone}">Help</button>
+      <button class="btn btn-success btn-sm popup-donate" data-email="${email}" data-phone="${phone}">Donate</button>
+    </div>
+  `;
 
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(`<strong style="color: black;">${category}</strong><p style="color: black;">Details about this listing.</p>`)
-        .setLngLat(location);
+  const marker = new mapboxgl.Marker()
+    .setLngLat(location)
+    .addTo(map);
+  
+  markers.push(marker);
+  marker.getElement().dataset.category = category;
 
-      marker.getElement().addEventListener('click', () => popup.toggle());
-      marker.setPopup(popup);
-    }
+  const popup = new mapboxgl.Popup({ offset: 25 })
+    .setHTML(popupContent)
+    .setLngLat(location);
 
-    // Function to clear all markers from the map
+  marker.getElement().addEventListener('click', () => {
+    popup.toggle();
+    
+    // Attach event listeners when popup opens
+    setTimeout(() => {
+      document.querySelectorAll('.popup-help').forEach(button => {
+        button.addEventListener('click', function() {
+          updateUserPoints(5); // +5 points for Help
+          alert("You are offering to help. Thank you for supporting the community!");
+        });
+      });
+
+      document.querySelectorAll('.popup-donate').forEach(button => {
+        button.addEventListener('click', function() {
+          updateUserPoints(1); // +1 point for Donate
+          alert("You are donating to this cause. Every small contribution counts!");
+        });
+      });
+    }, 100); // Small delay to allow buttons to be attached
+  });
+
+  marker.setPopup(popup);
+}
+
+
     function clearMarkers() {
       markers.forEach(marker => marker.remove());
       markers = [];
     }
 
-    // Attach event listeners to all "Add" controls (both desktop and mobile)
-    document.querySelectorAll('.control-add').forEach(button => {
-      button.addEventListener('click', function() {
-        const category = this.getAttribute('data-category');
-        document.getElementById('category').value = category;
-        canAddMarker = true;
-        map.once('click', function(event) {
-          if (canAddMarker) {
-            const coordinates = event.lngLat;
-            placeMarker(coordinates, category);
-            document.getElementById('latitude').value = coordinates.lat;
-            document.getElementById('longitude').value = coordinates.lng;
-            // If any offcanvas is open, hide it
-            let offcanvasAddEl = document.getElementById('mobileAdd');
-            let offcanvasViewEl = document.getElementById('mobileView');
-            if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
-              let offcanvasAdd = bootstrap.Offcanvas.getInstance(offcanvasAddEl);
-              offcanvasAdd.hide();
-            }
-            if (offcanvasViewEl && offcanvasViewEl.classList.contains('show')) {
-              let offcanvasView = bootstrap.Offcanvas.getInstance(offcanvasViewEl);
-              offcanvasView.hide();
-            }
-            new bootstrap.Modal(document.getElementById('dataModal')).show();
-          }
-        });
-      });
-    });
+  function updateUserPoints(points) {
+  let userPoints = parseInt(localStorage.getItem("userPoints")) || 0;
+  let userStars = parseInt(localStorage.getItem("userStars")) || 0;
 
-    // Attach event listeners to all "View" controls (both desktop and mobile)
-    document.querySelectorAll('.control-view').forEach(button => {
-      button.addEventListener('click', function() {
-        canAddMarker = false;
-        const category = this.getAttribute('data-category');
-        clearMarkers();
-        limitedFunctionality(category);
-        // If any offcanvas is open, hide it
+  // Add new points
+  userPoints += points;
+
+  // Check if points reached 10, then convert to stars
+  if (userPoints >= 10) {
+    userStars += Math.floor(userPoints / 10); // Convert points into stars
+    userPoints = userPoints % 10; // Keep remaining points after converting stars
+  }
+
+  // Store updated values
+  localStorage.setItem("userPoints", userPoints);
+  localStorage.setItem("userStars", userStars);
+
+  // Update the navbar display
+  document.getElementById("userStars").textContent = "★".repeat(userStars);
+}
+
+
+    document.querySelectorAll('.control-add').forEach(button => {
+  button.addEventListener('click', function() {
+    const category = this.getAttribute('data-category');
+    document.getElementById('category').value = category;
+    canAddMarker = true;
+
+    // Show the temporary "tap on map" message
+    const tapMessage = document.getElementById('tapMessage');
+    tapMessage.textContent = "Tap on the map to add a marker";
+    tapMessage.style.display = "block";
+
+    // Auto-hide the message after 4 seconds
+    const messageTimeout = setTimeout(() => {
+      tapMessage.style.display = "none";
+    }, 4000);
+
+    map.once('click', function(event) {
+      if (canAddMarker) {
+        const coordinates = event.lngLat;
+        document.getElementById('latitude').value = coordinates.lat;
+        document.getElementById('longitude').value = coordinates.lng;
+
+        // Get form values
+        const name = document.getElementById('name').value || "New Location";
+        const description = document.getElementById('description').value || "No details provided.";
+
+        placeMarker(coordinates, category, name, description);
+
+        // Hide any open offcanvas menus
         let offcanvasAddEl = document.getElementById('mobileAdd');
         let offcanvasViewEl = document.getElementById('mobileView');
         if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
@@ -407,23 +654,64 @@ if (navigator.geolocation) {
           let offcanvasView = bootstrap.Offcanvas.getInstance(offcanvasViewEl);
           offcanvasView.hide();
         }
-      });
+
+        // Show the modal for entering location details
+        new bootstrap.Modal(document.getElementById('dataModal')).show();
+
+        // Hide the tap message immediately once the map is tapped
+        tapMessage.style.display = "none";
+        clearTimeout(messageTimeout);
+      }
     });
+  });
+});
 
-    // Fetch and display existing data based on category
-    function limitedFunctionality(category) {
-      fetch('/get_existing_data/')
-        .then(response => response.json())
-        .then(data => {
-          data.filter(item => item.Category === category).forEach(item => {
-            const location = [item.Longitude, item.Latitude];
-            placeMarker(location, item.Name);
-          });
-        })
-        .catch(error => console.error('Error fetching data:', error));
+document.querySelectorAll('.control-view').forEach(button => {
+  button.addEventListener('click', function() {
+    canAddMarker = false;
+    const category = this.getAttribute('data-category');
+
+    // Clear existing markers before loading new ones
+    clearMarkers();
+
+    // Fetch existing data for selected category
+    fetch('/get_existing_data/')
+      .then(response => response.json())
+      .then(data => {
+        data.filter(item => item.Category === category).forEach(item => {
+          const location = [item.Longitude, item.Latitude];
+          placeMarker(location, item.Category, item.Name, item.Description, item.Email, item.Phone);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+
+    // Hide offcanvas menus if open
+    let offcanvasAddEl = document.getElementById('mobileAdd');
+    let offcanvasViewEl = document.getElementById('mobileView');
+    if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
+      let offcanvasAdd = bootstrap.Offcanvas.getInstance(offcanvasAddEl);
+      offcanvasAdd.hide();
     }
+    if (offcanvasViewEl && offcanvasViewEl.classList.contains('show')) {
+      let offcanvasView = bootstrap.Offcanvas.getInstance(offcanvasViewEl);
+      offcanvasView.hide();
+    }
+  });
+});
 
-    // Handle form submission
+    function loadExistingData(category) {
+  fetch('/get_existing_data/')
+    .then(response => response.json())
+    .then(data => {
+      data.filter(item => item.Category === category).forEach(item => {
+        const location = [item.Longitude, item.Latitude];
+        placeMarker(location, item.Category, item.Name, item.Description);
+      });
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+
+
     document.getElementById('locationForm').addEventListener('submit', function(event) {
       event.preventDefault();
       const name = document.getElementById('name').value;
@@ -433,7 +721,6 @@ if (navigator.geolocation) {
       const longitude = document.getElementById('longitude').value;
       const description = document.getElementById('description').value;
       const category = document.getElementById('category').value;
-
       const data = { name, email, phone, latitude, longitude, description, category };
 
       fetch('/save_location', {
@@ -454,13 +741,11 @@ if (navigator.geolocation) {
       })
       .catch(error => console.error('Error:', error));
 
-      // Hide the modal and reset the form
       const modalInstance = bootstrap.Modal.getInstance(document.getElementById('dataModal'));
       modalInstance.hide();
       this.reset();
     });
 
-    // Helper function to get CSRF token from cookies
     function getCookie(name) {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {
@@ -476,7 +761,9 @@ if (navigator.geolocation) {
       return cookieValue;
     }
 
-    // Cookie consent
+    // ================================================
+    // Cookie Consent
+    // ================================================
     if (!localStorage.getItem('cookieConsent')) {
       const cookieConsentBanner = document.getElementById('cookieConsentBanner');
       cookieConsentBanner.style.display = 'block';
@@ -486,19 +773,41 @@ if (navigator.geolocation) {
       });
     }
 
-    // Center the map on the user's current location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          const userLocation = [position.coords.longitude, position.coords.latitude];
-          map.setCenter(userLocation);
-          map.setZoom(12);
-        },
-        function(error) {
-          console.error('Error getting location:', error);
-        }
-      );
+    // ================================================
+    // Draggable Functionality for Left Sidebar
+    // ================================================
+    function makeDraggable(el) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      el.onmousedown = dragMouseDown;
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        el.style.top = (el.offsetTop - pos2) + "px";
+        el.style.left = (el.offsetLeft - pos1) + "px";
+      }
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
     }
+    document.addEventListener('DOMContentLoaded', function() {
+      const leftSidebar = document.querySelector('.sidebar');
+      if (leftSidebar) {
+        makeDraggable(leftSidebar);
+      }
+    });
   </script>
 </body>
 </html>
