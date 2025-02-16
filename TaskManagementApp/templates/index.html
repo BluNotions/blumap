@@ -1,20 +1,18 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Blumaps</title>
   {% load static %}
   <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
 
+  <!-- Web3Auth -->
   <script src="https://cdn.jsdelivr.net/npm/@web3auth/modal@latest/dist/web3auth.umd.min.js"></script>
-
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <!-- Mapbox CSS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-
   <!-- Google Fonts: Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
@@ -27,23 +25,27 @@
       color: #ffffff;
       position: relative;
     }
+    /* Scrollbar Styles */
+    ::-webkit-scrollbar { width: 16px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #888; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+    html { scrollbar-width: auto; scrollbar-color: #888 #f1f1f1; }
+
     /* Navbar */
-    .navbar {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    /* Status text (hidden until logged in) */
-    #statusNav {
-      margin-right: 1rem;
-    }
+    .navbar { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    #statusNav { margin-right: 1rem; }
+
     /* Map Container */
     #map {
-      height: 500px;
+      height: 900px;
       border: 3px solid #ffffff;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       margin-bottom: 2rem;
     }
-    /* Top Banner Styling */
+
+    /* Top Banner */
     .top-banner {
       background-color: #002D62;
       padding: 30px;
@@ -52,35 +54,25 @@
       margin-bottom: 20px;
       color: #ffffff;
     }
-    .top-banner .professional-heading {
-      font-size: 2.5rem;
-      margin: 0;
-    }
-    .top-banner .lead {
-      font-size: 1.25rem;
-      margin-top: 10px;
-    }
-    /* Sidebar for Desktop Controls (Draggable) */
+    .top-banner .professional-heading { font-size: 2.5rem; margin: 0; }
+    .top-banner .lead { font-size: 1.25rem; margin-top: 10px; }
+
+    /* Sidebar (Draggable) */
     .sidebar {
       position: fixed;
       top: 20%;
       left: 2%;
       width: 220px;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0,0,0,0.75);
       padding: 1rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       cursor: move;
     }
-    .sidebar h5 {
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .sidebar .btn {
-      width: 100%;
-      margin-bottom: 0.75rem;
-    }
-    /* Professional Button Styles */
+    .sidebar h5 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+    .sidebar .btn { width: 100%; margin-bottom: 0.75rem; }
+
+    /* Professional Buttons */
     .btn-professional {
       font-family: 'Roboto', sans-serif;
       border: none;
@@ -89,28 +81,20 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       transition: background-color 0.3s ease;
     }
-    .btn-professional.btn-add {
-      background-color: #005BB5;
-      color: #ffffff;
-    }
-    .btn-professional.btn-add:hover {
-      background-color: #004a9e;
-    }
-    .btn-professional.btn-view {
-      background-color: #003f7f;
-      color: #ffffff;
-    }
-    .btn-professional.btn-view:hover {
-      background-color: #003469;
-    }
+    .btn-professional.btn-add { background-color: #005BB5; color: #ffffff; }
+    .btn-professional.btn-add:hover { background-color: #004a9e; }
+    .btn-professional.btn-view { background-color: #003f7f; color: #ffffff; }
+    .btn-professional.btn-view:hover { background-color: #003469; }
+
     /* About Section */
     #about-section {
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0,0,0,0.8);
       padding: 2rem;
       border-radius: 8px;
       margin-bottom: 2rem;
     }
-    /* Improved Banner Styling */
+
+    /* Banner Section */
     .banner {
       display: flex;
       justify-content: center;
@@ -120,48 +104,50 @@
       width: 100%;
       height: 120px;
     }
-    /* Improved Logo Styling */
     .banner-logo {
-      height: 100px;
-      max-width: 120px;
+      height: 50px;
+      max-width: 60px;
       object-fit: contain;
       background-color: white;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 5px;
+      border-radius: 4px;
       margin: 0 15px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+
     #dataScienceSidebar {
       position: fixed;
       top: 20%;
       left: 2%;
       width: 250px;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0,0,0,0.85);
       padding: 1rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       cursor: move;
       color: #ffffff;
       z-index: 1050;
     }
+
     /* Cookie Consent */
     .cookie-consent {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0,0,0,0.85);
       color: #ffffff;
       padding: 1rem;
       text-align: center;
       z-index: 1100;
     }
+
     #tapMessage {
       position: fixed;
       top: 50px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0,0,0,0.8);
       color: #ffffff;
       padding: 10px 20px;
       border-radius: 5px;
@@ -169,12 +155,30 @@
       z-index: 1500;
       display: none;
     }
+
     /* Auth Modal Dark Background */
     .modal-content.auth-modal-dark {
       background-color: #1a1a1a;
       color: #e0e0e0;
       border: none;
     }
+
+    /* Scroll Buttons */
+    .scroll-btn {
+      position: fixed;
+      right: 20px;
+      z-index: 9999;
+      font-size: 1.5rem;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      cursor: pointer;
+      color: #fff;
+      background-color: #005BB5;
+    }
+    #scrollUpBtn { bottom: 80px; }
+    #scrollDownBtn { bottom: 20px; }
   </style>
 </head>
 <body>
@@ -194,8 +198,10 @@
             Explore
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#" id="dataScienceBtn">Data Science</a></li>
+            <li><a class="dropdown-item" href="#" id="dataScienceBtn">Insights</a></li>
             <li><a class="dropdown-item" href="#about-section">About</a></li>
+            <!-- New NFT Dropdown Item -->
+            <li><a class="dropdown-item" href="/nft">NFT</a></li>
           </ul>
         </li>
         <li class="nav-item">
@@ -203,7 +209,7 @@
             Community Builder: <span id="userStars">-</span>
           </span>
         </li>
-        <!-- Single "Log In" link that triggers modal -->
+        <!-- Log In Link -->
         <li class="nav-item">
           <a id="auth-link" class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#authModal">Log In</a>
         </li>
@@ -212,10 +218,11 @@
   </div>
 </nav>
 
+
 <!-- Draggable Data Science Sidebar -->
 <div id="dataScienceSidebar" class="sidebar d-none">
   <div class="d-flex justify-content-between align-items-center">
-    <h5>Data Science Insights</h5>
+    <h5>Insights</h5>
     <button class="btn-close btn-close-white" id="closeDataScience"></button>
   </div>
   <hr>
@@ -227,7 +234,7 @@
 <!-- Top Banner -->
 <header class="top-banner">
   <h1 class="professional-heading"> *</h1>
-  <h1 class="professional-heading">Blumaps </h1>
+  <h1 class="professional-heading">Blumaps</h1>
   <p class="lead">Mapping Needs & Ideas</p>
 </header>
 
@@ -240,7 +247,7 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Single Login Form -->
+        <!-- Login Form -->
         <form id="loginForm">
           <div class="mb-3">
             <input type="text" class="form-control" id="loginPhoneOrEmail" placeholder="Phone number or email address" required>
@@ -256,13 +263,12 @@
           </div>
           <button type="submit" class="btn btn-primary w-100">Log In</button>
         </form>
-
         <div class="d-flex justify-content-between mt-3">
           <a href="#" class="text-decoration-none" style="color: #aaa;">Forgot password?</a>
           <a href="#" class="text-decoration-none" style="color: #aaa;">Sign up</a>
         </div>
         <div class="text-center mt-3" style="color: #aaa;">OR</div>
-        <!-- Log in with Google (Web3Auth) -->
+        <!-- Log in with Google -->
         <button type="button" class="btn btn-light w-100 mt-2" id="googleLoginBtn">
           Log in with Google
         </button>
@@ -297,7 +303,7 @@
               <option value="Private">Private</option>
             </select>
           </div>
-          <!-- Hidden fields for coordinates -->
+          <!-- Hidden Coordinates -->
           <input type="hidden" id="latitude">
           <input type="hidden" id="longitude">
           <button type="submit" class="btn btn-primary">Submit</button>
@@ -343,13 +349,13 @@
   </div>
   <div class="offcanvas-body">
     <div class="mb-4">
-      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community-mobile" data-category="Community">
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community-mobile" data-category="Community" data-bs-dismiss="offcanvas">
         Community<br><small>Urgent Need</small>
       </button>
-      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business-mobile" data-category="Commerce">
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business-mobile" data-category="Commerce" data-bs-dismiss="offcanvas">
         Commerce<br><small>Ideas & Wants</small>
       </button>
-      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-inner-circle-mobile" data-category="Private">
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-inner-circle-mobile" data-category="Private" data-bs-dismiss="offcanvas">
         Private<br><small>Family & Friends</small>
       </button>
     </div>
@@ -364,20 +370,20 @@
   </div>
   <div class="offcanvas-body">
     <div>
-      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-community-2-mobile" data-category="Community">
+      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-community-2-mobile" data-category="Community" data-bs-dismiss="offcanvas">
         Community Needs
       </button>
-      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-business-2-mobile" data-category="Commerce">
+      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-business-2-mobile" data-category="Commerce" data-bs-dismiss="offcanvas">
         Business Ideas
       </button>
-      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-inner-circle-2-mobile" data-category="Private">
+      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-inner-circle-2-mobile" data-category="Private" data-bs-dismiss="offcanvas">
         Private Interest
       </button>
     </div>
   </div>
 </div>
 
-<!-- Mobile Controls Toggle Buttons (Visible only on mobile) -->
+<!-- Mobile Controls Toggle Buttons -->
 <div class="d-lg-none text-center my-3">
   <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileAdd" aria-controls="mobileAdd">
     Add Need/Idea
@@ -398,14 +404,73 @@
     <h2 class="professional-heading" style="font-size: 2rem;">Empowering Communities</h2>
     <p class="lead">A Journey of Innovation and Transformation</p>
   </div>
-  <div class="mx-auto" style="max-width: 800px;"> 
-    <p class="lead"><strong>BluMaps</strong> is a nonprofit initiative established and operated by <strong>BluNotions (Pty) Ltd</strong>, with support from the <strong>AWS Rapid Ramp Program</strong>.</p>
-    <p class="lead">Our platform connects resources to those in need by capturing real-time data to identify urgent needs and entrepreneurial opportunities.</p>
-    <p class="lead">With plans to integrate <strong>Web3Auth, NFTs, and cryptocurrency EFTs</strong>, we ensure secure, direct donations via mobile wallets, empowering the most vulnerable.</p>
-    <p class="lead">Join us in driving innovation, uplifting communities, and creating lasting impact.</p>
+  <div class="mx-auto" style="max-width: 800px;">
+    <p class="lead"><strong>Blumaps</strong> is a pioneering social impact platform and community resource network managed by <strong>BluNotions (Pty) Ltd</strong> and supported by the <strong>AWS Rapid Ramp Program</strong>.</p>
+    <p class="lead">Our state-of-the-art interactive web application redefines community engagement by mapping urgent needs, breakthrough ideas, and transformative projects in real time, effectively bridging the gap between resources and those in need.</p>
+    <p class="lead">You can help and donate directly to individuals of your choice. When you help, your support comes via direct email communication, providing personal guidance and assistance. When you donate, your financial contribution is applied directly to those in need, ensuring a tangible impact.</p>
+    <p class="lead">Additionally, as you contribute, your status increases—earning you recognition and valuable NFTs that highlight your social impact.</p>
+    <p class="lead">Join us in driving innovation, uplifting communities, and creating lasting change.</p>
     <p class="lead"><strong>Donate today and be part of the change.</strong></p>
   </div>
 </section>
+
+
+</section>
+
+<!-- Donation Modal for Support BluMaps (Centralized Donation) -->
+<div class="modal fade" id="donationModal" tabindex="-1" aria-labelledby="donationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="donationModalLabel">Support BluMaps </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Choose your preferred donation method:</p>
+        <div class="d-grid gap-3">
+          <!-- PayPal Donation Link (Organization's) -->
+          <a href="https://www.paypal.com/ncp/payment/2BNNA4BYFW8PN" target="_blank" class="btn btn-primary">
+            Donate with PayPal
+          </a>
+          <!-- Crypto Donate Button -->
+          <a href="https://commerce.coinbase.com/checkout/YOUR_COINBASE_CHECKOUT_ID" target="_blank" class="btn btn-warning">
+            Donate with Crypto
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Donation Modal for Support Donee (Direct Donation to Donee) -->
+<div class="modal fade" id="donationDoneeModal" tabindex="-1" aria-labelledby="donationDoneeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: #1a1a1a; color: #fff;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="donationDoneeModalLabel">Support Donee</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Choose your preferred donation method:</p>
+        <div class="d-grid gap-3">
+          <!-- The PayPal link here will be dynamically updated -->
+          <a href="" target="_blank" class="btn btn-primary paypal-link">
+            Donate with PayPal
+          </a>
+          <!-- Crypto Donate Button -->
+          <a href="https://commerce.coinbase.com/checkout/YOUR_COINBASE_CHECKOUT_ID" target="_blank" class="btn btn-warning">
+            Donate with Crypto
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed Donate Button for Support BluMaps -->
+<div style="position: fixed; bottom: 20px; left: 20px; z-index: 1200;">
+  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#donationModal">Support BluNotions</button>
+</div>
 
 <!-- Cookie Consent Banner -->
 <div class="cookie-consent" id="cookieConsentBanner">
@@ -417,8 +482,7 @@
 <!-- Mapbox and Bootstrap JS -->
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Web3Auth (Google, Apple, Facebook, etc.) -->
+<!-- Web3Auth -->
 <script src="https://cdn.jsdelivr.net/npm/@web3auth/modal@latest/dist/web3auth.umd.min.js"></script>
 
 <script>
@@ -430,8 +494,6 @@
       this.currentUser = null;
       this.users = JSON.parse(localStorage.getItem('users') || '{}');
     }
-
-    // Simplified login with phone/email & password
     login(phoneOrEmail, password) {
       const user = this.users[phoneOrEmail];
       if (!user || user.password !== password) {
@@ -440,8 +502,6 @@
       this.currentUser = phoneOrEmail;
       return { success: true, user: phoneOrEmail, stars: user.stars };
     }
-
-    // Example sign-up if needed
     register(phoneOrEmail, password) {
       if (this.users[phoneOrEmail]) {
         return { success: false, message: 'User already exists' };
@@ -450,11 +510,7 @@
       localStorage.setItem('users', JSON.stringify(this.users));
       return { success: true, user: phoneOrEmail, stars: 0 };
     }
-
-    logout() {
-      this.currentUser = null;
-    }
-
+    logout() { this.currentUser = null; }
     updateUserPoints(phoneOrEmail, points) {
       if (!this.users[phoneOrEmail]) return;
       let user = this.users[phoneOrEmail];
@@ -467,7 +523,6 @@
       localStorage.setItem('users', JSON.stringify(this.users));
       document.getElementById("userStars").textContent = "★".repeat(user.stars);
     }
-
     getUserStars(phoneOrEmail) {
       return this.users[phoneOrEmail]?.stars || 0;
     }
@@ -478,14 +533,12 @@
   // Web3Auth Initialization
   // ================================================
   let web3auth;
-
   async function initWeb3Auth() {
     if (typeof window.Web3auth === "undefined") {
       console.error("❌ Web3Auth library not loaded! Check your script tag.");
       alert("Web3Auth is not ready yet. Please refresh the page.");
       return;
     }
-
     try {
       web3auth = new window.Web3auth.Web3Auth({
         clientId: "YOBHFz0jugozoNYo_RsyPxUN7RN6AjGcjD6BHe2VW0L7eySoWRFIJD5RY-YyP_AoFiGu1vAJZmk7snW6eQ_2wzoSM",
@@ -499,17 +552,13 @@
           loginMethodsOrder: ["google", "facebook", "apple"],
         }
       });
-
       await web3auth.initModal();
       console.log("✅ Web3Auth Initialized");
-
     } catch (error) {
       console.error("❌ Error initializing Web3Auth:", error);
       alert("Failed to initialize Web3Auth. Please try again.");
     }
   }
-
-  // Ensure Web3Auth initializes only after the page fully loads
   window.addEventListener("load", async () => {
     console.log("📢 Page Loaded. Initializing Web3Auth...");
     await initWeb3Auth();
@@ -524,19 +573,14 @@
       alert("Web3Auth is not ready yet. Please try again in a moment.");
       return;
     }
-
     try {
       const provider = await web3auth.connect();
       console.log("✅ Web3Auth provider:", provider);
-
       authSystem.currentUser = "web3authUser";
       document.getElementById('auth-link').textContent = 'Log Out';
       document.getElementById('brandName').textContent = "Web3Auth User";
       document.getElementById('statusNav').classList.remove('d-none');
-
-      // Close login modal
       bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-
     } catch (error) {
       console.error("❌ Error logging in with Web3Auth:", error);
       alert("Login failed. Please try again.");
@@ -548,25 +592,19 @@
   // ================================================
   document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
     const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
     if (!authSystem || typeof authSystem.login !== "function") {
       console.error("❌ authSystem is not defined or not working.");
       alert("Authentication system is unavailable.");
       return;
     }
-
     const result = authSystem.login(phoneOrEmail, password);
-
     if (result.success) {
       document.getElementById('auth-link').textContent = 'Log Out';
       document.getElementById('brandName').textContent = result.user;
       document.getElementById('statusNav').classList.remove('d-none');
       document.getElementById("userStars").textContent = "★".repeat(result.stars);
-
-      // Close login modal
       bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
     } else {
       alert(result.message);
@@ -579,18 +617,15 @@
   document.getElementById('auth-link').addEventListener('click', async function(e) {
     if (authSystem.currentUser === null || authSystem.currentUser === "web3authUser") {
       e.preventDefault();
-
       try {
         if (web3auth) {
           await web3auth.logout();
           console.log("✅ Web3Auth Logged Out");
         }
-
         authSystem.logout();
         document.getElementById('auth-link').textContent = 'Log In';
         document.getElementById('brandName').textContent = 'Blumaps';
         document.getElementById('statusNav').classList.add('d-none');
-
       } catch (error) {
         console.error("❌ Error during Web3Auth logout:", error);
         alert("Logout failed. Please try again.");
@@ -636,53 +671,64 @@
   // ================================================
   let canAddMarker = false;
   let markers = [];
-  function placeMarker(location, category, title = "Unnamed", description = "No details available.", email = "Not provided", phone = "Not provided") {
+
+  // Modified to accept a "payLink" parameter for donee-specific payment details
+  function placeMarker(location, category, title = "Unnamed", description = "No details available.", email = "Not provided", phone = "Not provided", payLink = "") {
+    let donateButtonHtml = "";
+    if (!authSystem.currentUser || authSystem.currentUser !== email) {
+      // Include the donee payment link as a data attribute
+      donateButtonHtml = `<button class="btn btn-success btn-sm popup-donate" data-email="${email}" data-phone="${phone}" data-paylink="${payLink}">Donate</button>`;
+    }
     const popupContent = `
       <strong style="color: black;">${title}</strong>
       <p style="color: black;">${description}</p>
       <div style="margin-top: 10px;">
         <button class="btn btn-primary btn-sm popup-help" data-email="${email}" data-phone="${phone}">Help</button>
-        <button class="btn btn-success btn-sm popup-donate" data-email="${email}" data-phone="${phone}">Donate</button>
+        ${donateButtonHtml}
       </div>
     `;
     const marker = new mapboxgl.Marker().setLngLat(location).addTo(map);
     markers.push(marker);
     marker.getElement().dataset.category = category;
     const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent).setLngLat(location);
-    marker.getElement().addEventListener('click', () => {
-      popup.toggle();
-    });
+    marker.getElement().addEventListener('click', () => { popup.toggle(); });
     marker.setPopup(popup);
   }
+
   function clearMarkers() {
     markers.forEach(marker => marker.remove());
     markers = [];
   }
+
   function showTapMessage(message, duration = 3000) {
     const tapMessage = document.getElementById('tapMessage');
     tapMessage.textContent = message;
     tapMessage.style.display = "block";
-    setTimeout(() => {
-      tapMessage.style.display = "none";
-    }, duration);
+    setTimeout(() => { tapMessage.style.display = "none"; }, duration);
   }
 
-  // Delegated listener for "Help" buttons
+  // Help button: Opens email client (no points updated)
   document.addEventListener('click', function(e) {
     if (e.target && e.target.matches('.popup-help')) {
+      e.stopPropagation();
       if (!authSystem.currentUser) {
         new bootstrap.Modal(document.getElementById('authModal')).show();
         showTapMessage("Please log in to help.", 3000);
         e.preventDefault();
         return;
       }
-      authSystem.updateUserPoints(authSystem.currentUser, 5);
-      showTapMessage("You are offering to help. Thank you for supporting the community!", 3000);
+      const doneeEmail = e.target.getAttribute("data-email");
+      const subject = encodeURIComponent("Assistance Inquiry from BluMaps");
+      const body = encodeURIComponent("Hi, I saw your need on BluMaps and would like to offer help. Please contact me for further details.");
+      window.open(`mailto:${doneeEmail}?subject=${subject}&body=${body}`, '_blank');
+      showTapMessage("Your help inquiry email has been prepared. Please check your email.", 3000);
     }
   });
-  // Delegated listener for "Donate" buttons
+
+  // Donate button: Updates donation points and opens the Support Donee modal (with donee's payment details)
   document.addEventListener('click', function(e) {
     if (e.target && e.target.matches('.popup-donate')) {
+      e.stopPropagation();
       if (!authSystem.currentUser) {
         new bootstrap.Modal(document.getElementById('authModal')).show();
         showTapMessage("Please log in to donate.", 3000);
@@ -690,9 +736,21 @@
         return;
       }
       authSystem.updateUserPoints(authSystem.currentUser, 1);
-      showTapMessage("You are donating to this cause. Every small contribution counts!", 3000);
+      // Retrieve donee's payment link from data attribute
+      const doneePayLink = e.target.getAttribute("data-paylink");
+      // Update the donationDoneeModal's PayPal link dynamically
+      const paypalLinkAnchor = document.querySelector("#donationDoneeModal a.paypal-link");
+      if (doneePayLink && doneePayLink.trim() !== "") {
+         paypalLinkAnchor.setAttribute("href", doneePayLink);
+      } else {
+         paypalLinkAnchor.setAttribute("href", "https://default-donee-link.example.com");
+      }
+      new bootstrap.Modal(document.getElementById('donationDoneeModal')).show();
+      showTapMessage("Please review the donation options.", 3000);
     }
   });
+
+  // Controls to add new markers.
   document.querySelectorAll('.control-add').forEach(button => {
     button.addEventListener('click', function() {
       if (!authSystem.currentUser) {
@@ -706,18 +764,14 @@
       const tapMessage = document.getElementById('tapMessage');
       tapMessage.textContent = "Tap on the map to add a marker";
       tapMessage.style.display = "block";
-      const messageTimeout = setTimeout(() => {
-        tapMessage.style.display = "none";
-      }, 4000);
+      const messageTimeout = setTimeout(() => { tapMessage.style.display = "none"; }, 4000);
       map.once('click', function(event) {
         if (canAddMarker) {
           const coordinates = event.lngLat;
-          // Set coordinates in the form for later submission
           document.getElementById('latitude').value = coordinates.lat;
           document.getElementById('longitude').value = coordinates.lng;
-          // Optionally, you can place a temporary marker here
-          placeMarker(coordinates, category, "New Need", "No details provided.");
-          // Hide any open offcanvas menus if applicable
+          // For demonstration, pass an example donee payment link.
+          placeMarker(coordinates, category, "New Need", "No details provided.", "donee@example.com", "1234567890", "https://www.paypal.com/ncp/payment/DONEE_SPECIFIC_LINK");
           let offcanvasAddEl = document.getElementById('mobileAdd');
           let offcanvasViewEl = document.getElementById('mobileView');
           if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
@@ -730,24 +784,25 @@
           }
           tapMessage.style.display = "none";
           clearTimeout(messageTimeout);
-          // Show the "Add Need" modal so the user can enter details
           new bootstrap.Modal(document.getElementById('dataModal')).show();
         }
       });
     });
   });
+
+  // Controls to view markers.
   document.querySelectorAll('.control-view').forEach(button => {
     button.addEventListener('click', function() {
       canAddMarker = false;
       const category = this.getAttribute('data-category');
       clearMarkers();
-      // Load markers from server for the selected category
       fetch('/get_existing_data/')
         .then(response => response.json())
         .then(data => {
           data.filter(item => item.Category === category).forEach(item => {
             const location = [item.Longitude, item.Latitude];
-            placeMarker(location, item.Category, item.Name, item.Description, item.Email, item.Phone);
+            // Assume that each item has a "PaymentLink" field for donee donations.
+            placeMarker(location, item.Category, item.Name, item.Description, item.Email, item.Phone, item.PaymentLink);
           });
         })
         .catch(error => console.error('Error fetching data:', error));
@@ -765,25 +820,10 @@
   });
 
   // ================================================
-  // Re-added Function: Load Existing Data (if needed elsewhere)
-  // ================================================
-  function loadExistingData(category) {
-    fetch('/get_existing_data/')
-      .then(response => response.json())
-      .then(data => {
-        data.filter(item => item.Category === category).forEach(item => {
-          const location = [item.Longitude, item.Latitude];
-          placeMarker(location, item.Category, item.Name, item.Description);
-        });
-      })
-      .catch(error => console.error('Error fetching data:', error));
-  }
-
-  // ================================================
-  // New Function: Check Toxicity via Perspective API
+  // Check Toxicity via Perspective API
   // ================================================
   async function checkToxicity(text) {
-    const apiKey = "AIzaSyAYwrzOaH6eIU63Wwz1TcBZodnjvYV0-_k"; // (store securely!)
+    const apiKey = "AIzaSyAYwrzOaH6eIU63Wwz1TcBZodnjvYV0-_k";
     const url = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
     const requestBody = {
       comment: { text: text },
@@ -801,36 +841,29 @@
         return 0;
       }
       const data = await response.json();
-      const toxicityScore = data.attributeScores.TOXICITY.summaryScore.value;
-      return toxicityScore;
+      return data.attributeScores.TOXICITY.summaryScore.value;
     } catch (error) {
       console.error("Error calling Perspective API:", error);
       return 0;
     }
   }
 
-  // ================================================
-  // Re-added Function: Handle Location Form Submission with Toxicity Check
-  // ================================================
+  // Handle Location Form Submission with Toxicity Check
   document.getElementById('locationForm').addEventListener('submit', async function(event) {
     event.preventDefault();
     const title = document.getElementById('title').value;
     const description = document.getElementById('description').value;
     const combinedText = title + " " + description;
-    
-    // Check for toxic or inappropriate content using Perspective API
     const toxicity = await checkToxicity(combinedText);
     console.log("Toxicity score:", toxicity);
     if (toxicity >= 0.7) {
       alert("Your submission contains inappropriate content. Please revise your text.");
       return;
     }
-    
     const latitude = document.getElementById('latitude').value;
     const longitude = document.getElementById('longitude').value;
     const category = document.getElementById('category').value;
     const data = { title, latitude, longitude, description, category };
-
     fetch('/save_location', {
       method: 'POST',
       headers: {
@@ -848,15 +881,12 @@
       placeMarker([longitude, latitude], category, title, description);
     })
     .catch(error => console.error('Error:', error));
-
     const modalInstance = bootstrap.Modal.getInstance(document.getElementById('dataModal'));
     modalInstance.hide();
     this.reset();
   });
 
-  // ================================================
-  // Re-added Function: Get Cookie for CSRF
-  // ================================================
+  // Get Cookie for CSRF
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -872,9 +902,7 @@
     return cookieValue;
   }
 
-  // ================================================
   // Cookie Consent
-  // ================================================
   if (!localStorage.getItem('cookieConsent')) {
     const cookieConsentBanner = document.getElementById('cookieConsentBanner');
     cookieConsentBanner.style.display = 'block';
@@ -884,9 +912,7 @@
     });
   }
 
-  // ================================================
   // Draggable Functionality for Sidebars
-  // ================================================
   function makeDraggable(el) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     el.onmousedown = dragMouseDown;
@@ -913,9 +939,7 @@
   }
   document.addEventListener('DOMContentLoaded', function() {
     const leftSidebar = document.querySelector('.sidebar.d-none.d-lg-block');
-    if (leftSidebar) {
-      makeDraggable(leftSidebar);
-    }
+    if (leftSidebar) { makeDraggable(leftSidebar); }
     const dataScienceSidebar = document.getElementById("dataScienceSidebar");
     makeDraggable(dataScienceSidebar);
   });
@@ -957,9 +981,28 @@
       document.getElementById("dataScienceContent").innerHTML = "<p>Geolocation is not supported by your browser.</p>";
     }
   });
+
   // Close Data Science Sidebar
   document.getElementById("closeDataScience").addEventListener("click", function () {
     document.getElementById("dataScienceSidebar").classList.add("d-none");
+  });
+
+  // Scroll Up / Scroll Down Buttons
+  const scrollUpBtn = document.createElement('button');
+  scrollUpBtn.id = 'scrollUpBtn';
+  scrollUpBtn.className = 'scroll-btn';
+  scrollUpBtn.textContent = '▲';
+  document.body.appendChild(scrollUpBtn);
+  const scrollDownBtn = document.createElement('button');
+  scrollDownBtn.id = 'scrollDownBtn';
+  scrollDownBtn.className = 'scroll-btn';
+  scrollDownBtn.textContent = '▼';
+  document.body.appendChild(scrollDownBtn);
+  scrollUpBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  scrollDownBtn.addEventListener('click', () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   });
 </script>
 

@@ -6,6 +6,13 @@ from django.http import JsonResponse
 from django.conf import settings
 import json
 
+
+from django.shortcuts import render
+
+def nft_view(request):
+    return render(request, 'nft.html')
+
+
 def home(request):
     if request.method == 'POST':
         form = TaskForm(request.POST or None)
