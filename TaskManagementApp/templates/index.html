@@ -9,7 +9,7 @@
 
   <!-- Cyber -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Web3Auth -->
+  <!-- Web3Auth (only one instance now) -->
   <script src="https://cdn.jsdelivr.net/npm/@web3auth/modal@latest/dist/web3auth.umd.min.js"></script>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -27,12 +27,6 @@
       color: #ffffff;
       position: relative;
     }
-    /* Scrollbar Styles */
-    ::-webkit-scrollbar { width: 16px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #888; border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: #555; }
-    html { scrollbar-width: auto; scrollbar-color: #888 #f1f1f1; }
 
     /* ======================
        CYBERPUNK Theme 
@@ -106,15 +100,42 @@
       transition: 0.3s ease;
     }
     .nav-link:hover::after { left: 0; }
-    /* Map Container */
-    #map {
-      height: 600px;
+  /* Map Container */
+  #map {
+      height: 500px;
       border: 3px solid #ffffff;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      margin-bottom: 2rem;
       z-index: 1;
+      transition: all 0.3s ease;
     }
+    /* Full screen styles: when activated the container and map fill the viewport */
+    #mapContainer.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: 9999;
+      background: #fff;
+    }
+    #map.fullscreen {
+      width: 100%;
+      height: 100%;
+    }
+    /* Full screen buttons on the left side */
+    #enterFullScreenBtn,
+    #exitFullScreenBtn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
+    /* Hide exit button by default */
+    #exitFullScreenBtn { display: none; }
+    
     .top-banner {
       background-color: transparent !important; 
       padding: 50px 0;
@@ -239,206 +260,128 @@
       color: #e0e0e0;
       border: none;
     }
-/* Scroll Buttons */
-.scroll-btn {
-  position: fixed;
-  right: 20px;
-  z-index: 12000 !important;
-  font-size: 1.5rem;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  cursor: pointer;
-  color: #fff;
-  background-color: #005BB5;
-  transform: translateY(-50%); /* Vertical centering */
-}
 
-#scrollUpBtn { 
-  top: 90%; /* Position at halfway point */
-  margin-top: -30px; /* Adjust for button spacing */
-}
+    .btn-custom-blue {
+      background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+      border: none;
+      color: white;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 247, 255, 0.3);
+    }
+    .btn-custom-blue:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
+      color: var(--neon-accent);
+    }
+    .card-link {
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .donation-card {
+      background: linear-gradient(145deg, rgba(0,40,102,0.8), rgba(0,66,255,0.15));
+      border: 1px solid rgba(0, 247, 255, 0.3);
+      border-radius: 15px;
+      padding: 2rem;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .glow-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 30px rgba(0, 247, 255, 0.2);
+    }
+    .cyber-header {
+      position: relative;
+      z-index: 2;
+    }
+    .hacker-effect {
+      position: relative;
+      display: inline-block;
+    }
+    .hacker-effect::before {
+      content: attr(data-text);
+      position: absolute;
+      color: var(--neon-accent);
+      clip-path: inset(0 100% 0 0);
+      animation: glitch 1.5s infinite alternate;
+    }
+    @keyframes glitch {
+      0% { clip-path: inset(10% 0 30% 0); }
+      100% { clip-path: inset(0 0 0 0); }
+    }
+    .cyber-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 4px;
+      margin: 0;
+    }
+    .cyber-subhead {
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.9);
+      margin: 1rem 0;
+    }
+    .neon-underline {
+      position: relative;
+      padding-bottom: 3px;
+    }
+    .neon-underline::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--neon-accent);
+      box-shadow: 0 0 10px rgba(0,247,255,0.5);
+    }
+    .cta-pulse {
+      margin-top: 2rem;
+      position: relative;
+      text-align: center;
+    }
+    .cta-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      position: relative;
+    }
+    .cta-text {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+      color: var(--neon-accent);
+      text-shadow: 0 0 10px rgba(0,247,255,0.3);
+    }
 
-#scrollDownBtn { 
-  top: 90%; /* Position at halfway point */
-  margin-top: 30px; /* Adjust for button spacing */
-}
-
-    @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(0, 102, 255, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 102, 255, 0); }
-  }
-  
-  .btn-custom-blue {
-    background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 247, 255, 0.3);
-  }
-  
-  .btn-custom-blue:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
-    color: var(--neon-accent);
-  }
-
-  .card-link {
-  text-decoration: none;
-  display: block;
-  position: relative;
-  overflow: hidden;
-}
-
-.donation-card {
-  background: linear-gradient(145deg, rgba(0,40,102,0.8), rgba(0,66,255,0.15));
-  border: 1px solid rgba(0, 247, 255, 0.3);
-  border-radius: 15px;
-  padding: 2rem;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.glow-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 30px rgba(0, 247, 255, 0.2);
-}
-
-.cyber-header {
-  position: relative;
-  z-index: 2;
-}
-
-.hacker-effect {
-  position: relative;
-  display: inline-block;
-}
-
-.hacker-effect::before {
-  content: attr(data-text);
-  position: absolute;
-  color: var(--neon-accent);
-  clip-path: inset(0 100% 0 0);
-  animation: glitch 1.5s infinite alternate;
-}
-
-@keyframes glitch {
-  0% { clip-path: inset(10% 0 30% 0); }
-  100% { clip-path: inset(0 0 0 0); }
-}
-
-.cyber-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2.5rem;
-  background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 4px;
-  margin: 0;
-}
-
-.cyber-subhead {
-  font-size: 1.25rem;
-  color: rgba(255,255,255,0.9);
-  margin: 1rem 0;
-}
-
-.neon-underline {
-  position: relative;
-  padding-bottom: 3px;
-}
-
-.neon-underline::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--neon-accent);
-  box-shadow: 0 0 10px rgba(0,247,255,0.5);
-}
-
-.cta-pulse {
-  margin-top: 2rem;
-  position: relative;
-  text-align: center;
-}
-
-.cta-content {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  position: relative;
-}
-
-.cta-text {
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 2px;
-  color: var(--neon-accent);
-  text-shadow: 0 0 10px rgba(0,247,255,0.3);
-}
-
-.cta-arrow {
-  position: relative;
-  animation: pulse-arrow 1.5s infinite;
-}
-
-.arrow-beam {
-  position: absolute;
-  width: 40px;
-  height: 2px;
-  background: var(--neon-accent);
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.5;
-}
-
-@keyframes pulse-arrow {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(10px); }
-  100% { transform: translateX(0); }
-}
-
-.grid-pattern {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .cyber-title {
-    font-size: 2rem;
-  }
-  
-  .cyber-subhead {
-    font-size: 1.1rem;
-  }
-
-  /* Make scroll buttons larger on small screens */
-@media (max-width: 768px) {
-  .scroll-btn {
-    font-size: 2rem;
-    padding: 15px 20px;
-  }
-}
-}
-
+    .grid-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    @media (max-width: 768px) {
+      .cyber-title { font-size: 2rem; }
+      .cyber-subhead { font-size: 1.1rem; }
+      /* Make scroll buttons larger on small screens */
+      .scroll-btn {
+        font-size: 2rem;
+        padding: 15px 20px;
+      }
+    }
     /* ================================
-       New Sponsor Banner Styles (to be placed in Footer)
+       New Sponsor Banner Styles (Footer)
        ================================ */
     .sponsor-banner {
       background: linear-gradient(90deg, rgba(0,40,102,0.9), rgba(0,66,255,0.2));
@@ -461,7 +404,6 @@
       filter: drop-shadow(0 0 5px rgba(0,247,255,0.3));
       opacity: 0.9;
     }
-
     .sponsor-label {
       font-family: 'Orbitron', sans-serif;
       font-size: 0.75rem;
@@ -477,48 +419,10 @@
       margin: 0.5rem;
       border: 1px solid rgba(0,247,255,0.1);
     }
-
-/* Scroll Control */
-.scroll-control {
-  position: fixed;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 12000;
-  height: 700px;
-  width: 50px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 20px;
-  touch-action: none;
-}
-
-.scroll-handle {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  background: #005BB5;
-  border-radius: 50%;
-  left: 2px;
-  cursor: grab;
-  transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.scroll-handle:active {
-  cursor: grabbing;
-  transform: scale(1.1);
-}
-
-/* Optional hover effect for desktop */
-@media (hover: hover) {
-  .scroll-control:hover {
-    background: rgba(0,0,0,0.15);
-  }
-}
-
   </style>
 </head>
 <body>
+
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand" href="#" id="brandName">Blumaps</a>
@@ -535,6 +439,10 @@
           <li class="nav-item">
             <a class="nav-link" href="#" id="addFriendBtn">Add Friend</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/inbox" id="inboxBtn">Inbox</a>
+          </li>
+          
           <!-- Existing Navigation Items -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -560,11 +468,18 @@
       </div>
     </div>
   </nav>
-  
-<!-- Add this to your HTML -->
-<div class="scroll-control">
-  <div class="scroll-handle"></div>
-</div>
+
+  <!-- Inbox Sidebar -->
+  <div id="inboxSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5>Inbox</h5>
+      <button class="btn-close btn-close-white" id="closeInboxSidebar"></button>
+    </div>
+    <hr>
+    <div id="inboxContent">
+      <p>No help requests yet.</p>
+    </div>
+  </div>
 
   <!-- NGO Registration/Login Modal -->
   <div class="modal fade" id="ngoAuthModal" tabindex="-1" aria-labelledby="ngoAuthModalLabel" aria-hidden="true">
@@ -624,31 +539,30 @@
   </div>
 
   <!-- Friends List Sidebar -->
-<div id="friendsListSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
-  <div class="d-flex justify-content-between align-items-center">
-    <h5>Friends List</h5>
-    <button class="btn-close btn-close-white" id="closeFriendsListSidebar"></button>
+  <div id="friendsListSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5>Friends List</h5>
+      <button class="btn-close btn-close-white" id="closeFriendsListSidebar"></button>
+    </div>
+    <hr>
+    <div id="friendsListContent">
+      <p>No friends added yet.</p>
+    </div>
   </div>
-  <hr>
-  <div id="friendsListContent">
-    <p>No friends added yet.</p>
-  </div>
-</div>
 
-<!-- Add Friend Sidebar -->
-<div id="addFriendSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
-  <div class="d-flex justify-content-between align-items-center">
-    <h5>Add Friend</h5>
-    <button class="btn-close btn-close-white" id="closeAddFriendSidebar"></button>
+  <!-- Add Friend Sidebar -->
+  <div id="addFriendSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5>Add Friend</h5>
+      <button class="btn-close btn-close-white" id="closeAddFriendSidebar"></button>
+    </div>
+    <hr>
+    <div id="addFriendContent">
+      <input type="text" class="form-control" id="friendUsername" placeholder="Search by username">
+      <button class="btn btn-primary mt-2" id="addFriendAction">Add Friend</button>
+      <div id="friendSearchResults" class="mt-3"></div>
+    </div>
   </div>
-  <hr>
-  <div id="addFriendContent">
-    <input type="text" class="form-control" id="friendUsername" placeholder="Search by username">
-    <button class="btn btn-primary mt-2" id="addFriendAction">Add Friend</button>
-    <div id="friendSearchResults" class="mt-3"></div>
-  </div>
-</div>
-
 
   <!-- Top Banner -->
   <header class="top-banner">
@@ -807,50 +721,45 @@
     </button>
   </div>
 
-  <!-- Map Container -->
-  <div class="container my-4">
+  <!-- Map Container with Full Screen Toggle -->
+  <div class="container my-4 position-relative" id="mapContainer">
     <div id="map"></div>
   </div>
 
-<!-- 3 Button Model Section -->
-<section id="about-section" class="container">
-  <div class="text-center mb-4">
-    <h2 class="professional-heading" style="font-size: 2rem;">6 Button Model</h2>
-    <p class="lead">Select category then click on map</p>
-  </div>
-  <div class="mx-auto" style="max-width: 800px;">
-    <h4>1. Urgent Needs (Community/Public)</h4>
-    <p class="lead">Post and view immediate community needs, emergencies, or crisis support requests. Visible to everyone, enabling quick community response and collective action.</p>
+  <!-- 3 Button Model Section -->
+  <section id="about-section" class="container">
+    <div class="text-center mb-4">
+      <h2 class="professional-heading" style="font-size: 2rem;">6 Button Model</h2>
+      <p class="lead">Select category then click on map</p>
+    </div>
+    <div class="mx-auto" style="max-width: 800px;">
+      <h4>1. Urgent Needs (Community/Public)</h4>
+      <p class="lead">Post and view immediate community needs, emergencies, or crisis support requests. Visible to everyone, enabling quick community response and collective action.</p>
 
-    <h4>2. Business Ideas, Wants, Wishlist (Commerce/public)</h4>
-    <p class="lead">Share your wishes, innovative business ideas, or community projects openly. Inspire collaboration, gather feedback, and find support to turn ideas into reality.</p>
+      <h4>2. Business Ideas, Wants, Wishlist (Commerce/public)</h4>
+      <p class="lead">Share your wishes, innovative business ideas, or community projects openly. Inspire collaboration, gather feedback, and find support to turn ideas into reality.</p>
 
-    <h4>3. Private Circle (Family and Friends Only)</h4>
-    <p class="lead">Privately communicate sensitive or personal needs with trusted users only. Foster deeper connections and secure support within your private network.</p>
-  </div>
-</section>
+      <h4>3. Private Circle (Family and Friends Only)</h4>
+      <p class="lead">Privately communicate sensitive or personal needs with trusted users only. Foster deeper connections and secure support within your private network.</p>
+    </div>
+  </section>
 
-
-
-<!-- About Section -->
-<section id="about-section" class="container">
-  <div class="text-center mb-4">
-    <h2 class="professional-heading" style="font-size: 2rem;">Empowering Communities</h2>
-    <p class="lead">Absolutely Everybody</p>
-  </div>
-  <div class="mx-auto" style="max-width: 800px;">
-    <p class="lead"><strong>Blumaps</strong>, powered by <strong>BluNotions (Pty) Ltd</strong> and backed by the <strong>AWS Rapid Ramp Program</strong>, is a cutting-edge social impact platform and collaborative resource network designed to spark meaningful change.</p>
-    <p class="lead">Our revolutionary web application transforms how communities connect by dynamically mapping real-time needs, visionary ideas, and impactful initiatives—instantly linking resources with those who need them most.</p>
-    <p class="lead">Empowering you to support individuals or causes you care about, whether in your community or anywhere else, with AI verification ensuring every contribution delivers visible, measurable results directly to those in need.</p>
-    <p class="lead">Together, we can fuel innovation, empower underserved communities, and build a legacy of sustainable progress.</p>
-    <p class="lead"><strong>Shape the future. Join our movement.</strong></p>
-    <p class="lead">
-    <a href="{% url 'about' %}" class="text-white text-decoration-underline">Learn more about us</a>
-    </p>
-  </div>
-</section>
-
-
+  <!-- About Section -->
+  <section id="about-section" class="container">
+    <div class="text-center mb-4">
+      <h2 class="professional-heading" style="font-size: 2rem;">Empowering Communities</h2>
+      <p class="lead">Absolutely Everybody</p>
+    </div>
+    <div class="mx-auto" style="max-width: 800px;">
+      <p class="lead"><strong>Blumaps</strong>, powered by <strong>BluNotions (Pty) Ltd</strong> and backed by the <strong>AWS Rapid Ramp Program</strong>, is a cutting-edge social impact platform and collaborative resource network designed to spark meaningful change.</p>
+      <p class="lead">Our revolutionary web application transforms how communities connect by dynamically mapping real-time needs, visionary ideas, and impactful initiatives—instantly linking resources with those who need them most.</p>
+      <p class="lead">Empowering you to support individuals or causes you care about, whether in your community or anywhere else, with AI verification ensuring every contribution delivers visible, measurable results directly to those in need.</p>
+      <p class="lead"><strong>Shape the future. Join our movement.</strong></p>
+      <p class="lead">
+      <a href="{% url 'about' %}" class="text-white text-decoration-underline">Learn more about us</a>
+      </p>
+    </div>
+  </section>
 
   <div class="container" data-aos="fade-up">
     <a href="{% url 'sponser' %}" class="card-link">
@@ -879,38 +788,33 @@
     </a>
   </div>
   
-  
-  
+  <!-- Fixed Donate Button for Support Blumaps -->
+  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1200;">
+    <a href="{% url 'sponser' %}" class="btn btn-custom-blue btn-lg shadow-lg" 
+       style="animation: pulse 2s infinite; min-width: 160px;"
+       role="button">
+      <i class="fas fa-hands-helping me-2"></i>Support Blumaps
+    </a>
+  </div>
 
-<!-- Fixed Donate Button for Support Blumaps -->
-<div style="position: fixed; bottom: 20px; left: 20px; z-index: 1200;">
-  <a href="{% url 'sponser' %}" class="btn btn-custom-blue btn-lg shadow-lg" 
-     style="animation: pulse 2s infinite; min-width: 160px;"
-     role="button">
-    <i class="fas fa-hands-helping me-2"></i>Support Blumaps
-  </a>
-</div>
-
-
-
-<style>
-  @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(76, 175, 80, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-  }
-  
-  .btn-success {
-    background: linear-gradient(135deg, #00C851, #007E33);
-    border: none;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-success:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 200, 81, 0.4);
-  }
-</style>
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(76, 175, 80, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #00C851, #007E33);
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 200, 81, 0.4);
+    }
+  </style>
 
   <!-- Cookie Consent Banner -->
   <div class="cookie-consent" id="cookieConsentBanner">
@@ -922,8 +826,7 @@
   <!-- Mapbox and Bootstrap JS -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Web3Auth -->
-  <script src="https://cdn.jsdelivr.net/npm/@web3auth/modal@latest/dist/web3auth.umd.min.js"></script>
+  
   <script>
     // ================================================
     // Authentication System
@@ -1043,6 +946,8 @@
       }
     });
 
+
+
     // Mapbox Initialization
     mapboxgl.accessToken = 'pk.eyJ1IjoibW9ybmVncmVlbiIsImEiOiJjamJsNWJtc3oxbDl6MzFvYnpoeHNucHNkIn0.F8OjEDmrkseIRVMOt32Fcw';
     var map = new mapboxgl.Map({
@@ -1102,31 +1007,132 @@
       tapMessage.style.display = "block";
       setTimeout(() => { tapMessage.style.display = "none"; }, duration);
     }
-    document.addEventListener('click', function(e) {
-      if (e.target && e.target.matches('.popup-help')) {
-        e.stopPropagation();
-        if (!authSystem.currentUser) {
-          new bootstrap.Modal(document.getElementById('authModal')).show();
-          showTapMessage("Please log in to help.", 3000);
-          return;
-        }
-        const doneeEmail = e.target.getAttribute("data-email");
-        const doneePhone = e.target.getAttribute("data-phone");
-        const subject = "Assistance Inquiry from BluMaps";
-        const messageText = "Hi, I saw your need on BluMaps and would like to offer help. Please contact me for further details.";
-        if (doneePhone && doneePhone !== "Not provided" && doneePhone.trim() !== "") {
-          const cleanedPhone = doneePhone.replace(/\D/g, '');
-          const encodedMessage = encodeURIComponent(messageText);
-          window.open(`https://wa.me/${cleanedPhone}?text=${encodedMessage}`, '_blank');
-          showTapMessage("Your WhatsApp help inquiry has been prepared. Please check your WhatsApp.", 3000);
-        } else if (doneeEmail && doneeEmail !== "Not provided" && doneeEmail.trim() !== "") {
-          window.open(`mailto:${doneeEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(messageText)}`, '_blank');
-          showTapMessage("Your email help inquiry has been prepared. Please check your email.", 3000);
-        } else {
-          alert("No contact information available for this need.");
-        }
-      }
+
+    
+// --- Inbox System Setup ---
+// Initialize inboxes from localStorage or create empty object
+let inboxes = JSON.parse(localStorage.getItem('inboxes')) || {};
+
+// Improved addToInbox function with persistence
+function addToInbox(recipient, conversation) {
+    // Initialize array if recipient doesn't exist
+    if (!inboxes[recipient]) {
+        inboxes[recipient] = [];
+    }
+    
+    // Add new conversation
+    inboxes[recipient].push(conversation);
+    
+    // Persist to localStorage
+    localStorage.setItem('inboxes', JSON.stringify(inboxes));
+    
+    // Update UI if recipient is current user
+    if (authSystem.currentUser === recipient) {
+        updateInboxUI();
+    }
+}
+
+// Enhanced UI Update Function
+function updateInboxUI() {
+    const inboxContent = document.getElementById('inboxContent');
+    if (!inboxContent) return;
+
+    const userEmail = authSystem.currentUser;
+    inboxContent.innerHTML = ""; // Clear existing content
+
+    if (!userEmail) {
+        inboxContent.innerHTML = "<p>Please log in to view your inbox</p>";
+        return;
+    }
+
+    const conversations = inboxes[userEmail] || [];
+    
+    if (conversations.length === 0) {
+        inboxContent.innerHTML = "<p>No messages found</p>";
+        return;
+    }
+
+    // Create conversation elements
+    conversations.forEach(conv => {
+        const convElement = document.createElement('div');
+        convElement.className = 'conversation-item';
+        convElement.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6>${conv.title}</h6>
+                    <small>From: ${conv.sender}</small>
+                </div>
+                <button class="btn btn-sm btn-primary view-conversation" 
+                        data-conv-id="${conv.id}">
+                    View
+                </button>
+            </div>
+        `;
+        inboxContent.appendChild(convElement);
     });
+}
+
+// --- Enhanced "Help" Button Handler ---
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.popup-help')) {
+        e.stopPropagation();
+        
+        // Auth check
+        if (!authSystem.currentUser) {
+            showToast('Please log in to help someone', 'warning');
+            return;
+        }
+
+        // Get recipient info
+        const recipientEmail = e.target.dataset.email;
+        if (!recipientEmail || recipientEmail === "Not provided") {
+            showToast('No valid contact information available', 'error');
+            return;
+        }
+
+        // Create conversation object
+        const newConversation = {
+            id: Date.now(),
+            sender: authSystem.currentUser,
+            recipient: recipientEmail,
+            title: `Help Request - ${new Date().toLocaleDateString()}`,
+            messages: [{
+                from: authSystem.currentUser,
+                text: "Hi, I saw your request and would like to help. How can I assist?",
+                timestamp: new Date().toLocaleString()
+            }]
+        };
+
+        // Add to inbox and show feedback
+        addToInbox(recipientEmail, newConversation);
+        showToast('Help request sent successfully!', 'success');
+        
+        // Optional: Refresh inbox if open
+        if (document.getElementById('inboxSidebar').classList.contains('show')) {
+            updateInboxUI();
+        }
+    }
+});
+
+// --- Toast Notification System ---
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+
+
     document.querySelectorAll('.control-add').forEach(button => {
       button.addEventListener('click', function() {
         if (!authSystem.currentUser) {
@@ -1204,6 +1210,10 @@
         }
       });
     });
+
+
+
+
     async function checkToxicity(text) {
       const apiKey = "AIzaSyAYwrzOaH6eIU63Wwz1TcBZodnjvYV0-_k";
       const url = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
@@ -1355,159 +1365,101 @@
     document.getElementById("closeDataScience").addEventListener("click", function () {
       document.getElementById("dataScienceSidebar").classList.add("d-none");
     });
-    const scrollUpBtn = document.createElement('button');
-    scrollUpBtn.id = 'scrollUpBtn';
-    scrollUpBtn.className = 'scroll-btn';
-    scrollUpBtn.textContent = '▲';
-    document.body.appendChild(scrollUpBtn);
-    const scrollDownBtn = document.createElement('button');
-    scrollDownBtn.id = 'scrollDownBtn';
-    scrollDownBtn.className = 'scroll-btn';
-    scrollDownBtn.textContent = '▼';
-    document.body.appendChild(scrollDownBtn);
-    scrollUpBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    scrollDownBtn.addEventListener('click', () => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+
+    // Full Screen Map Toggle
+    document.getElementById('expandMapBtn').addEventListener('click', function() {
+      const mapEl = document.getElementById('map');
+      if (mapEl.classList.contains('map-fullscreen')) {
+        mapEl.classList.remove('map-fullscreen');
+        this.textContent = "Full Screen";
+      } else {
+        mapEl.classList.add('map-fullscreen');
+        this.textContent = "Exit Full Screen";
+      }
+      map.resize();
     });
 
-// Add this JavaScript
-const scrollControl = document.querySelector('.scroll-control');
-const scrollHandle = document.querySelector('.scroll-handle');
-let isDragging = false;
+    // Show Friends List sidebar when the navbar item is clicked
+    document.getElementById("friendsListBtn").addEventListener("click", function(e) {
+      e.preventDefault();
+      document.getElementById("friendsListSidebar").classList.remove("d-none");
+    });
 
-function moveHandle(clientY) {
-  const containerRect = scrollControl.getBoundingClientRect();
-  const yPosition = clientY - containerRect.top - 18; // Center handle
-  const maxY = containerRect.height - 36;
-  
-  const newY = Math.min(Math.max(yPosition, 0), maxY);
-  const scrollPercent = newY / maxY;
-  
-  // Update handle position
-  scrollHandle.style.transform = `translateY(${newY}px)`;
-  
-  // Scroll page proportionally
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  window.scrollTo(0, maxScroll * scrollPercent);
-}
+    // Hide Friends List sidebar
+    document.getElementById("closeFriendsListSidebar").addEventListener("click", function() {
+      document.getElementById("friendsListSidebar").classList.add("d-none");
+    });
 
-// Touch events
-scrollControl.addEventListener('touchstart', (e) => {
-  isDragging = true;
-  moveHandle(e.touches[0].clientY);
-});
+    // Show Add Friend sidebar when the navbar item is clicked
+    document.getElementById("addFriendBtn").addEventListener("click", function(e) {
+      e.preventDefault();
+      document.getElementById("addFriendSidebar").classList.remove("d-none");
+    });
 
-scrollControl.addEventListener('touchmove', (e) => {
-  if (isDragging) {
-    e.preventDefault();
-    moveHandle(e.touches[0].clientY);
-  }
-});
+    // Hide Add Friend sidebar
+    document.getElementById("closeAddFriendSidebar").addEventListener("click", function() {
+      document.getElementById("addFriendSidebar").classList.add("d-none");
+    });
 
-scrollControl.addEventListener('touchend', () => {
-  isDragging = false;
-});
-
-// Mouse events
-scrollControl.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  moveHandle(e.clientY);
-});
-
-document.addEventListener('mousemove', (e) => {
-  if (isDragging) {
-    moveHandle(e.clientY);
-  }
-});
-
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-});
-
-// Show Friends List sidebar when the navbar item is clicked
-document.getElementById("friendsListBtn").addEventListener("click", function(e) {
-  e.preventDefault();
-  document.getElementById("friendsListSidebar").classList.remove("d-none");
-});
-
-// Hide Friends List sidebar
-document.getElementById("closeFriendsListSidebar").addEventListener("click", function() {
-  document.getElementById("friendsListSidebar").classList.add("d-none");
-});
-
-// Show Add Friend sidebar when the navbar item is clicked
-document.getElementById("addFriendBtn").addEventListener("click", function(e) {
-  e.preventDefault();
-  document.getElementById("addFriendSidebar").classList.remove("d-none");
-});
-
-// Hide Add Friend sidebar
-document.getElementById("closeAddFriendSidebar").addEventListener("click", function() {
-  document.getElementById("addFriendSidebar").classList.add("d-none");
-});
-
-// Handle the Add Friend action
-document.getElementById("addFriendAction").addEventListener("click", function() {
-  const username = document.getElementById("friendUsername").value.trim();
-  if (username === "") {
-    alert("Please enter a username");
-    return;
-  }
-  // Placeholder: Add your friend request logic here (e.g., AJAX call to server)
-  alert("Friend request sent to " + username);
-  document.getElementById("friendUsername").value = "";
-});
-
-
+    // Handle the Add Friend action
+    document.getElementById("addFriendAction").addEventListener("click", function() {
+      const username = document.getElementById("friendUsername").value.trim();
+      if (username === "") {
+        alert("Please enter a username");
+        return;
+      }
+      // Placeholder: Add your friend request logic here (e.g., AJAX call to server)
+      alert("Friend request sent to " + username);
+      document.getElementById("friendUsername").value = "";
+    });
   </script>
-<footer class="footer-bottom">
-  <div class="container text-center">
-    <div class="sponsor-banner">
-      <div class="container">
-        <!-- Group 1: Combined Sponsor & Operated (AWS and BluNotion) -->
-        <div class="row justify-content-center mb-4" data-aos="fade-down">
-          <div class="col-12 col-md-6">
-            <div class="logo-group-container">
-              <img src="{% static 'awslogo.png' %}" alt="AWS Logo" class="banner-logo" style="height: 100px;">
-              <div class="sponsor-label">SPONSORED BY AWS</div>
+  <footer class="footer-bottom">
+    <div class="container text-center">
+      <div class="sponsor-banner">
+        <div class="container">
+          <!-- Group 1: Combined Sponsor & Operated (AWS and BluNotion) -->
+          <div class="row justify-content-center mb-4" data-aos="fade-down">
+            <div class="col-12 col-md-6">
+              <div class="logo-group-container">
+                <img src="{% static 'awslogo.png' %}" alt="AWS Logo" class="banner-logo" style="height: 100px;">
+                <div class="sponsor-label">SPONSORED BY AWS</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="logo-group-container">
+                <img src="{% static 'BluNotionLogo.png' %}" alt="BluNotion Logo" class="banner-logo" style="height: 100px;">
+                <div class="sponsor-label">OPERATED BY BLUNOTION</div>
+              </div>
             </div>
           </div>
-          <div class="col-12 col-md-6">
-            <div class="logo-group-container">
-              <img src="{% static 'BluNotionLogo.png' %}" alt="BluNotion Logo" class="banner-logo" style="height: 100px;">
-              <div class="sponsor-label">OPERATED BY BLUNOTION</div>
-            </div>
-          </div>
-        </div>
-        <!-- Group 2: Combined Development Tooling & Future Development Roadmap -->
-        <div class="row justify-content-center mb-4" data-aos="fade-down" data-aos-delay="200">
-          <div class="col-12">
-            <div class="logo-group-container">
-              <div class="tech-logo-group">
-                <img src="{% static 'github.png' %}" alt="GitHub Logo" class="banner-logo" style="height: 60px;">
-                <img src="{% static 'linuxlogo2.png' %}" alt="Linux Logo" class="banner-logo" style="height: 60px;">
-                <img src="{% static 'python.png' %}" alt="Python Logo" class="banner-logo" style="height: 60px;">
-                <img src="{% static 'nftlogo.png' %}" alt="NFT Logo" class="banner-logo"style="height: 60px;">
-                <img src="{% static 'web3.png' %}" alt="Web3 Logo" class="banner-logo" style="height: 60px;">
+          <!-- Group 2: Combined Development Tooling & Future Development Roadmap -->
+          <div class="row justify-content-center mb-4" data-aos="fade-down" data-aos-delay="200">
+            <div class="col-12">
+              <div class="logo-group-container">
+                <div class="tech-logo-group">
+                  <img src="{% static 'github.png' %}" alt="GitHub Logo" class="banner-logo" style="height: 60px;">
+                  <img src="{% static 'linuxlogo2.png' %}" alt="Linux Logo" class="banner-logo" style="height: 60px;">
+                  <img src="{% static 'python.png' %}" alt="Python Logo" class="banner-logo" style="height: 60px;">
+                  <img src="{% static 'nftlogo.png' %}" alt="NFT Logo" class="banner-logo" style="height: 60px;">
+                  <img src="{% static 'web3.png' %}" alt="Web3 Logo" class="banner-logo" style="height: 60px;">
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-      <p>
-        <a href="{% url 'termsofuse' %}">Terms of Use</a>
-        <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
-        <a href="{% url 'corporate_policy' %}">Corporate Policies</a>
-        <a href="{% url 'careers' %}">Careers</a>
-        <a href="#">Contact Us</a> |
-      </p>
-      <p>&copy; 2024 Blunotions™. All Rights Reserved.</p>
-    </div>
-  </footer>
+        <p>
+          <a href="{% url 'termsofuse' %}">Terms of Use</a>
+          <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+          <a href="{% url 'corporate_policy' %}">Corporate Policies</a>
+          <a href="{% url 'careers' %}">Careers</a>
+          <a href = "{% url 'contact' %}">Contact Us</a> |
+        </p>
+        <p>&copy; 2024 Blunotions™. All Rights Reserved.</p>
+      </div>
+    </footer>
 
-  <div id="tapMessage">Tap on map to add</div>
+    <div id="tapMessage">Tap on map to add</div>
 </body>
 </html>

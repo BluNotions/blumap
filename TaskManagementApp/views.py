@@ -15,8 +15,14 @@ def nft_view(request):
 def sponser_page(request):
     return render(request, 'sponser.html') 
 
+def contact_page(request):
+    return render(request, 'contact.html') 
+
 def about_page(request):
     return render(request, 'about.html') 
+
+def inbox_page(request):
+    return render(request, 'inbox.html') 
 
 def forum_discus(request):
     return render(request, 'forum_discus.html')

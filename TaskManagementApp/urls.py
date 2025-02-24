@@ -15,4 +15,6 @@ urlpatterns = [
     path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
     path('sponser/', views.sponser_page, name='sponser'),
     path('about/', views.about_page, name='about'),
+    path('inbox/', views.inbox_page, name='inbox'),
+    path('contact/', views.contact_page, name='contact'),
 ]
