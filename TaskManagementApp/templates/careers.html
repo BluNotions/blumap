@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Careers | Blunotions™</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-blue: #002966;
+      --accent-blue: #0066FF;
+      --neon-accent: #00F7FF;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #001A4D, #003D99);
+      color: white;
+      padding-top: 80px;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, var(--primary-blue), rgba(0, 40, 102, 0.9));
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-scrolled {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: var(--glass-bg);
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 10px rgba(0, 247, 255, 0.3));
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      color: var(--neon-accent);
+      font-weight: 300;
+    }
+
+    .divider {
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+      margin: 2rem 0;
+      border: none;
+    }
+
+    .job-list {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0;
+    }
+
+    .job-list li {
+      background: var(--glass-bg);
+      margin: 1.5rem auto;
+      padding: 1.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .job-list li:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .job-list li::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .job-list li:hover::before {
+      left: 100%;
+    }
+
+    .btn-gradient {
+      background: linear-gradient(45deg, var(--accent-blue), var(--neon-accent));
+      border: none;
+      color: white;
+      padding: 0.8rem 2rem;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-gradient:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 247, 255, 0.4);
+    }
+
+    .notice {
+      font-size: 1.1rem;
+      color: var(--neon-accent);
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: var(--glass-bg);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 247, 255, 0.3);
+    }
+
+    .back-home a {
+      color: var(--neon-accent);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+    }
+
+    .back-home a:hover {
+      color: white;
+      text-shadow: 0 0 10px rgba(0, 247, 255, 0.5);
+      transform: translateX(5px);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-atom icon-glow"></i> Blunotions
+      </a>
+    </div>
+  </nav>
+
+  <div class="container" data-aos="fade-up">
+    <h1 class="text-center">Careers at Blunotions™</h1>
+    <p class="subtitle text-center">Innovating the Future, One Freelancer at a Time</p>
+    <div class="divider"></div>
+
+    <p class="notice" data-aos="zoom-in">
+      <i class="fas fa-info-circle"></i> We currently offer <strong>freelance opportunities only</strong> in the fields below
+    </p>
+
+    <ul class="job-list">
+      <li data-aos="fade-right">
+        <i class="fas fa-rocket me-2"></i>Software Engineering
+        <span class="badge bg-primary float-end">Remote</span>
+      </li>
+      <li data-aos="fade-left">
+        <i class="fas fa-chart-line me-2"></i>Marketing Specialist
+        <span class="badge bg-primary float-end">Remote</span>
+      </li>
+      <li data-aos="fade-right">
+        <i class="fas fa-chart-pie me-2"></i>Business Analysis
+        <span class="badge bg-primary float-end">Remote</span>
+      </li>
+    </ul>
+
+    <div class="text-center mt-4" data-aos="zoom-in">
+      <p>Send your portfolio & resume to:</p>
+      <a href="mailto:careers@blunotions.com" class="btn-gradient">
+        <i class="fas fa-paper-plane me-2"></i>Apply Now
+      </a>
+    </div>
+
+    <div class="notice mt-4" data-aos="fade-up">
+      <i class="fas fa-clock me-2"></i>Stay tuned for future openings as we continue to grow
+    </div>
+
+    <p class="back-home text-center mt-4">
+      <a href="/"><i class="fas fa-arrow-left me-2"></i>Back to Home</a>
+    </p>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: 'ease-out-back'
+    });
+
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 50) {
+        document.querySelector('.navbar').classList.add('navbar-scrolled');
+      } else {
+        document.querySelector('.navbar').classList.remove('navbar-scrolled');
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

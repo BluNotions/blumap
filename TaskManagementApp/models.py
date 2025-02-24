@@ -62,4 +62,3 @@ class Locations(models.Model):
 
     class Meta:
         db_table = 'Locations'  # Ensure the table name matches
-

@@ -12,6 +12,29 @@ from django.shortcuts import render
 def nft_view(request):
     return render(request, 'nft.html')
 
+def sponser_page(request):
+    return render(request, 'sponser.html') 
+
+def about_page(request):
+    return render(request, 'about.html') 
+
+def forum_discus(request):
+    return render(request, 'forum_discus.html')
+
+def termsofuse(request):
+    return render(request, 'termsofuse.html')
+
+def careers(request):
+    return render(request, 'careers.html')
+
+def corporate_policy(request):
+    return render(request, 'corporatepolicy.html')
+
+def privacy_policy(request):
+    return render(request, 'privacypolicy.html')
+
+
+
 
 def home(request):
     if request.method == 'POST':
