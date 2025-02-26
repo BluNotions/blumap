@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -15,6 +15,9 @@ urlpatterns = [
     path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
     path('sponser/', views.sponser_page, name='sponser'),
     path('about/', views.about_page, name='about'),
-    path('inbox/', views.inbox_page, name='inbox'),
     path('contact/', views.contact_page, name='contact'),
+    # Inbox page view
+    path('inbox/', views.inbox_page, name='inbox'),
+    # Include messaging endpoints under /messaging/
+    path('messaging/', include('messaging_app.urls')),
 ]

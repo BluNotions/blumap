@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TaskManagementApp',
+    'messaging_app',
  
    # Add your apps here
 ]
