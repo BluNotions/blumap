@@ -1,5 +1,7 @@
 from django.urls import path, include
 from . import views
+from .views import logout_view
+from .views import get_csrf_token
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -20,4 +22,6 @@ urlpatterns = [
     path('inbox/', views.inbox_page, name='inbox'),
     # Include messaging endpoints under /messaging/
     path('messaging/', include('messaging_app.urls')),
+    path('api/logout/', logout_view, name='logout'),
+    path('api/csrf/', get_csrf_token, name='csrf-token'),
 ]

@@ -3,6 +3,9 @@ from .models import taskDb, LocationInterest, Locations
 from .forms import TaskForm
 from django.contrib import messages
 from django.http import JsonResponse
+from django.http import HttpResponse
+from django.contrib.auth import logout
+from django.middleware.csrf import get_token
 from django.conf import settings
 import json
 
@@ -53,6 +56,9 @@ def home(request):
     else:
         all_items = taskDb.objects.all()
         return render(request, 'index.html', {'all_items': all_items, 'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY})
+
+
+
 
 def delete(request, list_id):
     item = taskDb.objects.get(pk=list_id)
@@ -119,3 +125,18 @@ def get_location_interests(request):
 def get_existing_data(request):
     data = Locations.objects.values('Name', 'Latitude', 'Longitude', 'Category','Description')
     return JsonResponse(list(data), safe=False)
+
+def set_cookie(request):
+    response = HttpResponse("Cookie has been set!")
+    response.set_cookie('cookie_name', 'cookie_value', max_age=3600)
+    return response
+
+def logout_view(request):
+    logout(request)  # This clears the Django user session (if used)
+    request.session.flush()  # This clears any other session data (like Web3Auth tokens you might have stored)
+    return JsonResponse({'message': 'Logged out successfully'})
+
+
+def get_csrf_token(request):
+    token = get_token(request)
+    return JsonResponse({'csrfToken': token})

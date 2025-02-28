@@ -1,5 +1,3 @@
-// static/js/messaging.js
-
 /**
  * Retrieve the value of a cookie by name.
  * @param {string} name - The name of the cookie.
