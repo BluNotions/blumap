@@ -805,12 +805,34 @@
     }
   </style>
 
+ 
+ 
   <!-- Cookie Consent Banner -->
-  <div class="cookie-consent" id="cookieConsentBanner">
-    This website uses cookies to enhance your experience.
-    <a href="/privacy-policy" class="text-decoration-underline text-light">Learn more</a>
-    <button id="accept-cookies" class="btn btn-primary btn-sm">Accept</button>
-  </div>
+<div class="cookie-consent" id="cookieConsentBanner">
+  This website uses cookies to enhance your experience.
+  <a href="/privacy-policy" class="text-decoration-underline text-light">Learn more</a>
+  <button id="accept-cookies" class="btn btn-primary btn-sm">Accept</button>
+</div>
+
+<script>
+// Check if the cookie has already been accepted
+if (document.cookie.indexOf('cookiesAccepted=true') === -1) {
+  document.getElementById('cookieConsentBanner').style.display = 'block';
+} else {
+  document.getElementById('cookieConsentBanner').style.display = 'none';
+}
+
+// Handle the click event for the 'Accept' button
+document.getElementById('accept-cookies').addEventListener('click', function() {
+alert('hit')
+  // Set a cookie to remember the user's choice
+  document.cookie = 'cookiesAccepted=true; max-age=' + 60 * 60 * 24 * 365 + '; path=/';
+  
+  // Hide the cookie consent banner
+  document.getElementById('cookieConsentBanner').style.display = 'none';
+});
+</script>
+
 
   <!-- Mapbox and Bootstrap JS -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
