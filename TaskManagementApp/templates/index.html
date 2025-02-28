@@ -7,15 +7,10 @@
   {% load static %}
   <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
 
-  <!-- Cyber -->
+  <!-- Stylesheets -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Web3Auth (only one instance now) -->
-  <script src="https://cdn.jsdelivr.net/npm/@web3auth/modal@latest/dist/web3auth.umd.min.js"></script>
-  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Mapbox CSS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-  <!-- Google Fonts: Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
@@ -423,6 +418,7 @@
 </head>
 <body>
 
+  <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand" href="#" id="brandName">Blumaps</a>
@@ -432,7 +428,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
-          <!-- New Friend Items -->
+          <!-- Navigation Items -->
           <li class="nav-item">
             <a class="nav-link" href="#" id="friendsListBtn">Friends List</a>
           </li>
@@ -442,8 +438,7 @@
           <li class="nav-item">
             <a class="nav-link" href="/inbox" id="inboxBtn">Inbox</a>
           </li>
-          
-          <!-- Existing Navigation Items -->
+          <!-- Dropdown Menu -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Explore
@@ -469,6 +464,10 @@
     </div>
   </nav>
 
+  <!-- Main Content -->
+  <header class="top-banner">
+    <h1 class="professional-heading">Mapping Needs & Ideas</h1>
+  </header>
 
   <!-- NGO Registration/Login Modal -->
   <div class="modal fade" id="ngoAuthModal" tabindex="-1" aria-labelledby="ngoAuthModalLabel" aria-hidden="true">
@@ -552,11 +551,6 @@
       <div id="friendSearchResults" class="mt-3"></div>
     </div>
   </div>
-
-  <!-- Top Banner -->
-  <header class="top-banner">
-    <h1 class="professional-heading">Mapping Needs & Ideas</h1>
-  </header>
 
   <!-- Authentication Modal -->
   <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
@@ -1028,25 +1022,7 @@ fetchCsrfToken();  // Call this on page load
       }
     });
 
-    // Logout Handling
-    // document.getElementById('auth-link').addEventListener('click', async function(e) {
-    //   if (authSystem.currentUser === null || authSystem.currentUser === "web3authUser") {
-    //     e.preventDefault();
-    //     try {
-    //       if (web3auth) {
-    //         await web3auth.logout();
-    //         console.log("✅ Web3Auth Logged Out");
-    //       }
-    //       authSystem.logout();
-    //       document.getElementById('auth-link').textContent = 'Log In';
-    //       document.getElementById('brandName').textContent = 'Blumaps';
-    //       document.getElementById('statusNav').classList.add('d-none');
-    //     } catch (error) {
-    //       console.error("❌ Error during Web3Auth logout:", error);
-    //       alert("Logout failed. Please try again.");
-    //     }
-    //   }
-    // });
+  
 
 
     function getCsrfToken() {
@@ -1057,11 +1033,6 @@ fetchCsrfToken();  // Call this on page load
         ?.split('=')[1];
     return cookieValue;
 }
-// function getCookie(name) {
-//     const value = `; ${document.cookie}`;
-//     const parts = value.split(`; ${name}=`);
-//     if (parts.length === 2) return parts.pop().split(';').shift();
-// }
 
 
     document.getElementById('auth-link').addEventListener('click', async function(e) {

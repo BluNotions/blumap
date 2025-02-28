@@ -6,6 +6,7 @@
 const getCookie = (name) => {
     const cookieStr = document.cookie;
     if (!cookieStr) return null;
+
     const cookies = cookieStr.split(';').map(cookie => cookie.trim());
     for (const cookie of cookies) {
         if (cookie.startsWith(name + '=')) {
@@ -25,6 +26,7 @@ const showToast = (message, type = 'info') => {
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `<div class="toast-body">${message}</div>`;
     document.body.appendChild(toast);
+    
     setTimeout(() => { toast.remove(); }, 3000);
 };
 
@@ -35,13 +37,15 @@ const showToast = (message, type = 'info') => {
 const sendHelpRequest = (recipientId) => {
     // Check if the logged-in user is set
     if (!window.loggedInUserId) {
-        alert("Please log in to send a help request.");
+        alert('Please log in to send a help request.');
         return;
     }
+
     if (!recipientId) {
-        alert("No valid recipient information available.");
+        alert('No valid recipient information available.');
         return;
     }
+
     const payload = {
         sender_id: window.loggedInUserId,
         recipient_id: recipientId
@@ -58,13 +62,13 @@ const sendHelpRequest = (recipientId) => {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showToast("Help request sent successfully!", 'success');
+            showToast('Help request sent successfully!', 'success');
             loadInbox();  // Refresh the inbox UI from the database.
         } else {
-            alert("Error sending help request: " + (data.error || "Unknown error"));
+            alert('Error sending help request: ' + (data.error || 'Unknown error'));
         }
     })
-    .catch(err => console.error("Error sending help request:", err));
+    .catch(err => console.error('Error sending help request:', err));
 };
 
 /**
@@ -79,33 +83,26 @@ const loadInbox = () => {
                 inboxElement.innerHTML = html;
             }
         })
-        .catch(err => console.error("Error loading inbox:", err));
+        .catch(err => console.error('Error loading inbox:', err));
 };
-
-
-
-    //   if (e.target.matches('.popup-help')) {
-    //     alert('hit')
-
 
 document.addEventListener('DOMContentLoaded', () => {
     // Set the logged-in user's ID.
     // In production, this value should be set dynamically by your server-side code.
     window.loggedInUserId = window.loggedInUserId || 1; // Example: 1
     // Optionally, set a username if needed.
-    window.loggedInUsername = window.loggedInUsername || "User1";
+    window.loggedInUsername = window.loggedInUsername || 'User1';
 
     // Attach event listeners to all "Help" buttons.
     // These buttons must have a data attribute 'data-recipient-id'
     const helpButtons = document.querySelectorAll('.popup-help');
     helpButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            alert('hit')
             e.preventDefault();
             // Retrieve the recipient's user ID from the data attribute.
             const recipientId = button.dataset.recipientId;
             if (!recipientId) {
-                alert("No valid recipient information available.");
+                alert('No valid recipient information available.');
                 return;
             }
             sendHelpRequest(Number(recipientId));
