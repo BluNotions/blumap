@@ -71,7 +71,7 @@ const sendHelpRequest = (recipientId) => {
  * Loads the inbox content from the server and updates the UI.
  */
 const loadInbox = () => {
-    fetch('/messaging/inbox/')
+    fetch('/inbox/')
         .then(response => response.text())
         .then(html => {
             const inboxElement = document.getElementById('inboxContent');
@@ -81,6 +81,12 @@ const loadInbox = () => {
         })
         .catch(err => console.error("Error loading inbox:", err));
 };
+
+
+
+    //   if (e.target.matches('.popup-help')) {
+    //     alert('hit')
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Set the logged-in user's ID.
@@ -94,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpButtons = document.querySelectorAll('.popup-help');
     helpButtons.forEach(button => {
         button.addEventListener('click', (e) => {
+            alert('hit')
             e.preventDefault();
             // Retrieve the recipient's user ID from the data attribute.
             const recipientId = button.dataset.recipientId;
