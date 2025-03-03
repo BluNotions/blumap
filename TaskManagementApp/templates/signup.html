@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blumaps</title>
+  {% load static %}
+  <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
+
+  <!-- Stylesheets -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #002D62, #005BB5);
+      color: #ffffff;
+      position: relative;
+    }
+
+    /* ======================
+       CYBERPUNK Theme 
+       ====================== */
+    .navbar { border-bottom: 1px solid var(--neon-blue); }
+    :root {
+      --neon-blue: #0066FF;
+      --neon-accent: #00F7FF;
+    }
+    .professional-heading {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400; 
+      font-size: 3rem;
+      background: linear-gradient(45deg, rgba(255,255,255,0.9) 0%, #7DF9FF 40%, var(--neon-accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+      margin: 1.5rem auto;
+      text-shadow: 0 2px 10px rgba(0, 247, 255, 0.2);
+      width: fit-content;
+      padding: 0 15px;
+      position: relative;
+    }
+    .professional-heading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -10px;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-accent), transparent);
+      opacity: 0.7;
+    }
+    @media (max-width: 768px) {
+      .professional-heading { font-size: 2.2rem; padding: 0 10px; }
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 247, 255, 0.3);
+      margin-bottom: 3rem;
+    }
+    .navbar {
+      background: linear-gradient(90deg, rgba(0,40,102,0.9) 0%, rgba(0,11,26,0.95) 100%);
+      box-shadow: 0 0 25px rgba(0,247,255,0.3);
+      border-bottom: 1px solid var(--neon-blue);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    .navbar-brand {
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 15px rgba(0,247,255,0.5);
+      letter-spacing: 2px;
+    }
+    .nav-link {
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: var(--neon-blue);
+      transition: 0.3s ease;
+    }
+    .nav-link:hover::after { left: 0; }
+  /* Map Container */
+  #map {
+      height: 500px;
+      border: 3px solid #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+    /* Full screen styles: when activated the container and map fill the viewport */
+    #mapContainer.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      z-index: 9999;
+      background: #fff;
+    }
+    #map.fullscreen {
+      width: 100%;
+      height: 100%;
+    }
+    /* Full screen buttons on the left side */
+    #enterFullScreenBtn,
+    #exitFullScreenBtn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+    }
+    /* Hide exit button by default */
+    #exitFullScreenBtn { display: none; }
+    
+    .top-banner {
+      background-color: transparent !important; 
+      padding: 50px 0;
+      text-shadow: 0 0 15px rgba(0,247,255,0.3);
+      z-index: 1;
+    }
+    .top-banner .lead {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      color: var(--neon-accent);
+      z-index: 1;
+    }
+    /* Sidebar (Draggable) */
+    .sidebar {
+      position: fixed;
+      top: 20%;
+      left: 2%;
+      width: 220px;
+      background: rgba(0,0,0,0.75);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: move;
+      z-index: 11000 !important;
+    }
+    .sidebar h5 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+    .sidebar .btn { width: 100%; margin-bottom: 0.75rem; }
+    /* Professional Buttons */
+    .btn-professional {
+      font-family: 'Roboto', sans-serif;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+    }
+    .btn-professional.btn-add { background-color: #005BB5; color: #ffffff; }
+    .btn-professional.btn-add:hover { background-color: #004a9e; }
+    .btn-professional.btn-view { background-color: #003f7f; color: #ffffff; }
+    .btn-professional.btn-view:hover { background-color: #003469; }
+    /* About Section */
+    #about-section {
+      background: rgba(0,0,0,0.8);
+      padding: 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    /* Footer Banner & Footer */
+    .footer-banner {
+      background-color: #005BB5;
+      padding: 30px 0;
+      color: #ffffff;
+      z-index: 1;
+    }
+    .footer-banner h6 { font-size: 16px; font-weight: 700; margin-bottom: 15px; }
+    .footer-banner ul { padding: 0; list-style: none; }
+    .footer-banner ul li { margin-bottom: 8px; }
+    .footer-banner ul li a {
+      text-decoration: none;
+      color: #ffffff;
+      transition: color 0.3s ease-in-out;
+      z-index: 1;
+    }
+    .footer-banner ul li a:hover { color: #ccdef0; }
+    .footer-bottom {
+      background-color: #00174D;
+      padding: 20px 0;
+      color: white;
+      z-index: 1;
+    }
+    .footer-bottom .social-icons img { width: 30px; margin: 0 10px; }
+    .footer-bottom p { margin: 10px 0; }
+    .footer-bottom a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      z-index: 1;
+    }
+    .footer-bottom a:hover { text-decoration: underline; }
+    /* Data Science Sidebar */
+    #dataScienceSidebar {
+      position: fixed;
+      top: 20%;
+      left: 2%;
+      width: 250px;
+      background: rgba(0,0,0,0.85);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: move;
+      color: #ffffff;
+      z-index: 11000 !important;
+    }
+    /* Cookie Consent */
+    .cookie-consent {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.85);
+      color: #ffffff;
+      padding: 1rem;
+      text-align: center;
+      z-index: 1100;
+    }
+    #tapMessage {
+      position: fixed;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      z-index: 1500;
+      display: none;
+    }
+    /* Auth Modal Dark Background */
+    .modal-content.auth-modal-dark {
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+      border: none;
+    }
+
+    .btn-custom-blue {
+      background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+      border: none;
+      color: white;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 247, 255, 0.3);
+      margin:7px;
+    }
+    .btn-custom-blue:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
+      color: var(--neon-accent);
+    }
+    .card-link {
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .donation-card {
+      background: linear-gradient(145deg, rgba(0,40,102,0.8), rgba(0,66,255,0.15));
+      border: 1px solid rgba(0, 247, 255, 0.3);
+      border-radius: 15px;
+      padding: 2rem;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .glow-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 30px rgba(0, 247, 255, 0.2);
+    }
+    .cyber-header {
+      position: relative;
+      z-index: 2;
+    }
+    .hacker-effect {
+      position: relative;
+      display: inline-block;
+    }
+    .hacker-effect::before {
+      content: attr(data-text);
+      position: absolute;
+      color: var(--neon-accent);
+      clip-path: inset(0 100% 0 0);
+      animation: glitch 1.5s infinite alternate;
+    }
+    @keyframes glitch {
+      0% { clip-path: inset(10% 0 30% 0); }
+      100% { clip-path: inset(0 0 0 0); }
+    }
+    .cyber-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 4px;
+      margin: 0;
+    }
+    .cyber-subhead {
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.9);
+      margin: 1rem 0;
+    }
+    .neon-underline {
+      position: relative;
+      padding-bottom: 3px;
+    }
+    .neon-underline::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--neon-accent);
+      box-shadow: 0 0 10px rgba(0,247,255,0.5);
+    }
+    .cta-pulse {
+      margin-top: 2rem;
+      position: relative;
+      text-align: center;
+    }
+    .cta-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      position: relative;
+    }
+    .cta-text {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+      color: var(--neon-accent);
+      text-shadow: 0 0 10px rgba(0,247,255,0.3);
+    }
+
+    .grid-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    @media (max-width: 768px) {
+      .cyber-title { font-size: 2rem; }
+      .cyber-subhead { font-size: 1.1rem; }
+      /* Make scroll buttons larger on small screens */
+      .scroll-btn {
+        font-size: 2rem;
+        padding: 15px 20px;
+      }
+    }
+    /* ================================
+       New Sponsor Banner Styles (Footer)
+       ================================ */
+    .sponsor-banner {
+      background: linear-gradient(90deg, rgba(0,40,102,0.9), rgba(0,66,255,0.2));
+      backdrop-filter: blur(15px);
+      padding: 1.5rem 0;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--neon-accent);
+      z-index: 1;
+    }
+    .tech-logo-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem;
+    }
+    .banner-logo {
+      height: 40px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 0 5px rgba(0,247,255,0.3));
+      opacity: 0.9;
+    }
+    .sponsor-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      color: var(--neon-accent);
+      text-align: center;
+      margin-top: 0.5rem;
+      letter-spacing: 1px;
+    }
+    .logo-group-container {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 0.5rem;
+      border: 1px solid rgba(0,247,255,0.1);
+    }
+    form{
+        width:70%;
+        height:60%;
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .main{
+        width:100%;
+        height:100vh;
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    /* Add styles for the signup form */
+    .signup-form {
+        border: 1px solid #ffffff; /* White border */
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+        padding: 2rem; /* Padding inside the form */
+        background-color: rgba(0, 0, 0, 0.7); /* Background color */
+    }
+    .signup-heading {
+        font-size: 2rem; /* Heading size */
+        color: var(--neon-accent); /* Heading color */
+        margin-bottom: 1rem; /* Space below the heading */
+        text-align: center; /* Center the heading */
+    }
+  </style>
+
+</head>
+<>
+    <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#" id="brandName">Blumaps</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <!-- Navigation Items -->
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+          
+          <!-- Dropdown Menu -->
+          <li class="nav-item dropdown">
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/">Home</a></li>
+              <li><a class="dropdown-item" href="/about">About</a></li>
+
+            </ul>
+          </li>
+        
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="main">
+    <h2 class="signup-heading">Sign Up</h2>
+    <form method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn-custom-blue">Sign Up</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+  </div>
+    <footer class="footer-bottom">
+        <div class="container text-center">
+          <div class="sponsor-banner">
+            <div class="container">
+              <!-- Group 1: Combined Sponsor & Operated (AWS and BluNotion) -->
+              <div class="row justify-content-center mb-4" data-aos="fade-down">
+                <div class="col-12 col-md-6">
+                  <div class="logo-group-container">
+                    <img src="{% static 'awslogo.png' %}" alt="AWS Logo" class="banner-logo" style="height: 100px;">
+                    <div class="sponsor-label">SPONSORED BY AWS</div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="logo-group-container">
+                    <img src="{% static 'BluNotionLogo.png' %}" alt="BluNotion Logo" class="banner-logo" style="height: 100px;">
+                    <div class="sponsor-label">OPERATED BY BLUNOTION</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Group 2: Combined Development Tooling & Future Development Roadmap -->
+              <div class="row justify-content-center mb-4" data-aos="fade-down" data-aos-delay="200">
+                <div class="col-12">
+                  <div class="logo-group-container">
+                    <div class="tech-logo-group">
+                      <img src="{% static 'github.png' %}" alt="GitHub Logo" class="banner-logo" style="height: 60px;">
+                      <img src="{% static 'linuxlogo2.png' %}" alt="Linux Logo" class="banner-logo" style="height: 60px;">
+                      <img src="{% static 'python.png' %}" alt="Python Logo" class="banner-logo" style="height: 60px;">
+                      <img src="{% static 'nftlogo.png' %}" alt="NFT Logo" class="banner-logo" style="height: 60px;">
+                      <img src="{% static 'web3.png' %}" alt="Web3 Logo" class="banner-logo" style="height: 60px;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            <p>
+              <a href="{% url 'termsofuse' %}">Terms of Use</a>
+              <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+              <a href="{% url 'corporate_policy' %}">Corporate Policies</a>
+              <a href="{% url 'careers' %}">Careers</a>
+              <a href = "{% url 'contact' %}">Contact Us</a> |
+            </p>
+            <p>&copy; 2024 Blunotions™. All Rights Reserved.</p>
+          </div>
+        </footer>
+<script>
+    const csrfToken = fetch('/api/csrf').then(res =>res.json()).catch(err => alert(err));
+
+    console.log('CSRF', csrfToken)
+    // document.getElementById('signupForm').addEventListener('submit', function(event) {
+    //     event.preventDefault(); // Prevent the default form submission
+
+    //     const formData = new FormData(this);
+    //     const data = Object.fromEntries(formData.entries());
+
+    //     fetch('/api/register', { 
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'X-CSRFToken': csrfToken
+    //         },
+    //         body: JSON.stringify(data),
+    //     })
+    //     .then(response => {
+    //         if (response.ok) {
+    //             return response.json();
+    //         }
+    //         throw new Error('Registration failed');
+    //     })
+    //     .then(data => {
+    //         document.getElementById('message').innerText = 'You are registered successfully! A welcome email has been sent. You can now log in.';
+    //         document.getElementById('message').style.display = 'block';
+    //     })
+    //     .catch(error => {
+    //         document.getElementById('message').innerText = 'Error: ' + error.message;
+    //         document.getElementById('message').style.display = 'block';
+    //     });
+    // });
+
+    // Example using jQuery
+  
+
+    // Function to get CSRF token from cookies
+ 
+</script>
+</body>
+</html>

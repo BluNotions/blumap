@@ -100,16 +100,27 @@ def inbox_view(request):
     """
     Renders your inbox.html template, possibly with conversation list pre-fetched.
     """
-    if not request.user.is_authenticated:
-        # redirect to login or show a message
-        return redirect('login')
-    # Get all conversations for this user
-    user_conversations = request.user.conversations.all().order_by('-created_at')
-    # Preload the last message, etc. if you want
-    context = {
-        "conversations": user_conversations
-    }
-    return render(request, "inbox.html", context)
+    if request.method == 'GET':
+        # Retrieve the 'id' parameter from the query string
+        user_id = request.GET.get('id')
+
+        if not user_id:
+            return JsonResponse({"error": "User ID is required"}, status=400)
+
+        # Get the user by the provided ID (assuming it's an email or user ID)
+        try:
+            user = User.objects.get(email=user_id)  # Adjust if using a different identifier
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
+
+        # Get all conversations for this user
+        user_conversations = user.conversations.all().order_by('-created_at')
+
+        # Preload the last message, etc. if you want
+        context = {
+            "conversations": user_conversations
+        }
+        return render(request, "inbox.html", context)
 
 @csrf_exempt
 def send_message(request):

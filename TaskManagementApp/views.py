@@ -1,13 +1,17 @@
 from django.shortcuts import render, redirect
 from .models import taskDb, LocationInterest, Locations
 from .forms import TaskForm
+from .forms import SignupForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.http import HttpResponse
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login, authenticate
 from django.middleware.csrf import get_token
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth.models import User
+from .models import UserProfile
 
 
 from django.shortcuts import render
@@ -25,7 +29,7 @@ def about_page(request):
     return render(request, 'about.html') 
 
 def inbox_page(request):
-    return render(request, 'inbox.html') 
+    return render(request, 'inbox.html')
 
 def forum_discus(request):
     return render(request, 'forum_discus.html')
@@ -41,8 +45,6 @@ def corporate_policy(request):
 
 def privacy_policy(request):
     return render(request, 'privacypolicy.html')
-
-
 
 
 def home(request):
@@ -140,3 +142,48 @@ def logout_view(request):
 def get_csrf_token(request):
     token = get_token(request)
     return JsonResponse({'csrfToken': token})
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()  # This creates the User instance
+            UserProfile.objects.create(user=user)  # Create UserProfile instance
+            messages.success(request, 'Registration successful')
+            return redirect('home')
+    else:
+        form = SignupForm()
+    return render(request, 'signup.html', {'form': form})
+
+@csrf_exempt
+def login_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            identifier = data.get('identifier')  # This will be either email or mobile number
+            password = data.get('password')
+
+            print(f"Received identifier: {identifier}, password: {password}")  # Debug statement
+
+            if not identifier or not password:
+                return JsonResponse({'success': False, 'message': 'Identifier (email or mobile) and password are required'}, status=400)
+
+            # Try to find the user by email or mobile number
+            try:
+                user_profile = UserProfile.objects.get(user__email=identifier)  # Check by email
+            except UserProfile.DoesNotExist:
+                try:
+                    user_profile = UserProfile.objects.get(phone_number=identifier)  # Check by mobile number
+                except UserProfile.DoesNotExist:
+                    return JsonResponse({'success': False, 'message': 'Invalid credentials'}, status=400)
+
+            # Authenticate the user using the username (which is the User's email)
+            user = authenticate(request, username=user_profile.user.username, password=password)
+            if user is not None:
+                return JsonResponse({'success': True, 'user': user_profile.user.email})
+            else:
+                return JsonResponse({'success': False, 'message': 'Invalid credentials'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
