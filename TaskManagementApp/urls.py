@@ -2,10 +2,14 @@ from django.urls import path, include
 from . import views
 from .views import logout_view
 from .views import login_view
-from .views import home
 from .views import get_csrf_token
+from .views import accept_friend_request
+from .views import check_user
+from .views import send_friend_request_email
+
 urlpatterns = [
-    path('', home, name='home'),
+    # Frontend Endpoints
+    path('', views.home, name='home' ),
     path('delete/<int:list_id>', views.delete, name='delete'),
     path('save_location/', views.save_location, name='save_location'),
     path('get_location_interests/', views.get_location_interests, name='get_location_interests'),
@@ -19,13 +23,16 @@ urlpatterns = [
     path('sponser/', views.sponser_page, name='sponser'),
     path('about/', views.about_page, name='about'),
     path('contact/', views.contact_page, name='contact'),
-    # Inbox page view
-    # path('inbox/', views.inbox_page, name='inbox'),
-    # Include messaging endpoints under /messaging/
-    path('messaging/', include('messaging_app.urls')),
+    path('signup/', views.signup, name='signup'),
+    
+   # Backend API Endpoints
     path('api/login/', login_view, name='login'),
     path('api/logout/', logout_view, name='logout'),
     path('api/csrf/', get_csrf_token, name='csrf-token'),
-    path('signup/', views.signup, name='signup'),
-    
+    path('api/check_user/', check_user, name='check_user'),
+    path('api/send_friend_request_email/', send_friend_request_email, name='send_friend_request_email'),
+    path('api/accept_friend_request/<int:request_id>/', accept_friend_request, name='accept_friend_request'),
+
+    #  messaging
+    path('messaging/', include('messaging_app.urls')),
 ]

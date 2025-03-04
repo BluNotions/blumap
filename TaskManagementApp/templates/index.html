@@ -430,10 +430,10 @@
         <ul class="navbar-nav ms-auto align-items-center">
           <!-- Navigation Items -->
           <li class="nav-item">
-            <a class="nav-link" href="#" id="friendsListBtn">Friends List</a>
+            <span class="nav-link" id="friendsListBtn">Friends List</span>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" id="addFriendBtn">Add Friend</a>
+            <span class="nav-link" id="addFriendBtn">Add Friend</span>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="" id="inboxBtn">Inbox</a>
@@ -1188,7 +1188,7 @@ document.addEventListener('click', function(event) {
     .then(data => {
       alert('Message sent successfully!');
       hideModal();
-      window.location.href = '/inbox'; // Adjust the URL as needed
+      window.location.href = 'messaging/inbox'; // Adjust the URL as needed
     })
     .catch(error => {
       alert('There was an error sending your message.');
@@ -1197,7 +1197,7 @@ document.addEventListener('click', function(event) {
 
   // Handle "Go to Inbox" button click
   document.getElementById('goInbox').addEventListener('click', function() {
-    window.location.href = '/inbox'; // Adjust the URL as needed
+    window.location.href = '/messaging/inbox'; // Adjust the URL as needed
   });
 
 
@@ -1471,6 +1471,7 @@ document.addEventListener('click', function(event) {
     // Show Friends List sidebar when the navbar item is clicked
     document.getElementById("friendsListBtn").addEventListener("click", function(e) {
       e.preventDefault();
+      alert('freinds');
       document.getElementById("friendsListSidebar").classList.remove("d-none");
     });
 
@@ -1498,11 +1499,35 @@ document.addEventListener('click', function(event) {
         return;
       }
       // Placeholder: Add your friend request logic here (e.g., AJAX call to server)
-      alert("Friend request sent to " + username);
+      const email = document.getElementById("friendUsername").value; // Get the email input
+      // AJAX call to check if the user exists
+      fetch('/check_user/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ identifier: email }),
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.exists) {
+              // Send email notification
+              fetch('/send_friend_request_email/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ email: email, username: username }),
+              });
+              alert("Friend request sent to " + username);
+          } else {
+              alert("User does not exist.");
+          }
+      })
+      .catch((error) => {
+          console.error('Error:', error);
+      });
       document.getElementById("friendUsername").value = "";
-
-
-  
     });
 
 

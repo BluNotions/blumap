@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import taskDb, LocationInterest, Locations
 from .forms import TaskForm
 from .forms import SignupForm
@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.models import User
 from .models import UserProfile
+from django.core.mail import send_mail  # Import send_mail
 
 
 from django.shortcuts import render
@@ -138,6 +139,38 @@ def logout_view(request):
     request.session.flush()  # This clears any other session data (like Web3Auth tokens you might have stored)
     return JsonResponse({'message': 'Logged out successfully'})
 
+@csrf_exempt
+def check_user(request):
+        try:
+            data = json.loads(request.body)
+            identifier = data.get('identifier')
+            profile = UserProfile.objects.get(user__email=identifier)  # Check by email
+            return JsonResponse(profile)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+        
+
+def send_friend_request_email(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get('email')  # Get the email from the request
+
+        if email:
+            try:
+                send_mail(
+                    'Friend Request',  # Subject
+                    'You have received a friend request!',  # Message
+                    settings.DEFAULT_FROM_EMAIL,  # From email (set in settings.py)
+                    [email],  # Recipient list
+                    fail_silently=False,
+                )
+                return JsonResponse({'status': 'success', 'message': 'Email sent successfully'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Email address is required'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 def get_csrf_token(request):
     token = get_token(request)
@@ -187,3 +220,21 @@ def login_view(request):
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+def accept_friend_request(request, request_id):
+    if request.method == 'GET':
+        try:
+            # Assuming you have a FriendRequest model to manage friend requests
+            friend_request = get_object_or_404(FriendRequest, id=request_id)
+            user = request.user  # Get the currently logged-in user
+            
+            # Update the user's friend list
+            user.friends.add(friend_request.sender)  # Assuming sender is the user who sent the request
+            friend_request.delete()  # Remove the friend request after acceptance
+            
+            return render(request, 'accept_request.html')
+        except Exception as e:
+            messages.error(request, f'Error accepting friend request: {str(e)}')
+            return redirect('home')  # Redirect to home or an appropriate page
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
