@@ -436,7 +436,7 @@
             <a class="nav-link" href="#" id="addFriendBtn">Add Friend</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/inbox" id="inboxBtn">Inbox</a>
+            <a class="nav-link" href="" id="inboxBtn">Inbox</a>
           </li>
           <!-- Dropdown Menu -->
           <li class="nav-item dropdown">
@@ -578,7 +578,7 @@
           </form>
           <div class="d-flex justify-content-between mt-3">
             <a href="#" class="text-decoration-none" style="color: #aaa;">Forgot password?</a>
-            <a href="#" class="text-decoration-none" style="color: #aaa;">Sign up</a>
+            <a href="/signup" class="text-decoration-none" style="color: #aaa;">Sign up</a>
           </div>
           <div class="text-center mt-3" style="color: #aaa;">OR</div>
           <button type="button" class="btn btn-light w-100 mt-2" id="googleLoginBtn">
@@ -929,57 +929,64 @@ fetchCsrfToken();  // Call this on page load
     class AuthSystem {
       constructor() {
         this.currentUser = null;
-        this.users = JSON.parse(localStorage.getItem('users') || '{}');
       }
-      login(email, password) {
-        const user = this.users[email];
-        if (!user || user.password !== password) {
-          return { success: false, message: 'Invalid credentials' };
+
+      async login(email, password) {
+        alert(password +'- '+ email)
+        try {
+          const response = await fetch('/api/login/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCsrfToken() // Function to get CSRF token
+            },
+            body: JSON.stringify({ identifier: email, password })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            return { success: false, message: data.message || 'Login failed' };
+          }
+
+          this.currentUser = data.user; // Assuming the server returns user info
+          alert(JSON.stringify(this.currentUser))
+          return { success: true, user: data.user, stars: data.stars, isNGO: data.isNGO };
+        } catch (error) {
+          console.error('Login error:', error);
+          return { success: false, message: 'An error occurred during login' };
         }
-        this.currentUser = email;
-        return { success: true, user: email, stars: user.stars, isNGO: user.isNGO };
       }
-      register(userData) {
-        const { email, password, isNGO = false } = userData;
-        if (this.users[email]) {
-          return { success: false, message: 'User already exists' };
+
+      async register(userData) {
+        try {
+          const response = await fetch('/api/register/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCsrfToken() // Function to get CSRF token
+            },
+            body: JSON.stringify(userData)
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            return { success: false, message: data.message || 'Registration failed' };
+          }
+
+          return { success: true, user: data.user };
+        } catch (error) {
+          console.error('Registration error:', error);
+          return { success: false, message: 'An error occurred during registration' };
         }
-        this.users[email] = {
-          password,
-          points: 0,
-          stars: 0,
-          isNGO,
-          firstName: userData.firstName || "",
-          lastName: userData.lastName || "",
-          authority: userData.authority || "",
-          regCode: userData.regCode || ""
-        };
-        localStorage.setItem('users', JSON.stringify(this.users));
-        return { success: true, user: email, stars: 0, isNGO };
       }
+
       logout() {
         this.currentUser = null;
+        // Optionally notify the backend to clear the session
       }
-      updateUserPoints(email, points) {
-        if (!this.users[email]) return;
-        let user = this.users[email];
-        user.points += points;
-        while (user.points >= 10) {
-          user.stars += 1;
-          user.points -= 10;
-        }
-        this.users[email] = user;
-        localStorage.setItem('users', JSON.stringify(this.users));
-        const starsEl = document.getElementById("userStars");
-        if (starsEl) {
-          starsEl.textContent = "★".repeat(user.stars);
-        }
-      }
-      getUserStars(email) {
-        return this.users[email]?.stars || 0;
-      }
+
       getCurrentUser() {
-        return this.users[this.currentUser] || null;
+        return this.currentUser;
       }
     }
     const authSystem = new AuthSystem();
@@ -1008,18 +1015,23 @@ fetchCsrfToken();  // Call this on page load
     // Local Login Form
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
+     
       const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
       const password = document.getElementById('loginPassword').value;
-      const result = authSystem.login(phoneOrEmail, password);
-      if (result.success) {
-        document.getElementById('auth-link').textContent = 'Log Out';
-        document.getElementById('brandName').textContent = result.user;
+      authSystem.login(phoneOrEmail, password).then(result => {
+        alert('result' + result.success);
+        if (result.success) {
+          window.localStorage.setItem('id', result.user);
+          document.getElementById('inboxBtn').href = '/messaging/inbox?id='+result.user
+          document.getElementById('auth-link').textContent = 'Log Out';
+          document.getElementById('brandName').textContent = result.user;
         document.getElementById('statusNav').classList.remove('d-none');
         document.getElementById("userStars").textContent = "★".repeat(result.stars);
         bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
       } else {
         alert(result.message);
       }
+    })
     });
 
   
