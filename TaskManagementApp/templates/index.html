@@ -1,838 +1,331 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Blumaps</title>
-  {% load static %}
-  <link rel="icon" href="{% static 'icon8.png' %}" type="image/x-icon">
+{% load static %}
+{% include 'header.html' %}
+<!-- Main Content -->
+<header class="top-banner">
+  <h1 class="professional-heading">Mapping Needs & Ideas</h1>
+</header>
 
-  <!-- Stylesheets -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <style>
-    /* Global Styles */
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      background: linear-gradient(135deg, #002D62, #005BB5);
-      color: #ffffff;
-      position: relative;
-    }
-
-    /* ======================
-       CYBERPUNK Theme 
-       ====================== */
-    .navbar { border-bottom: 1px solid var(--neon-blue); }
-    :root {
-      --neon-blue: #0066FF;
-      --neon-accent: #00F7FF;
-    }
-    .professional-heading {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 400; 
-      font-size: 3rem;
-      background: linear-gradient(45deg, rgba(255,255,255,0.9) 0%, #7DF9FF 40%, var(--neon-accent) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 0.5px;
-      margin: 1.5rem auto;
-      text-shadow: 0 2px 10px rgba(0, 247, 255, 0.2);
-      width: fit-content;
-      padding: 0 15px;
-      position: relative;
-    }
-    .professional-heading::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -10px;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon-accent), transparent);
-      opacity: 0.7;
-    }
-    @media (max-width: 768px) {
-      .professional-heading { font-size: 2.2rem; padding: 0 10px; }
-    }
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 3.5rem;
-      background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 247, 255, 0.3);
-      margin-bottom: 3rem;
-    }
-    .navbar {
-      background: linear-gradient(90deg, rgba(0,40,102,0.9) 0%, rgba(0,11,26,0.95) 100%);
-      box-shadow: 0 0 25px rgba(0,247,255,0.3);
-      border-bottom: 1px solid var(--neon-blue);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-    .navbar-brand {
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 15px rgba(0,247,255,0.5);
-      letter-spacing: 2px;
-    }
-    .nav-link {
-      position: relative;
-      overflow: hidden;
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: -100%;
-      width: 100%;
-      height: 2px;
-      background: var(--neon-blue);
-      transition: 0.3s ease;
-    }
-    .nav-link:hover::after { left: 0; }
-  /* Map Container */
-  #map {
-      height: 500px;
-      border: 3px solid #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      z-index: 1;
-      transition: all 0.3s ease;
-    }
-    /* Full screen styles: when activated the container and map fill the viewport */
-    #mapContainer.fullscreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw !important;
-      height: 100vh !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      z-index: 9999;
-      background: #fff;
-    }
-    #map.fullscreen {
-      width: 100%;
-      height: 100%;
-    }
-    /* Full screen buttons on the left side */
-    #enterFullScreenBtn,
-    #exitFullScreenBtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-    }
-    /* Hide exit button by default */
-    #exitFullScreenBtn { display: none; }
-    
-    .top-banner {
-      background-color: transparent !important; 
-      padding: 50px 0;
-      text-shadow: 0 0 15px rgba(0,247,255,0.3);
-      z-index: 1;
-    }
-    .top-banner .lead {
-      font-size: 1.5rem;
-      margin-top: 1rem;
-      color: var(--neon-accent);
-      z-index: 1;
-    }
-    /* Sidebar (Draggable) */
-    .sidebar {
-      position: fixed;
-      top: 20%;
-      left: 2%;
-      width: 220px;
-      background: rgba(0,0,0,0.75);
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      cursor: move;
-      z-index: 11000 !important;
-    }
-    .sidebar h5 { font-size: 1.25rem; margin-bottom: 0.75rem; }
-    .sidebar .btn { width: 100%; margin-bottom: 0.75rem; }
-    /* Professional Buttons */
-    .btn-professional {
-      font-family: 'Roboto', sans-serif;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-    }
-    .btn-professional.btn-add { background-color: #005BB5; color: #ffffff; }
-    .btn-professional.btn-add:hover { background-color: #004a9e; }
-    .btn-professional.btn-view { background-color: #003f7f; color: #ffffff; }
-    .btn-professional.btn-view:hover { background-color: #003469; }
-    /* About Section */
-    #about-section {
-      background: rgba(0,0,0,0.8);
-      padding: 2rem;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-    }
-    /* Footer Banner & Footer */
-    .footer-banner {
-      background-color: #005BB5;
-      padding: 30px 0;
-      color: #ffffff;
-      z-index: 1;
-    }
-    .footer-banner h6 { font-size: 16px; font-weight: 700; margin-bottom: 15px; }
-    .footer-banner ul { padding: 0; list-style: none; }
-    .footer-banner ul li { margin-bottom: 8px; }
-    .footer-banner ul li a {
-      text-decoration: none;
-      color: #ffffff;
-      transition: color 0.3s ease-in-out;
-      z-index: 1;
-    }
-    .footer-banner ul li a:hover { color: #ccdef0; }
-    .footer-bottom {
-      background-color: #00174D;
-      padding: 20px 0;
-      color: white;
-      z-index: 1;
-    }
-    .footer-bottom .social-icons img { width: 30px; margin: 0 10px; }
-    .footer-bottom p { margin: 10px 0; }
-    .footer-bottom a {
-      color: #fff;
-      text-decoration: none;
-      margin: 0 10px;
-      z-index: 1;
-    }
-    .footer-bottom a:hover { text-decoration: underline; }
-    /* Data Science Sidebar */
-    #dataScienceSidebar {
-      position: fixed;
-      top: 20%;
-      left: 2%;
-      width: 250px;
-      background: rgba(0,0,0,0.85);
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      cursor: move;
-      color: #ffffff;
-      z-index: 11000 !important;
-    }
-    /* Cookie Consent */
-    .cookie-consent {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0,0,0,0.85);
-      color: #ffffff;
-      padding: 1rem;
-      text-align: center;
-      z-index: 1100;
-    }
-    #tapMessage {
-      position: fixed;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
-      color: #ffffff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-size: 1.2rem;
-      z-index: 1500;
-      display: none;
-    }
-    /* Auth Modal Dark Background */
-    .modal-content.auth-modal-dark {
-      background-color: #1a1a1a;
-      color: #e0e0e0;
-      border: none;
-    }
-
-    .btn-custom-blue {
-      background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
-      border: none;
-      color: white;
-      transition: all 0.3s ease;
-      border: 1px solid rgba(0, 247, 255, 0.3);
-    }
-    .btn-custom-blue:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
-      color: var(--neon-accent);
-    }
-    .card-link {
-      text-decoration: none;
-      display: block;
-      position: relative;
-      overflow: hidden;
-    }
-    .donation-card {
-      background: linear-gradient(145deg, rgba(0,40,102,0.8), rgba(0,66,255,0.15));
-      border: 1px solid rgba(0, 247, 255, 0.3);
-      border-radius: 15px;
-      padding: 2rem;
-      position: relative;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
-    }
-    .glow-hover:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 30px rgba(0, 247, 255, 0.2);
-    }
-    .cyber-header {
-      position: relative;
-      z-index: 2;
-    }
-    .hacker-effect {
-      position: relative;
-      display: inline-block;
-    }
-    .hacker-effect::before {
-      content: attr(data-text);
-      position: absolute;
-      color: var(--neon-accent);
-      clip-path: inset(0 100% 0 0);
-      animation: glitch 1.5s infinite alternate;
-    }
-    @keyframes glitch {
-      0% { clip-path: inset(10% 0 30% 0); }
-      100% { clip-path: inset(0 0 0 0); }
-    }
-    .cyber-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      background: linear-gradient(45deg, #fff 30%, var(--neon-accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 4px;
-      margin: 0;
-    }
-    .cyber-subhead {
-      font-size: 1.25rem;
-      color: rgba(255,255,255,0.9);
-      margin: 1rem 0;
-    }
-    .neon-underline {
-      position: relative;
-      padding-bottom: 3px;
-    }
-    .neon-underline::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: var(--neon-accent);
-      box-shadow: 0 0 10px rgba(0,247,255,0.5);
-    }
-    .cta-pulse {
-      margin-top: 2rem;
-      position: relative;
-      text-align: center;
-    }
-    .cta-content {
-      display: inline-flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 2rem;
-      position: relative;
-    }
-    .cta-text {
-      font-family: 'Orbitron', sans-serif;
-      letter-spacing: 2px;
-      color: var(--neon-accent);
-      text-shadow: 0 0 10px rgba(0,247,255,0.3);
-    }
-
-    .grid-pattern {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(rgba(0, 102, 255, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 102, 255, 0.1) 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    @media (max-width: 768px) {
-      .cyber-title { font-size: 2rem; }
-      .cyber-subhead { font-size: 1.1rem; }
-      /* Make scroll buttons larger on small screens */
-      .scroll-btn {
-        font-size: 2rem;
-        padding: 15px 20px;
-      }
-    }
-    /* ================================
-       New Sponsor Banner Styles (Footer)
-       ================================ */
-    .sponsor-banner {
-      background: linear-gradient(90deg, rgba(0,40,102,0.9), rgba(0,66,255,0.2));
-      backdrop-filter: blur(15px);
-      padding: 1.5rem 0;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--neon-accent);
-      z-index: 1;
-    }
-    .tech-logo-group {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1.5rem;
-      padding: 1rem;
-    }
-    .banner-logo {
-      height: 40px;
-      transition: all 0.3s ease;
-      filter: drop-shadow(0 0 5px rgba(0,247,255,0.3));
-      opacity: 0.9;
-    }
-    .sponsor-label {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.75rem;
-      color: var(--neon-accent);
-      text-align: center;
-      margin-top: 0.5rem;
-      letter-spacing: 1px;
-    }
-    .logo-group-container {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 1rem;
-      margin: 0.5rem;
-      border: 1px solid rgba(0,247,255,0.1);
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Navigation Bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#" id="brandName">Blumaps</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <!-- Navigation Items -->
-          <li class="nav-item">
-            <span class="nav-link" id="friendsListBtn">Friends List</span>
-          </li>
-          <li class="nav-item">
-            <span class="nav-link" id="addFriendBtn">Add Friend</span>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="" id="inboxBtn">Inbox</a>
-          </li>
-          <!-- Dropdown Menu -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Explore
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#" id="dataScienceBtn">Insights</a></li>
-              <li><a class="dropdown-item" href="/about">About</a></li>
-              <li><a class="dropdown-item" href="/nft">NFT Collection</a></li>
-              <li><a class="dropdown-item" href="/forum_discus">Forum Discussion</a></li>
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ngoAuthModal">NGO Portal</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <span class="navbar-text d-none" id="statusNav">
-              Community Builder: <span id="userStars">-</span>
-            </span>
-          </li>
-          <li class="nav-item">
-            <a id="auth-link" class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#authModal">Log In</a>
-          </li>
-        </ul>
+<!-- NGO Registration/Login Modal -->
+<div class="modal fade" id="ngoAuthModal" tabindex="-1" aria-labelledby="ngoAuthModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content auth-modal-dark">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="ngoAuthModalLabel" style="color: #bbb;">NGO Portal: Register / Log In</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <header class="top-banner">
-    <h1 class="professional-heading">Mapping Needs & Ideas</h1>
-  </header>
-
-  <!-- NGO Registration/Login Modal -->
-  <div class="modal fade" id="ngoAuthModal" tabindex="-1" aria-labelledby="ngoAuthModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content auth-modal-dark">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="ngoAuthModalLabel" style="color: #bbb;">NGO Portal: Register / Log In</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="ngoRegisterForm">
-            <div class="mb-3">
-              <input type="text" class="form-control" id="ngoFirstName" placeholder="First Name" required>
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control" id="ngoLastName" placeholder="Last Name" required>
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control" id="ngoAuthority" placeholder="Authority to act on behalf of NGO" required>
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control" id="ngoRegCode" placeholder="Registration/Practice Code" required>
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control" id="ngoEmail" placeholder="Email Address" required>
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control" id="ngoPassword" placeholder="Password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Register as NGO</button>
-          </form>
-          <hr style="background-color: #bbb;">
-          <form id="ngoLoginForm">
-            <div class="mb-3">
-              <input type="text" class="form-control" id="ngoLoginEmail" placeholder="Email Address" required>
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control" id="ngoLoginPassword" placeholder="Password" required>
-            </div>
-            <button type="submit" class="btn btn-success w-100">Log In as NGO</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Draggable Data Science Sidebar -->
-  <div id="dataScienceSidebar" class="sidebar d-none">
-    <div class="d-flex justify-content-between align-items-center">
-      <h5>Insights</h5>
-      <button class="btn-close btn-close-white" id="closeDataScience"></button>
-    </div>
-    <hr>
-    <div id="dataScienceContent">
-      <p>Loading insights...</p>
-    </div>
-  </div>
-
-  <!-- Friends List Sidebar -->
-  <div id="friendsListSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
-    <div class="d-flex justify-content-between align-items-center">
-      <h5>Friends List</h5>
-      <button class="btn-close btn-close-white" id="closeFriendsListSidebar"></button>
-    </div>
-    <hr>
-    <div id="friendsListContent">
-      <p>No friends added yet.</p>
-    </div>
-  </div>
-
-  <!-- Add Friend Sidebar -->
-  <div id="addFriendSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
-    <div class="d-flex justify-content-between align-items-center">
-      <h5>Add Friend</h5>
-      <button class="btn-close btn-close-white" id="closeAddFriendSidebar"></button>
-    </div>
-    <hr>
-    <div id="addFriendContent">
-      <input type="text" class="form-control" id="friendUsername" placeholder="Search by username">
-      <button class="btn btn-primary mt-2" id="addFriendAction">Add Friend</button>
-      <div id="friendSearchResults" class="mt-3"></div>
-    </div>
-  </div>
-
-  <!-- Authentication Modal -->
-  <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content auth-modal-dark">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="authModalLabel" style="color: #bbb;">Only login via email, Google, or +86 phone number</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="loginForm">
-            <div class="mb-3">
-              <input type="text" class="form-control" id="loginPhoneOrEmail" placeholder="Phone number or email address" required>
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
-            </div>
-            <div class="form-check mb-3">
-              <input class="form-check-input" type="checkbox" id="tosCheck" required>
-              <label class="form-check-label" for="tosCheck">
-                I confirm that I have read, consent and agree to Blumaps's Terms of Use and Privacy Policy.
-              </label>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Log In</button>
-          </form>
-          <div class="d-flex justify-content-between mt-3">
-            <a href="#" class="text-decoration-none" style="color: #aaa;">Forgot password?</a>
-            <a href="/signup" class="text-decoration-none" style="color: #aaa;">Sign up</a>
+      <div class="modal-body">
+        <form id="ngoRegisterForm">
+          <div class="mb-3">
+            <input type="text" class="form-control" id="ngoFirstName" placeholder="First Name" required>
           </div>
-          <div class="text-center mt-3" style="color: #aaa;">OR</div>
-          <button type="button" class="btn btn-light w-100 mt-2" id="googleLoginBtn">
-            Log in with Google
-          </button>
-        </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="ngoLastName" placeholder="Last Name" required>
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="ngoAuthority" placeholder="Authority to act on behalf of NGO" required>
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="ngoRegCode" placeholder="Registration/Practice Code" required>
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="ngoEmail" placeholder="Email Address" required autocomplete="username">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="ngoPassword" placeholder="Password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Register as NGO</button>
+        </form>
+        <hr style="background-color: #bbb;">
+        <form id="ngoLoginForm">
+          <div class="mb-3">
+            <input type="text" class="form-control" id="ngoLoginEmail" placeholder="Email Address" required autocomplete="username">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="ngoLoginPassword" placeholder="Password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-success w-100">Log In as NGO</button>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal for Adding Need Data -->
-  <div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-secondary" id="dataModalLabel">Add Need</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Draggable Data Science Sidebar -->
+<div id="dataScienceSidebar" class="sidebar d-none">
+  <div class="d-flex justify-content-between align-items-center">
+    <h5>Insights</h5>
+    <button class="btn-close btn-close-white" id="closeDataScience"></button>
+  </div>
+  <hr>
+  <div id="dataScienceContent">
+    <p>Loading insights...</p>
+  </div>
+</div>
+
+<!-- Friends List Sidebar -->
+<div id="friendsListSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h5>Friends List</h5>
+    <button class="btn-close btn-close-white" id="closeFriendsListSidebar"></button>
+  </div>
+  <hr>
+  <div id="friendsListContent">
+    <p>No friends added yet.</p>
+  </div>
+</div>
+
+<!-- Add Friend Sidebar -->
+<div id="addFriendSidebar" class="sidebar d-none" style="right: 2%; left: auto;">
+  <div class="d-flex justify-content-between align-items-center">
+    <h5>Add Friend</h5>
+    <button class="btn-close btn-close-white" id="closeAddFriendSidebar"></button>
+  </div>
+  <hr>
+  <div id="addFriendContent">
+    <input type="text" class="form-control" id="friendUsername" placeholder="Search by username">
+    <button class="btn btn-primary mt-2" id="addFriendAction">Add Friend</button>
+    <div id="friendSearchResults" class="mt-3"></div>
+  </div>
+</div>
+
+<!-- Authentication Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content auth-modal-dark">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="authModalLabel" style="color: #bbb;">Only login via email, Google, or +86 phone number</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="mb-3">
+            <input type="text" class="form-control" id="loginPhoneOrEmail" placeholder="Phone number or email address" required autocomplete="username">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="tosCheck" required>
+            <label class="form-check-label" for="tosCheck">
+              I confirm that I have read, consent and agree to Blumaps's Terms of Use and Privacy Policy.
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Log In</button>
+        </form>
+        <div class="d-flex justify-content-between mt-3">
+          <a href="#" class="text-decoration-none" style="color: #aaa;">Forgot password?</a>
+          <a href="/signup" class="text-decoration-none" style="color: #aaa;">Sign up</a>
         </div>
-        <div class="modal-body">
-          <form id="locationForm">
-            <div class="mb-3">
-              <label for="title" class="form-label">Title</label>
-              <input type="text" class="form-control" id="title" placeholder="Enter title" required>
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
-              <textarea class="form-control" id="description" placeholder="Enter description" required></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="category" class="form-label">Category Selected</label>
-              <select class="form-select" id="category" required>
-                <option value="Community">Community</option>
-                <option value="Commerce">Commerce</option>
-                <option value="Private">Private</option>
-              </select>
-            </div>
-            <input type="hidden" id="latitude">
-            <input type="hidden" id="longitude">
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-        </div>
+        <div class="text-center mt-3" style="color: #aaa;">OR</div>
+        <button type="button" class="btn btn-light w-100 mt-2" id="googleLoginBtn">
+          Log in with Google
+        </button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Sidebar for Desktop Controls (Draggable) -->
-  <div class="sidebar d-none d-lg-block">
+<!-- Modal for Adding Need Data -->
+<div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-secondary" id="dataModalLabel">Add Need</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="locationForm">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" placeholder="Enter title" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" placeholder="Enter description" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="category" class="form-label">Category Selected</label>
+            <select class="form-select" id="category" required>
+              <option value="Community">Community</option>
+              <option value="Commerce">Commerce</option>
+              <option value="Private">Private</option>
+            </select>
+          </div>
+          <input type="hidden" id="latitude">
+          <input type="hidden" id="longitude">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar for Desktop Controls (Draggable) -->
+<div class="sidebar d-none d-lg-block">
+  <div class="mb-4">
+    <h5>Add</h5>
+    <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community" data-category="Community">
+      Community<br><small>Urgent Need</small>
+    </button>
+    <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business" data-category="Commerce">
+      Commerce<br><small>Ideas & Wants</small>
+    </button>
+    <button class="btn btn-professional btn-add control-add" id="zoom-inner-circle" data-category="Private">
+      Private<br><small>Family & Friends</small>
+    </button>
+  </div>
+  <div>
+    <h5>View</h5>
+    <button class="btn btn-professional btn-view control-view" id="zoom-community-2" data-category="Community">
+      Community Needs
+    </button>
+    <button class="btn btn-professional btn-view control-view" id="zoom-business-2" data-category="Commerce">
+      Business Ideas
+    </button>
+    <button class="btn btn-professional btn-view control-view" id="zoom-inner-circle-2" data-category="Private">
+      Private Interest
+    </button>
+  </div>
+</div>
+
+<!-- Offcanvas for Mobile Add Controls -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileAdd" aria-labelledby="mobileAddLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileAddLabel">Add Need/Idea</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
     <div class="mb-4">
-      <h5>Add</h5>
-      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community" data-category="Community">
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community-mobile" data-category="Community" data-bs-dismiss="offcanvas">
         Community<br><small>Urgent Need</small>
       </button>
-      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business" data-category="Commerce">
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business-mobile" data-category="Commerce" data-bs-dismiss="offcanvas">
         Commerce<br><small>Ideas & Wants</small>
       </button>
-      <button class="btn btn-professional btn-add control-add" id="zoom-inner-circle" data-category="Private">
+      <button class="btn btn-professional btn-add control-add mb-2" id="zoom-inner-circle-mobile" data-category="Private" data-bs-dismiss="offcanvas">
         Private<br><small>Family & Friends</small>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- Offcanvas for Mobile View Controls -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileView" aria-labelledby="mobileViewLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileViewLabel">View Need/Idea</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
     <div>
-      <h5>View</h5>
-      <button class="btn btn-professional btn-view control-view" id="zoom-community-2" data-category="Community">
-        Community Needs
+      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-community-2-mobile" data-category="Community" data-bs-dismiss="offcanvas">
+        Community Urgent Needs
       </button>
-      <button class="btn btn-professional btn-view control-view" id="zoom-business-2" data-category="Commerce">
-        Business Ideas
+      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-business-2-mobile" data-category="Commerce" data-bs-dismiss="offcanvas">
+        Wants & Business Ideas
       </button>
-      <button class="btn btn-professional btn-view control-view" id="zoom-inner-circle-2" data-category="Private">
+      <button class="btn btn-professional btn-view control-view mb-2" id="zoom-inner-circle-2-mobile" data-category="Private" data-bs-dismiss="offcanvas">
         Private Interest
       </button>
     </div>
   </div>
+</div>
 
-  <!-- Offcanvas for Mobile Add Controls -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileAdd" aria-labelledby="mobileAddLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="mobileAddLabel">Add Need/Idea</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div class="mb-4">
-        <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community-mobile" data-category="Community" data-bs-dismiss="offcanvas">
-          Community<br><small>Urgent Need</small>
-        </button>
-        <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business-mobile" data-category="Commerce" data-bs-dismiss="offcanvas">
-          Commerce<br><small>Ideas & Wants</small>
-        </button>
-        <button class="btn btn-professional btn-add control-add mb-2" id="zoom-inner-circle-mobile" data-category="Private" data-bs-dismiss="offcanvas">
-          Private<br><small>Family & Friends</small>
-        </button>
-      </div>
-    </div>
+<!-- Mobile Controls Toggle Buttons -->
+<div class="d-lg-none text-center my-3">
+  <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileAdd" aria-controls="mobileAdd">
+    Add Need/Idea
+  </button>
+  <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileView" aria-controls="mobileView">
+    View Need/Idea
+  </button>
+</div>
+
+<!-- Map Container with Full Screen Toggle -->
+<div class="container my-4 position-relative" id="mapContainer">
+  <div id="map"></div>
+</div>
+
+<!-- 3 Button Model Section -->
+<section id="about-section" class="container">
+  <div class="text-center mb-4">
+    <h2 class="professional-heading" style="font-size: 2rem;">3|6 Interface Model </h2>
+    <p class="lead">Select category then click on map</p>
   </div>
+  <div class="mx-auto" style="max-width: 800px;">
+    <h4>1. Urgent Needs (Community/Public)</h4>
+    <p class="lead">Post and view immediate community needs, emergencies, or crisis support requests. Visible to everyone, enabling quick community response and collective action.</p>
 
-  <!-- Offcanvas for Mobile View Controls -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileView" aria-labelledby="mobileViewLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="mobileViewLabel">View Need/Idea</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div>
-        <button class="btn btn-professional btn-view control-view mb-2" id="zoom-community-2-mobile" data-category="Community" data-bs-dismiss="offcanvas">
-          Community Urgent Needs
-        </button>
-        <button class="btn btn-professional btn-view control-view mb-2" id="zoom-business-2-mobile" data-category="Commerce" data-bs-dismiss="offcanvas">
-          Wants & Business Ideas
-        </button>
-        <button class="btn btn-professional btn-view control-view mb-2" id="zoom-inner-circle-2-mobile" data-category="Private" data-bs-dismiss="offcanvas">
-          Private Interest
-        </button>
-      </div>
-    </div>
+    <h4>2. Business Ideas, Wants, Wishlist (Commerce/public)</h4>
+    <p class="lead">Share your wishes, innovative business ideas, or community projects openly. Inspire collaboration, gather feedback, and find support to turn ideas into reality.</p>
+
+    <h4>3. Private Circle (Family and Friends Only)</h4>
+    <p class="lead">Privately communicate sensitive or personal needs with trusted users only. Foster deeper connections and secure support within your private network.</p>
   </div>
+</section>
 
-  <!-- Mobile Controls Toggle Buttons -->
-  <div class="d-lg-none text-center my-3">
-    <button class="btn btn-primary me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileAdd" aria-controls="mobileAdd">
-      Add Need/Idea
-    </button>
-    <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileView" aria-controls="mobileView">
-      View Need/Idea
-    </button>
+<!-- About Section -->
+<section id="about-section" class="container">
+  <div class="text-center mb-4">
+    <h2 class="professional-heading" style="font-size: 2rem;">Empowering Communities</h2>
+    <p class="lead">Absolutely Everybody</p>
   </div>
-
-  <!-- Map Container with Full Screen Toggle -->
-  <div class="container my-4 position-relative" id="mapContainer">
-    <div id="map"></div>
+  <div class="mx-auto" style="max-width: 800px;">
+    <p class="lead"><strong>Blumaps</strong>, powered by <strong>BluNotions (Pty) Ltd</strong> and backed by the <strong>AWS Rapid Ramp Program</strong>, is a cutting-edge social impact platform and collaborative resource network designed to spark meaningful change.</p>
+    <p class="lead">Our revolutionary web application transforms how communities connect by dynamically mapping real-time needs, visionary ideas, and impactful initiatives—instantly linking resources with those who need them most.</p>
+    <p class="lead">Empowering you to support individuals or causes you care about, whether in your community or anywhere else, with AI verification ensuring every contribution delivers visible, measurable results directly to those in need.</p>
+    <p class="lead"><strong>Shape the future. Join our movement.</strong></p>
+    <p class="lead">
+    <a href="{% url 'about' %}" class="text-white text-decoration-underline">Learn more about us</a>
+    </p>
   </div>
+</section>
 
-  <!-- 3 Button Model Section -->
-  <section id="about-section" class="container">
-    <div class="text-center mb-4">
-      <h2 class="professional-heading" style="font-size: 2rem;">3|6 Interface Model </h2>
-      <p class="lead">Select category then click on map</p>
-    </div>
-    <div class="mx-auto" style="max-width: 800px;">
-      <h4>1. Urgent Needs (Community/Public)</h4>
-      <p class="lead">Post and view immediate community needs, emergencies, or crisis support requests. Visible to everyone, enabling quick community response and collective action.</p>
-
-      <h4>2. Business Ideas, Wants, Wishlist (Commerce/public)</h4>
-      <p class="lead">Share your wishes, innovative business ideas, or community projects openly. Inspire collaboration, gather feedback, and find support to turn ideas into reality.</p>
-
-      <h4>3. Private Circle (Family and Friends Only)</h4>
-      <p class="lead">Privately communicate sensitive or personal needs with trusted users only. Foster deeper connections and secure support within your private network.</p>
-    </div>
-  </section>
-
-  <!-- About Section -->
-  <section id="about-section" class="container">
-    <div class="text-center mb-4">
-      <h2 class="professional-heading" style="font-size: 2rem;">Empowering Communities</h2>
-      <p class="lead">Absolutely Everybody</p>
-    </div>
-    <div class="mx-auto" style="max-width: 800px;">
-      <p class="lead"><strong>Blumaps</strong>, powered by <strong>BluNotions (Pty) Ltd</strong> and backed by the <strong>AWS Rapid Ramp Program</strong>, is a cutting-edge social impact platform and collaborative resource network designed to spark meaningful change.</p>
-      <p class="lead">Our revolutionary web application transforms how communities connect by dynamically mapping real-time needs, visionary ideas, and impactful initiatives—instantly linking resources with those who need them most.</p>
-      <p class="lead">Empowering you to support individuals or causes you care about, whether in your community or anywhere else, with AI verification ensuring every contribution delivers visible, measurable results directly to those in need.</p>
-      <p class="lead"><strong>Shape the future. Join our movement.</strong></p>
-      <p class="lead">
-      <a href="{% url 'about' %}" class="text-white text-decoration-underline">Learn more about us</a>
-      </p>
-    </div>
-  </section>
-
-  <div class="container" data-aos="fade-up">
-    <a href="{% url 'sponser' %}" class="card-link">
-      <div class="donation-card glow-hover">
-        <div class="cyber-header">
-          <div class="hacker-effect" data-text="">
-            <h1 class="cyber-title">FUEL INNOVATION</h1>
-          </div>
-          <p class="cyber-subhead">
-            <span class="neon-underline">Power the Future</span> of Community Mapping
-          </p>
+<div class="container" data-aos="fade-up">
+  <a href="{% url 'sponsor' %}" class="card-link">
+    <div class="donation-card glow-hover">
+      <div class="cyber-header">
+        <div class="hacker-effect" data-text="">
+          <h1 class="cyber-title">FUEL INNOVATION</h1>
         </div>
-        
-        <div class="cta-pulse">
-          <div class="cta-content">
-            <span class="cta-text">Sustain the Vision: Support Blunotions ➔ Enhance Blumaps </span>
-            <div class="cta-arrow">
-              <div class="arrow-beam"></div>
-              <i class="fas fa-arrow-right"></i>
-            </div>
+        <p class="cyber-subhead">
+          <span class="neon-underline">Power the Future</span> of Community Mapping
+        </p>
+      </div>
+      
+      <div class="cta-pulse">
+        <div class="cta-content">
+          <span class="cta-text">Sustain the Vision: Support Blunotions ➔ Enhance Blumaps </span>
+          <div class="cta-arrow">
+            <div class="arrow-beam"></div>
+            <i class="fas fa-arrow-right"></i>
           </div>
         </div>
-  
-        <div class="grid-pattern"></div>
       </div>
-    </a>
-  </div>
+
+      <div class="grid-pattern"></div>
+    </div>
+  </a>
+</div>
   
-  <!-- Fixed Donate Button for Support Blumaps -->
-  <div style="position: fixed; bottom: 20px; left: 20px; z-index: 1200;">
-    <a href="{% url 'sponser' %}" class="btn btn-custom-blue btn-lg shadow-lg" 
-       style="animation: pulse 2s infinite; min-width: 160px;"
-       role="button">
-      <i class="fas fa-hands-helping me-2"></i>Support Blumaps
-    </a>
-  </div>
+<!-- Fixed Donate Button for Support Blumaps -->
+<div style="position: fixed; bottom: 20px; left: 20px; z-index: 1200;">
+  <a href="{% url 'sponsor' %}" class="btn btn-custom-blue btn-lg shadow-lg" 
+     style="animation: pulse 2s infinite; min-width: 160px;"
+     role="button">
+    <i class="fas fa-hands-helping me-2"></i>Support Blumaps
+  </a>
+</div>
 
-  <style>
-    @keyframes pulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-      70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(76, 175, 80, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-    }
-    
-    .btn-success {
-      background: linear-gradient(135deg, #00C851, #007E33);
-      border: none;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-success:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 200, 81, 0.4);
-    }
-  </style>
-
- 
- 
-  <!-- Cookie Consent Banner -->
+<!-- Cookie Consent Banner -->
 <div class="cookie-consent" id="cookieConsentBanner">
   This website uses cookies to enhance your experience.
   <a href="/privacy-policy" class="text-decoration-underline text-light">Learn more</a>
   <button id="accept-cookies" class="btn btn-primary btn-sm">Accept</button>
 </div>
 
-<script>
-// Check if the cookie has already been accepted
-if (document.cookie.indexOf('cookiesAccepted=true') === -1) {
-  document.getElementById('cookieConsentBanner').style.display = 'block';
-} else {
-  document.getElementById('cookieConsentBanner').style.display = 'none';
-}
-
-// Handle the click event for the 'Accept' button
-document.getElementById('accept-cookies').addEventListener('click', function() {
-
-  // Set a cookie to remember the user's choice
-  document.cookie = 'cookiesAccepted=true; max-age=' + 60 * 60 * 24 * 365 + '; path=/';
-  
-  // Hide the cookie consent banner
-  document.getElementById('cookieConsentBanner').style.display = 'none';
-});
-</script>
-
-
-  <!-- Mapbox and Bootstrap JS -->
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-
+<!-- Mapbox and Bootstrap JS -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
 <!-- Modal Markup -->
 <div id="helpModal" class="modal">
@@ -854,733 +347,10 @@ document.getElementById('accept-cookies').addEventListener('click', function() {
 </div>
 </div>
 
-<!-- Modal CSS -->
-<style>
-
-.modal-header {
-    background-color: #003f7f;
-  }
-
-  .modal-body {
-    background-color: #003f7f;
-  }
-
-  .modal-header .close {
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color:#aaa
-  }
-
-  .modal-body textarea {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    resize: vertical;
-  }
-
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1px;
-    background-color: #003f7f;
-  }
-
-  .modal-footer button {
-    margin-left: 10px;
-  }
-</style>
-<script>
-  // Retrieve modal elements
-  const helpModal = document.getElementById('helpModal');
-  const closeModal = helpModal.querySelector('.close');
-
-  // Show modal function
-  function showModal() {
-    helpModal.style.display = 'block';
-  }
-
-  // Hide modal function
-  function hideModal() {
-    helpModal.style.display = 'none';
-  }
-
-</script>
-
-
-
-
-
-
-  
-  <script>
-
-async function fetchCsrfToken() {
-    const response = await fetch('/api/csrf/', { credentials: 'include' });
-    const data = await response.json();
-    console.log('CSRF Token:', data.csrfToken);
-}
-fetchCsrfToken();  // Call this on page load
-
-
-
-    // ================================================
-    // Authentication System
-    class AuthSystem {
-      constructor() {
-        this.currentUser = null;
-      }
-
-      async login(email, password) {
-        alert(password +'- '+ email)
-        try {
-          const response = await fetch('/api/login/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': getCsrfToken() // Function to get CSRF token
-            },
-            body: JSON.stringify({ identifier: email, password })
-          });
-
-          const data = await response.json();
-          if (!response.ok) {
-            return { success: false, message: data.message || 'Login failed' };
-          }
-
-          this.currentUser = data.user; // Assuming the server returns user info
-          alert(JSON.stringify(this.currentUser))
-          return { success: true, user: data.user, stars: data.stars, isNGO: data.isNGO };
-        } catch (error) {
-          console.error('Login error:', error);
-          return { success: false, message: 'An error occurred during login' };
-        }
-      }
-
-      async register(userData) {
-        try {
-          const response = await fetch('/api/register/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': getCsrfToken() // Function to get CSRF token
-            },
-            body: JSON.stringify(userData)
-          });
-
-          const data = await response.json();
-          if (!response.ok) {
-            return { success: false, message: data.message || 'Registration failed' };
-          }
-
-          return { success: true, user: data.user };
-        } catch (error) {
-          console.error('Registration error:', error);
-          return { success: false, message: 'An error occurred during registration' };
-        }
-      }
-
-      logout() {
-        this.currentUser = null;
-        // Optionally notify the backend to clear the session
-      }
-
-      getCurrentUser() {
-        return this.currentUser;
-      }
-    }
-    const authSystem = new AuthSystem();
-
-    // Log in with Google using Web3Auth
-    document.getElementById("googleLoginBtn").addEventListener("click", async function() {
-      if (!web3auth) {
-        console.error("❌ Web3Auth is not initialized yet.");
-        alert("Web3Auth is not ready yet. Please try again in a moment.");
-        return;
-      }
-      try {
-        const provider = await web3auth.connect();
-        console.log("✅ Web3Auth provider:", provider);
-        authSystem.currentUser = "web3authUser";
-        document.getElementById('auth-link').textContent = 'Log Out';
-        document.getElementById('brandName').textContent = "Web3Auth User";
-        document.getElementById('statusNav').classList.remove('d-none');
-        bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-      } catch (error) {
-        console.error("❌ Error logging in with Web3Auth:", error);
-        alert("Login failed. Please try again.");
-      }
-    });
-
-    // Local Login Form
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-     
-      const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      authSystem.login(phoneOrEmail, password).then(result => {
-        alert('result' + result.success);
-        if (result.success) {
-          window.localStorage.setItem('id', result.user);
-          document.getElementById('inboxBtn').href = '/messaging/inbox?id='+result.user
-          document.getElementById('auth-link').textContent = 'Log Out';
-          document.getElementById('brandName').textContent = result.user;
-        document.getElementById('statusNav').classList.remove('d-none');
-        document.getElementById("userStars").textContent = "★".repeat(result.stars);
-        bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-      } else {
-        alert(result.message);
-      }
-    })
-    });
-
-  
-
-
-    function getCsrfToken() {
-    const name = 'csrftoken';
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(name + '='))
-        ?.split('=')[1];
-    return cookieValue;
-}
-
-
-    document.getElementById('auth-link').addEventListener('click', async function(e) {
-    e.preventDefault();
-
-    try {
-        if (authSystem.currentUser === "web3authUser") {
-            if (web3auth) {
-                await web3auth.logout();
-                console.log("✅ Web3Auth Logged Out");
-            }
-        }
-        authSystem.logout();
-
-        // Notify backend (Django) to clear server-side session
-        const csrfToken = getCookie('csrftoken'); // or store it from step 2
-    await fetch('/api/logout/', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'X-CSRFToken': csrfToken,
-        }
-    });
-
-        document.getElementById('auth-link').textContent = 'Log In';
-        document.getElementById('brandName').textContent = 'Blumaps';
-        document.getElementById('statusNav').classList.add('d-none');
-    } catch (error) {
-        console.error("❌ Error during logout:", error);
-        alert("Logout failed. Please try again.");
-    }
-});
-
-    // Mapbox Initialization
-    mapboxgl.accessToken = 'pk.eyJ1IjoibW9ybmVncmVlbiIsImEiOiJjamJsNWJtc3oxbDl6MzFvYnpoeHNucHNkIn0.F8OjEDmrkseIRVMOt32Fcw';
-    var map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mornegreen/cm6kon7vb00l001saaltfal2i',
-      center: [0, 20],
-      zoom: 1
-    });
-    map.addControl(new mapboxgl.NavigationControl());
-    map.addControl(new mapboxgl.GeolocateControl({
-      positionOptions: { enableHighAccuracy: true },
-      trackUserLocation: true
-    }));
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          var userLocation = [position.coords.longitude, position.coords.latitude];
-          map.flyTo({
-            center: userLocation,
-            zoom: 15,
-            speed: 1.8,
-            curve: 1.42,
-            easing: function(t) { return t; }
-          });
-        },
-        function(error) {
-          console.error('Error getting location:', error);
-        }
-      );
-    }
-
-    // Marker and Control Functionality
-    let canAddMarker = false;
-    let markers = [];
-    function placeMarker(location, category, title = "Unnamed", description = "No details provided.", email = "Not provided", phone) {
-      const popupContent = `
-        <strong style="color: black;">${title}</strong>
-        <p style="color: black;">${description}</p>
-        <div style="margin-top: 10px;">
-          <button class="btn btn-primary btn-sm popup-help" data-recipient="${phone}" data-email="${email}" data-phone="${phone}">Help</button>
-        </div>
-      `;
-      const marker = new mapboxgl.Marker().setLngLat(location).addTo(map);
-markers.push(marker);
-marker.getElement().dataset.category = category;
-const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent).setLngLat(location);
-marker.setPopup(popup);
-marker.getElement().addEventListener('click', () => {
-  marker.togglePopup();
-});
-    }
-    function clearMarkers() {
-      markers.forEach(marker => marker.remove());
-      markers = [];
-    }
-    function showTapMessage(message, duration = 3000) {
-      const tapMessage = document.getElementById('tapMessage');
-      tapMessage.textContent = message;
-      tapMessage.style.display = "block";
-      setTimeout(() => { tapMessage.style.display = "none"; }, duration);
-    }
-
-    
-
-// --- Enhanced "Help" Button Handler using AJAX and internal user IDs ---
-var recipient = '';
-     var email ='';
-      var phone = '';
-// Delegate click event on document to handle dynamic help buttons
-document.addEventListener('click', function(event) {
-    if (event.target.classList.contains('popup-help')) {
-      // Optionally retrieve data attributes:
-      recipient = event.target.getAttribute('data-recipient');
-      email = event.target.getAttribute('data-email');
-       phone = event.target.getAttribute('data-phone');
-      // You can use these details if needed for further logic
-
-      showModal();
-    }
-  });
-
-  // Close modal when user clicks the close icon
-  closeModal.addEventListener('click', hideModal);
-
-  // Hide modal when clicking outside the modal-content area
-  window.addEventListener('click', function(event) {
-    if (event.target === helpModal) {
-      hideModal();
-    }
-  });
-
-  // Handle "Send" button click using Fetch API
-  document.getElementById('sendHelp').addEventListener('click', function() {
-    const message = document.getElementById('helpMessage').value;
-    // Replace '/send-help' with your actual endpoint
-    fetch('/messaging/send_message/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ 
-        // conversation_id:1,// recipient,
-        // sender_id : 1, // TODO :hard coded need to make dynamic 
-        text:message
-       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      alert('Message sent successfully!');
-      hideModal();
-      window.location.href = 'messaging/inbox'; // Adjust the URL as needed
-    })
-    .catch(error => {
-      alert('There was an error sending your message.');
-    });
-  });
-
-  // Handle "Go to Inbox" button click
-  document.getElementById('goInbox').addEventListener('click', function() {
-    window.location.href = '/messaging/inbox'; // Adjust the URL as needed
-  });
-
-
-
-// document.addEventListener('click', (e) => {
-//   if (e.target.matches('.popup-help')) {
-//     alert('hit')
-//         e.stopPropagation();
-        
-//         // Check if the user is logged in (using internal user ID)
-//         if (!window.loggedInUserId) {
-//             showToast('Please log in to help someone', 'warning');
-//             return;
-//         }
-        
-//         // Get the recipient's ID from the data attribute (not an email)
-//         const recipientId = e.target.dataset.recipient;
-//         alert(recipientId)
-//         if (!recipientId) {
-//             showToast('No valid recipient information available', 'error');
-//             return;
-//         }
-        
-//         // Call the function to send a help request via AJAX.
-//         sendHelpRequest(Number(recipientId));
-//     }
-// });
-
-/**
- * Displays a toast notification.
- * @param {string} message - The message to display.
- * @param {string} [type='info'] - The type of toast (e.g., 'info', 'success', 'error').
- */
-// function showToast(message, type = 'info') {
-//     const toast = document.createElement('div');
-//     toast.className = `toast toast-${type}`;
-//     toast.innerHTML = `<div class="toast-body">${message}</div>`;
-//     document.body.appendChild(toast);
-//     setTimeout(() => { toast.remove(); }, 3000);
-// }
-
-
-
-    document.querySelectorAll('.control-add').forEach(button => {
-      button.addEventListener('click', function() {
-        if (!authSystem.currentUser) {
-          new bootstrap.Modal(document.getElementById('authModal')).show();
-          showTapMessage("Please log in to add a marker.", 3000);
-          return;
-        }
-        const category = this.getAttribute('data-category');
-        document.getElementById('category').value = category;
-        canAddMarker = true;
-        const tapMessage = document.getElementById('tapMessage');
-        tapMessage.textContent = "Tap on the map to add a marker";
-        tapMessage.style.display = "block";
-        const messageTimeout = setTimeout(() => { tapMessage.style.display = "none"; }, 4000);
-        map.once('click', function(event) {
-          if (!authSystem.currentUser) {
-            new bootstrap.Modal(document.getElementById('authModal')).show();
-            showTapMessage("Please log in to add a marker.", 3000);
-            return;
-          }
-          if (canAddMarker) {
-            const coordinates = event.lngLat;
-            document.getElementById('latitude').value = coordinates.lat;
-            document.getElementById('longitude').value = coordinates.lng;
-            const category = document.getElementById('category').value;
-            let verifiedDetails = "";
-            const currentUser = authSystem.users[authSystem.currentUser];
-            if (currentUser && currentUser.isNGO) {
-              verifiedDetails = "Verified by " + currentUser.firstName + " " + currentUser.lastName;
-            }
-            placeMarker(
-              coordinates,
-              category,
-              "New Need",
-              "No details provided.",
-              currentUser.email,
-              "1234567890"
-            );
-            const offcanvasAddEl = document.getElementById('mobileAdd');
-            const offcanvasViewEl = document.getElementById('mobileView');
-            if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
-              bootstrap.Offcanvas.getInstance(offcanvasAddEl).hide();
-            }
-            if (offcanvasViewEl && offcanvasViewEl.classList.contains('show')) {
-              bootstrap.Offcanvas.getInstance(offcanvasViewEl).hide();
-            }
-            tapMessage.style.display = "none";
-            clearTimeout(messageTimeout);
-            new bootstrap.Modal(document.getElementById('dataModal')).show();
-          }
-        });
-      });
-    });
-    document.querySelectorAll('.control-view').forEach(button => {
-      button.addEventListener('click', function() {
-        canAddMarker = false;
-        const category = this.getAttribute('data-category');
-        clearMarkers();
-        fetch('/get_existing_data/')
-          .then(response => response.json())
-          .then(data => {
-            data.filter(item => item.Category === category).forEach(item => {
-              const location = [item.Longitude, item.Latitude];
-              placeMarker(location, item.Category, item.Name, item.Description, item.Email, item.Phone);
-            });
-          })
-          .catch(error => console.error('Error fetching data:', error));
-        let offcanvasAddEl = document.getElementById('mobileAdd');
-        let offcanvasViewEl = document.getElementById('mobileView');
-        if (offcanvasAddEl && offcanvasAddEl.classList.contains('show')) {
-          bootstrap.Offcanvas.getInstance(offcanvasAddEl).hide();
-        }
-        if (offcanvasViewEl && offcanvasViewEl.classList.contains('show')) {
-          bootstrap.Offcanvas.getInstance(offcanvasViewEl).hide();
-        }
-      });
-    });
-
-
-
-
-    async function checkToxicity(text) {
-      const apiKey = "AIzaSyAYwrzOaH6eIU63Wwz1TcBZodnjvYV0-_k";
-      const url = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
-      const requestBody = {
-        comment: { text: text },
-        languages: ["en"],
-        requestedAttributes: { TOXICITY: {} }
-      };
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody)
-        });
-        if (!response.ok) {
-          console.error("Perspective API error:", response.statusText);
-          return 0;
-        }
-        const data = await response.json();
-        return data.attributeScores.TOXICITY.summaryScore.value;
-      } catch (error) {
-        console.error("Error calling Perspective API:", error);
-        return 0;
-      }
-    }
-    document.getElementById('locationForm').addEventListener('submit', async function(event) {
-      event.preventDefault();
-      const title = document.getElementById('title').value;
-      const description = document.getElementById('description').value;
-      const combinedText = title + " " + description;
-      const toxicity = await checkToxicity(combinedText);
-      console.log("Toxicity score:", toxicity);
-      if (toxicity >= 0.7) {
-        alert("Your submission contains inappropriate content. Please revise your text.");
-        return;
-      }
-      const latitude = document.getElementById('latitude').value;
-      const longitude = document.getElementById('longitude').value;
-      const category = document.getElementById('category').value;
-      const data = { title, latitude, longitude, description, category };
-      fetch('/save_location', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then(responseData => {
-        console.log('Success:', responseData);
-        placeMarker([longitude, latitude], category, title, description);
-      })
-      .catch(error => console.error('Error:', error));
-      bootstrap.Modal.getInstance(document.getElementById('dataModal')).hide();
-      this.reset();
-    });
-
-
-    function makeDraggable(el) {
-      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-      el.onmousedown = dragMouseDown;
-      function dragMouseDown(e) {
-        e.preventDefault();
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-      }
-      function elementDrag(e) {
-        e.preventDefault();
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        el.style.top = (el.offsetTop - pos2) + "px";
-        el.style.left = (el.offsetLeft - pos1) + "px";
-      }
-      function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
-      }
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      const leftSidebar = document.querySelector('.sidebar.d-none.d-lg-block');
-      if (leftSidebar) makeDraggable(leftSidebar);
-      const dataScienceSidebar = document.getElementById("dataScienceSidebar");
-      makeDraggable(dataScienceSidebar);
-    });
-    document.getElementById("dataScienceBtn").addEventListener("click", function () {
-      const sidebar = document.getElementById("dataScienceSidebar");
-      sidebar.classList.remove("d-none");
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            fetch(`/get_most_urgent_need/?lat=${lat}&lon=${lon}`)
-              .then(response => response.json())
-              .then(data => {
-                if (data && data.need) {
-                  document.getElementById("dataScienceContent").innerHTML = `
-                    <strong>${data.need.title}</strong>
-                    <p>${data.need.description}</p>
-                    <p><strong>Category:</strong> ${data.need.category}</p>
-                    <p><strong>Location:</strong> ${data.need.location}</p>
-                  `;
-                } else {
-                  document.getElementById("dataScienceContent").innerHTML = "<p>No urgent needs found in your area.</p>";
-                }
-              })
-              .catch(error => {
-                console.error("Error fetching data:", error);
-                document.getElementById("dataScienceContent").innerHTML = "<p>Unable to retrieve data.</p>";
-              });
-          },
-          function (error) {
-            console.error("Geolocation error:", error);
-            document.getElementById("dataScienceContent").innerHTML = "<p>Could not get location.</p>";
-          }
-        );
-      } else {
-        document.getElementById("dataScienceContent").innerHTML = "<p>Geolocation is not supported by your browser.</p>";
-      }
-    });
-    document.getElementById("closeDataScience").addEventListener("click", function () {
-      document.getElementById("dataScienceSidebar").classList.add("d-none");
-    });
-
-
-    // Full Screen Map Toggle
-    // document.getElementById('expandMapBtn').addEventListener('click', function() {
-    //   const mapEl = document.getElementById('map');
-    //   if (mapEl.classList.contains('map-fullscreen')) {
-    //     mapEl.classList.remove('map-fullscreen');
-    //     this.textContent = "Full Screen";
-    //   } else {
-    //     mapEl.classList.add('map-fullscreen');
-    //     this.textContent = "Exit Full Screen";
-    //   }
-    //   map.resize();
-    // });
-
-    // Show Friends List sidebar when the navbar item is clicked
-    document.getElementById("friendsListBtn").addEventListener("click", function(e) {
-      e.preventDefault();
-      alert('freinds');
-      document.getElementById("friendsListSidebar").classList.remove("d-none");
-    });
-
-    // Hide Friends List sidebar
-    document.getElementById("closeFriendsListSidebar").addEventListener("click", function() {
-      document.getElementById("friendsListSidebar").classList.add("d-none");
-    });
-
-    // Show Add Friend sidebar when the navbar item is clicked
-    document.getElementById("addFriendBtn").addEventListener("click", function(e) {
-      e.preventDefault();
-      document.getElementById("addFriendSidebar").classList.remove("d-none");
-    });
-
-    // Hide Add Friend sidebar
-    document.getElementById("closeAddFriendSidebar").addEventListener("click", function() {
-      document.getElementById("addFriendSidebar").classList.add("d-none");
-    });
-
-    // Handle the Add Friend action
-    document.getElementById("addFriendAction").addEventListener("click", function() {
-      const username = document.getElementById("friendUsername").value.trim();
-      if (username === "") {
-        alert("Please enter a username");
-        return;
-      }
-      // Placeholder: Add your friend request logic here (e.g., AJAX call to server)
-      const email = document.getElementById("friendUsername").value; // Get the email input
-      // AJAX call to check if the user exists
-      fetch('/check_user/', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ identifier: email }),
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.exists) {
-              // Send email notification
-              fetch('/send_friend_request_email/', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ email: email, username: username }),
-              });
-              alert("Friend request sent to " + username);
-          } else {
-              alert("User does not exist.");
-          }
-      })
-      .catch((error) => {
-          console.error('Error:', error);
-      });
-      document.getElementById("friendUsername").value = "";
-    });
-
-
-  </script>
-  <footer class="footer-bottom">
-    <div class="container text-center">
-      <div class="sponsor-banner">
-        <div class="container">
-          <!-- Group 1: Combined Sponsor & Operated (AWS and BluNotion) -->
-          <div class="row justify-content-center mb-4" data-aos="fade-down">
-            <div class="col-12 col-md-6">
-              <div class="logo-group-container">
-                <img src="{% static 'awslogo.png' %}" alt="AWS Logo" class="banner-logo" style="height: 100px;">
-                <div class="sponsor-label">SPONSORED BY AWS</div>
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="logo-group-container">
-                <img src="{% static 'BluNotionLogo.png' %}" alt="BluNotion Logo" class="banner-logo" style="height: 100px;">
-                <div class="sponsor-label">OPERATED BY BLUNOTION</div>
-              </div>
-            </div>
-          </div>
-          <!-- Group 2: Combined Development Tooling & Future Development Roadmap -->
-          <div class="row justify-content-center mb-4" data-aos="fade-down" data-aos-delay="200">
-            <div class="col-12">
-              <div class="logo-group-container">
-                <div class="tech-logo-group">
-                  <img src="{% static 'github.png' %}" alt="GitHub Logo" class="banner-logo" style="height: 60px;">
-                  <img src="{% static 'linuxlogo2.png' %}" alt="Linux Logo" class="banner-logo" style="height: 60px;">
-                  <img src="{% static 'python.png' %}" alt="Python Logo" class="banner-logo" style="height: 60px;">
-                  <img src="{% static 'nftlogo.png' %}" alt="NFT Logo" class="banner-logo" style="height: 60px;">
-                  <img src="{% static 'web3.png' %}" alt="Web3 Logo" class="banner-logo" style="height: 60px;">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-        <p>
-          <a href="{% url 'termsofuse' %}">Terms of Use</a>
-          <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
-          <a href="{% url 'corporate_policy' %}">Corporate Policies</a>
-          <a href="{% url 'careers' %}">Careers</a>
-          <a href = "{% url 'contact' %}">Contact Us</a> |
-        </p>
-        <p>&copy; 2024 Blunotions™. All Rights Reserved.</p>
-      </div>
-    </footer>
-
-    <div id="tapMessage">Tap on map to add</div>
-
-    <script src="{% static 'js/messaging.js' %}"></script>
+  <div id="tapMessage">Tap on map to add</div>
+  {% include 'footer.html' %}
+  <script src="{% static 'js/authentic.js' %}"></script>
+  <script src="{% static 'js/scripts.js' %}"></script>
 
 </body>
 </html>
