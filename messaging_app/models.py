@@ -24,12 +24,12 @@ class Message(models.Model):
     we now store them in the DB using this model.
     """
     conversation = models.ForeignKey(
-        Conversation, 
+        Conversation,
         on_delete=models.CASCADE,
         related_name='messages'
     )
     sender = models.ForeignKey(
-        User, 
+        User,
         on_delete=models.CASCADE, 
         related_name='sent_messages'
     )

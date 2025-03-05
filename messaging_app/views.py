@@ -112,9 +112,8 @@ def inbox_view(request):
             user = User.objects.get(email=user_id)  # Adjust if using a different identifier
         except User.DoesNotExist:
             return JsonResponse({"error": "User not found"}, status=404)
-
         # Get all conversations for this user
-        user_conversations = user.conversations.all().order_by('-created_at')
+        user_conversations = Conversation.objects.filter(participants=user).order_by('-created_at')
 
         # Preload the last message, etc. if you want
         context = {

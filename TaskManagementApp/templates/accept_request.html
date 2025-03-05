@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friend Request Accepted</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Friend Request Accepted!</h1>
+        <p>You have successfully accepted the friend request.</p>
+        <a href="{% url 'user_profile' %}" class="btn">Go to Your Profile</a>
+    </div>
+</body>
+</html>

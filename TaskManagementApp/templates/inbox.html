@@ -177,19 +177,13 @@
     <h1 class="text-center mb-4">Inbox</h1>
     
     <!-- Conversation List -->
-    <div class="conversation-list" id="conversationList" data-aos="fade-up">
-      <div class="conversation-item" data-user="Alice">
-        <div class="username">Alice</div>
-        <div class="latest-message">Hello, please send details to help you.</div>
-      </div>
-      <div class="conversation-item" data-user="Bob">
-        <div class="username">Bob</div>
-        <div class="latest-message">Hello, please send details to help you</div>
-      </div>
-      <div class="conversation-item" data-user="Charlie">
-        <div class="username">Charlie</div>
-        <div class="latest-message">Hello, please send details to help you.</div>
-      </div>
+    <div class="conversation-list" id="conversationList">
+      {% for conversation in conversations %}
+        <div class="conversation-item" data-user="{{ conversation.user.username }}">
+          <div class="username">{{ conversation.user.username }}</div>
+          <div class="latest-message">{{ conversation.latest_message }}</div>
+        </div>
+      {% endfor %}
     </div>
   </div>
 
@@ -353,6 +347,41 @@
         currentConversationElement.querySelector('.latest-message').textContent = messageText;
       }
     });
+
+    // Function to get URL parameters
+    function getUrlParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // Load conversations based on user ID from URL
+    async function loadConversations() {
+      const userId = getUrlParameter('id'); // Assuming the parameter is named 'id'
+      if (userId) {
+        // Fetch conversations for the user (replace with your actual API endpoint)
+        const response = await fetch(`/api/conversations?userId=${userId}`);
+        if (response.ok) {
+          const conversations = await response.json();
+          const conversationList = document.getElementById('conversationList');
+          conversationList.innerHTML = ''; // Clear existing conversations
+          conversations.forEach(convo => {
+            const item = document.createElement('div');
+            item.classList.add('conversation-item');
+            item.setAttribute('data-user', convo.username);
+            item.innerHTML = `
+              <div class="username">${convo.username}</div>
+              <div class="latest-message">${convo.latestMessage}</div>
+            `;
+            conversationList.appendChild(item);
+          });
+        } else {
+          console.error("Failed to load conversations:", response.statusText);
+        }
+      }
+    }
+
+    // Call loadConversations on page load
+    window.onload = loadConversations;
   </script>
 </body>
 </html>
