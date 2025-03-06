@@ -110,7 +110,7 @@ if (loginForm) {
         const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
         const password = document.getElementById('loginPassword').value;
         authSystem.login(phoneOrEmail, password).then(result => {
-            alert(`Result: ${result.success}`);
+           
             if (result.success) {
                 window.localStorage.setItem('user', JSON.stringify(result.user));
             
