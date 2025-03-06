@@ -129,7 +129,7 @@ def get_location_interests(request):
     return JsonResponse(data, safe=False)
 
 def get_existing_data(request):
-    data = Locations.objects.values('Name', 'Latitude', 'Longitude', 'Category','Description')
+    data = Locations.objects.values('name', 'latitude', 'longitude', 'category','description')
     return JsonResponse(list(data), safe=False)
 
 def set_cookie(request):
