@@ -112,7 +112,8 @@ if (loginForm) {
         authSystem.login(phoneOrEmail, password).then(result => {
             alert(`Result: ${result.success}`);
             if (result.success) {
-                window.localStorage.setItem('user', result.user);
+                window.localStorage.setItem('user', JSON.stringify(result.user));
+            
                 document.getElementById('inboxBtn').href = `/messaging/inbox?id=${result.user}`;
                 document.getElementById('auth-link').textContent = 'Log Out';
                 document.getElementById('brandName').textContent = result.user.id;

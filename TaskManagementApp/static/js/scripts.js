@@ -449,7 +449,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const email = document.getElementById("friendUsername").value; // Get the email input
     const username = document.getElementById("friendUsername").value; // Replace with actual username if necessary
     console.log(email);
-
+// Later when you want to retrieve sender_id
+const storedUser = JSON.parse(window.localStorage.getItem('user'));
+const sender_id = storedUser.id;
     // AJAX call to check if the user exists
     fetch('/api/check_user/', {
         method: 'POST',
@@ -467,14 +469,14 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
         if (data.exists) {
             // Send email notification with friend request
-            fetch('/friend-request/send', {
+            fetch('/friend-request/send/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                   email: email,
-                  sender_id: window.localStorage.getItem('user').json().id }),
+                  sender_id: sender_id }),
             })
             .then(response => response.json())
             .then(data => {
