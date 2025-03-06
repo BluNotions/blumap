@@ -15,6 +15,7 @@ from .models import UserProfile
 from django.core.mail import send_mail  # Import send_mail
 from django.shortcuts import render
 from django.urls import reverse
+import requests  # Import requests to make HTTP requests
 
 
 
@@ -192,10 +193,24 @@ def signup(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = form.save()  # This creates the User instance
-            UserProfile.objects.create(user=user)  # Create UserProfile instance
-            messages.success(request, 'Registration successful')
-            return redirect('home')
+            # Validate reCAPTCHA
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            data = {
+                'secret': '6LcNXOsqAAAAALhHQFgpI6cm41UWxQi42d9s066Q',  # Replace with your secret key
+                'response': recaptcha_response
+            }
+            response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+            result = response.json()
+
+            if result['success']:
+                user = form.save()  # This creates the User instance
+                UserProfile.objects.create(user=user)  # Create UserProfile instance
+                messages.success(request, 'Registration successful')
+                return redirect('home')
+            else:
+                messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+        else:
+            messages.error(request, 'Form is not valid.')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
@@ -289,7 +304,7 @@ def send_friend_request(request):
                 reverse('reject_friend_request', args=[friend_request.id])
             )
 
-            message = (f"You have received a friend request from {sender.username}!\n\n"
+            message = (f"You have received a friend request from {sender_id}!\n\n"
                 f"Accept: {accept_link}\n"
                 f"Reject: {reject_link}")
 

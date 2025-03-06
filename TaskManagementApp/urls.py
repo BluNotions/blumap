@@ -35,9 +35,9 @@ urlpatterns = [
     #  messaging
     path('messaging/', include('messaging_app.urls')),
 
-    path('friend-request/send', views.send_friend_request, name='send_friend_request'),
-    path('friend-request/accept/<int:request_id>', views.accept_friend_request, name='accept_friend_request'),
-    path('friend-request/reject/<int:request_id>', views.reject_friend_request, name='reject_friend_request'),
-    path('friend-request/friends/<int:user_id>', views.list_friends, name='list_friends'),
+    path('friend-request/send/', views.send_friend_request, name='send_friend_request'),
+    path('friend-request/accept/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
+    path('friend-request/reject/<int:request_id>/', views.reject_friend_request, name='reject_friend_request'),
+    path('friend-request/friends/<int:user_id>/', views.list_friends, name='list_friends'),
 
 ]
