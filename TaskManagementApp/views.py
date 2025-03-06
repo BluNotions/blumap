@@ -242,10 +242,12 @@ def login_view(request):
             if user is not None:
                 profile_data = {
                 'id': user_profile.user.id,
+                'username':user_profile.user.username,
                 'email': user_profile.user.email,
                 'phone_number': user_profile.phone_number,  # Assuming this field exists in UserProfile
                 # Add any other fields you want to include
-        }
+                }
+                login(request, user)
                 return JsonResponse({'success': True, 'user': profile_data})
             else:
                 return JsonResponse({'success': False, 'message': 'Invalid credentials'}, status=400)

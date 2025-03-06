@@ -256,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/get_existing_data/')
           .then(response => response.json())
           .then(data => {
+            console.log(data); // Log the data to see its structure
             data.filter(item => item.Category === category).forEach(item => {
               const location = [item.Longitude, item.Latitude];
               placeMarker(location, item.Category, item.Name, item.Description, item.Email, item.Phone);
@@ -412,17 +413,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   // Show Friends List sidebar when the navbar item is clicked
-  document.addEventListener('DOMContentLoaded', function() { //friendsListBtn
+  document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("friendsListBtn").addEventListener("click", function(e) {
-      e.preventDefault();
-      alert('friends');
-      document.getElementById("friendsListSidebar").classList.remove("d-none");
+        e.preventDefault();
+        user_id = JSON.parse(window.localStorage.getItem('user')).id
+        // Fetch the list of friends from the backend
+        fetch('friend-request/friends/'+user_id+'/') // Adjust the endpoint as necessary
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // Log the data to see its structure
+                const friendsListContent = document.getElementById("friendsListContent");
+                friendsListContent.innerHTML = ""; // Clear existing content
+                
+                // Access the friends array from the response
+                const friends = data.friends; // Access the friends property
+                
+                if (Array.isArray(friends)) { // Check if friends is an array
+                    if (friends.length === 0) {
+                        friendsListContent.innerHTML = "<p>No friends added yet.</p>"; // No friends case
+                    } else {
+                        friends.forEach(friend => {
+                            const listItem = document.createElement("p");
+                            listItem.textContent = friend.name; // Adjust based on your data structure
+                            friendsListContent.appendChild(listItem);
+                        });
+                    }
+                } else {
+                    console.error('Expected an array but got:', friends);
+                    friendsListContent.innerHTML = "<p>Error: Unexpected data format.</p>";
+                }
+                
+                document.getElementById("friendsListSidebar").classList.remove("d-none");
+            })
+            .catch(error => {
+                console.error('Error fetching friends:', error);
+            });
     });
 
-      // Hide Friends List sidebar
+    // Hide Friends List sidebar
     document.getElementById("closeFriendsListSidebar").addEventListener("click", function() {
         document.getElementById("friendsListSidebar").classList.add("d-none");
-      });
+    });
     
     // Show Add Friend sidebar when the navbar item is clicked
     document.getElementById("addFriendBtn").addEventListener("click", function(e) {

@@ -100,7 +100,17 @@ if (googleLoginBtn) {
         }
     });
 }
+  // Event listener for user icon click
+//   document.getElementById('userIcon').addEventListener('click', function() {
+//     const dropdown = document.getElementById('userDropdown');
+//     dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+// });
 
+// // Event listener for logout link
+// document.getElementById('logoutLink').addEventListener('click', function() {
+//     authSystem.logout();
+//     // Additional logout logic here
+// });
 // Local Login Form
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
@@ -114,12 +124,16 @@ if (loginForm) {
             if (result.success) {
                 window.localStorage.setItem('user', JSON.stringify(result.user));
             
-                document.getElementById('inboxBtn').href = `/messaging/inbox?id=${result.user}`;
-                document.getElementById('auth-link').textContent = 'Log Out';
-                document.getElementById('brandName').textContent = result.user.id;
-                document.getElementById('statusNav').classList.remove('d-none');
-                document.getElementById("userStars").textContent = "★".repeat(result.stars);
+               // document.getElementById('inboxBtn').href = `/messaging/inbox?id=${result.user}`;
+               // document.getElementById('auth-link').textContent = 'Log Out';
+               // document.getElementById('brandName').textContent = result.user.id;
+                //document.getElementById('statusNav').classList.remove('d-none');
+               // document.getElementById("userStars").textContent = "★".repeat(result.stars);
                 bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
+
+               
+
+              
             } else {
                 alert(result.message);
             }

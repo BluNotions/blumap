@@ -31,6 +31,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
           <!-- Navigation Items -->
+          {% if user.is_authenticated %}
           <li class="nav-item">
             <span class="nav-link" id="friendsListBtn">Friends List</span>
           </li>
@@ -38,8 +39,9 @@
             <span class="nav-link" id="addFriendBtn">Add Friend</span>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="" id="inboxBtn">Inbox</a>
+            <a class="nav-link" href="messaging/inbox?id={{user.email}}" id="inboxBtn">Inbox</a>
           </li>
+          {% endif %}
           <!-- Dropdown Menu -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -53,14 +55,33 @@
               <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ngoAuthModal">NGO Portal</a></li>
             </ul>
           </li>
+         
+          
           <li class="nav-item">
-            <span class="navbar-text d-none" id="statusNav">
-              Community Builder: <span id="userStars">-</span>
-            </span>
+            <div id="userIconContainer"></div>
           </li>
+          {% if user.is_authenticated  %}
+          <li class="nav-item dropdown">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="/static/images/user_icon.png" alt="User Icon" id="userIcon" style="cursor: pointer;width:40px;height:40px;">
+              </a>
+              <ul class="dropdown-menu">
+                <li><span  class="dropdown-item"> {{ user.username  }}</span></li>
+                <li>  <span class="dropdown-item" id="statusNav">
+                  Community Builder: <span id="userStars">-</span>
+                  </span></li>
+               
+                <li><a id="auth-link"  class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#authModal">Logout</a></li>
+              </ul>
+            </li>
+           
+          </li>
+          {% else %}
           <li class="nav-item">
             <a id="auth-link" class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#authModal">Log In</a>
           </li>
+          {% endif %}
         </ul>
       </div>
     </div>

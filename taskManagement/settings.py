@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = ')mhr(jqjluqws2r6s=%_@598n5c0b=g+d002_inew9%8-y$2m-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.blumaps.com',
@@ -140,15 +140,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collected f
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 
 CSRF_USE_SESSIONS = False
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 
-SESSION_COOKIE_DOMAIN = '.blumaps.com'
+# SESSION_COOKIE_DOMAIN = '.blumaps.com'
 
-CSRF_COOKIE_DOMAIN = '.blumaps.com'
+# CSRF_COOKIE_DOMAIN = '.blumaps.com'
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
