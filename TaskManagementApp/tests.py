@@ -51,8 +51,14 @@ class FriendRequestTests(TestCase):
 
         self.assertEqual(Friend.objects.count(), 2)
 
-        friends = Friend.objects.filter(user1=self.sender) | Friend.objects.filter(user2=self.sender)
-        self.assertEqual(friends.count(), 1)
+        # friends = Friend.objects.filter(user1=self.sender) | Friend.objects.filter(user2=self.sender)
+        # self.assertEqual(friends.count(), 1)
+        self.assertEqual(Friend.objects.count(), 2)
+
+# Check for both directions explicitly
+        self.assertTrue(Friend.objects.filter(user1=self.sender, user2=self.receiver).exists())
+        self.assertTrue(Friend.objects.filter(user1=self.receiver, user2=self.sender).exists())
+
 
     def test_reject_friend_request(self):
         """Test rejecting a friend request"""
