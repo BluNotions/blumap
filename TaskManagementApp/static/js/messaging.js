@@ -75,7 +75,7 @@ const sendHelpRequest = (recipientId) => {
  * Loads the inbox content from the server and updates the UI.
  */
 const loadInbox = () => {
-    fetch('/inbox/')
+    fetch('/messaging/inbox/')
         .then(response => response.text())
         .then(html => {
             const inboxElement = document.getElementById('inboxContent');

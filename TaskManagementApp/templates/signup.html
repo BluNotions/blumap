@@ -1,0 +1,45 @@
+{% load static %}
+{% include 'header.html' %}
+<!-- Main Content -->
+  <div class="main">
+    <h2 class="signup-heading">Sign Up</h2>
+    <form method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+    {{ form.as_p }}
+    <!-- Add reCAPTCHA widget -->
+    <div class="g-recaptcha" data-sitekey="6LczS-wqAAAAAMwS0aaREFbA4uZ-drP_kciBAryH"></div>
+   
+    <button type="submit" class="btn-custom-blue">Sign Up</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+  </div>
+  <!-- Modal Markup -->
+<div id="helpModal" class="modal">
+  <div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>Hello, please send details to help you</h4>
+      <span class="close">&times;</span>
+    </div>
+    <div class="modal-body">
+     
+      <textarea id="helpMessage" placeholder="Enter your message" rows="3"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button id="sendHelp" class="btn btn-primary">Send</button>
+      <button id="goInbox" class="btn btn-secondary">Go to Inbox</button>
+    </div>
+  </div>
+</div>
+</div>
+  {% include 'footer.html' %}
+  <!-- <script src="{% static 'js/authentic.js' %}"></script>
+  <script src="{% static 'js/scripts.js' %}"></script> -->
+  <!-- Add reCAPTCHA script -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</body>
+</html>

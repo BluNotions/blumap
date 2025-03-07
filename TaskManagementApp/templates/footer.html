@@ -1,0 +1,56 @@
+<!-- TaskManagementApp/templates/header.html -->
+{% load static %}  <!-- Ensure this line is included -->
+
+
+<body>
+
+<footer class="footer-bottom">
+  <div class="container text-center">
+    <div class="sponsor-banner">
+      <div class="container">
+        <!-- Group 1: Combined Sponsor & Operated (AWS and BluNotion) -->
+        <div class="row justify-content-center mb-4" data-aos="fade-down">
+          <div class="col-12 col-md-6">
+            <div class="logo-group-container">
+              <img src="{% static 'images/awslogo.png' %}" alt="AWS Logo" class="banner-logo" style="height: 100px;">
+              <div class="sponsor-label">SPONSORED BY AWS</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="logo-group-container">
+              <img src="{% static 'images/BluNotionLogo.png' %}" alt="BluNotion Logo" class="banner-logo" style="height: 100px;">
+              <div class="sponsor-label">OPERATED BY BLUNOTION</div>
+            </div>
+          </div>
+        </div>
+        <!-- Group 2: Combined Development Tooling & Future Development Roadmap -->
+        <div class="row justify-content-center mb-4" data-aos="fade-down" data-aos-delay="200">
+          <div class="col-12">
+            <div class="logo-group-container">
+              <div class="tech-logo-group">
+                <img src="{% static 'images/github.png' %}" alt="GitHub Logo" class="banner-logo" style="height: 60px;">
+                <img src="{% static 'images/linuxlogo2.png' %}" alt="Linux Logo" class="banner-logo" style="height: 60px;">
+                <img src="{% static 'images/python.png' %}" alt="Python Logo" class="banner-logo" style="height: 60px;">
+                <img src="{% static 'images/nftlogo.png' %}" alt="NFT Logo" class="banner-logo" style="height: 60px;">
+                <img src="{% static 'images/web3.png' %}" alt="Web3 Logo" class="banner-logo" style="height: 60px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <p>
+        <a href="{% url 'termsofuse' %}">Terms of Use</a>
+        <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        <a href="{% url 'corporate_policy' %}">Corporate Policies</a>
+        <a href="{% url 'careers' %}">Careers</a>
+        <a href = "{% url 'contact' %}">Contact Us</a> |
+      </p>
+      <p>&copy; 2025 Blunotions™. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+ 
+
+</body>
+</html>

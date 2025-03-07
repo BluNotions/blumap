@@ -23,10 +23,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run Django Tests
         run: |
-          python -m unittest discover  # Adjust based on testing framework
-
+          python manage.py test
+        env:
+          DJANGO_SETTINGS_MODULE: taskManagement.settings
+        
       - name: Deploy to EC2
         env:
           HOST: ${{ secrets.EC2_HOST }}  # EC2 IP address
@@ -40,11 +42,11 @@ jobs:
           # SSH into EC2 and deploy
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER}@${HOST} << 'EOF'
             cd blumap  # Update with your actual project path
-            git pull origin master  
-            source venv/bin/activate  # Adjust if necessary
-            pip install -r requirements.txt
-            python3 manage.py migrate
-            python3 manage.py collectstatic --noinput  
+            sudo git pull origin master  
+            sudo source venv/bin/activate  # Adjust if necessary
+            sudo pip install -r requirements.txt
+            sudo python3 manage.py migrate
+            sudo python3 manage.py collectstatic --noinput  
             sudo systemctl daemon-reload
             sudo systemctl restart gunicorn  # Restart gunicorn to apply changes
             sudo systemctl enable gunicorn
