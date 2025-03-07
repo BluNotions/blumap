@@ -129,7 +129,7 @@ def get_location_interests(request):
     return JsonResponse(data, safe=False)
 
 def get_existing_data(request):
-    data = Locations.objects.values('Name', 'Latitude', 'Longitude', 'Category','Description')
+    data = Locations.objects.values('name', 'latitude', 'longitude', 'category','description')
     return JsonResponse(list(data), safe=False)
 
 def set_cookie(request):
@@ -196,7 +196,7 @@ def signup(request):
             # Validate reCAPTCHA
             recaptcha_response = request.POST.get('g-recaptcha-response')
             data = {
-                'secret': '6LcNXOsqAAAAALhHQFgpI6cm41UWxQi42d9s066Q',  # Replace with your secret key
+                'secret': '6LczS-wqAAAAANlshDRij_CxeqUK25Qsua1d3I_4',  # Replace with your secret key
                 'response': recaptcha_response
             }
             response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
@@ -204,8 +204,17 @@ def signup(request):
 
             if result['success']:
                 user = form.save()  # This creates the User instance
-                UserProfile.objects.create(user=user)  # Create UserProfile instance
-                messages.success(request, 'Registration successful')
+                
+                # Check if UserProfile already exists
+                if not UserProfile.objects.filter(user=user).exists():
+                    UserProfile.objects.create(user=user)  # Create UserProfile instance
+                else:
+                    # Optionally, update the existing UserProfile if needed
+                    # existing_profile = UserProfile.objects.get(user=user)
+                    # existing_profile.some_field = new_value
+                    # existing_profile.save()
+
+                 messages.success(request, 'Registration successful')
                 return redirect('home')
             else:
                 messages.error(request, 'Invalid reCAPTCHA. Please try again.')
@@ -242,10 +251,12 @@ def login_view(request):
             if user is not None:
                 profile_data = {
                 'id': user_profile.user.id,
+                'username':user_profile.user.username,
                 'email': user_profile.user.email,
                 'phone_number': user_profile.phone_number,  # Assuming this field exists in UserProfile
                 # Add any other fields you want to include
-        }
+                }
+                login(request, user)
                 return JsonResponse({'success': True, 'user': profile_data})
             else:
                 return JsonResponse({'success': False, 'message': 'Invalid credentials'}, status=400)
@@ -318,9 +329,10 @@ def send_friend_request(request):
 
             return JsonResponse({'status': 'success', 'message': 'Friend request sent and email delivered'})
 
-        except User.DoesNotExist:
+        except User.DoesNotExist as e:
             return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
         except Exception as e:
+            print(f"Error in send_friend_request: {str(e)}")  # Log the error for debugging
             return JsonResponse({'status': 'error', 'message': f'Error: {str(e)}'}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
