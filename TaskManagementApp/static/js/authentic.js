@@ -1,28 +1,3 @@
-
-window.onload = () => {
-    google.accounts.id.initialize({
-      client_id: "954332897984-6eccprh5acm455775mb2sb6fms70pr5n.apps.googleusercontent.com",
-      callback: handleCredentialResponse
-    });
-
-    document.getElementById("googleSignInBtn").onclick = () => {
-      google.accounts.id.prompt();  // Triggers the One Tap or Sign-In prompt
-    };
-  };
-
-  function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    var profile = response.credential.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-    // Send this token to your backend for verification.
-    window.localStorage.setItem('user', JSON.stringify(response));
-                window.location.reload(); // Reload the webpage after successful login
-  }
-
-
 async function fetchCsrfToken() {
     try {
         const response = await fetch('/api/csrf/', { credentials: 'include' });
@@ -34,9 +9,48 @@ async function fetchCsrfToken() {
         console.error('Error fetching CSRF token:', error);
     }
 }
-fetchCsrfToken();  // Call this on page load
 
-// ================================================
+
+function getCsrfToken() {
+    const name = 'csrftoken';
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(name + '='))
+        ?.split('=')[1];
+    return cookieValue;
+}
+
+
+window.onload = () => {
+    fetchCsrfToken(); 
+    google.accounts.id.initialize({
+        client_id: "954332897984-6eccprh5acm455775mb2sb6fms70pr5n.apps.googleusercontent.com",
+        callback: handleCredentialResponse
+    });
+
+    document.getElementById("googleSignInBtn").onclick = () => {
+      google.accounts.id.prompt();  // Triggers the One Tap or Sign-In prompt
+    };
+  };
+
+  function handleCredentialResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+    var profile = response.credential.getBasicProfile();
+    console.log('ID: ' + profile.getId());
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail());
+    window.localStorage.setItem('user', JSON.stringify(response));
+                window.location.reload(); // Reload the webpage after successful login
+  }
+
+
+
+
+
+
+
+/*================================================*/
 // Authentication System
 class AuthSystem {
     constructor() {
@@ -65,7 +79,7 @@ class AuthSystem {
             }
 
             this.currentUser = data.user; // Assuming the server returns user info
-            alert(JSON.stringify(this.currentUser));
+            
             return { success: true, user: data.user, stars: data.stars, isNGO: data.isNGO };
         } catch (error) {
             // Hide loading animation
@@ -107,87 +121,23 @@ class AuthSystem {
         return this.currentUser;
     }
 }
+/*================================================*/
+
 const authSystem = new AuthSystem();
 
-// Log in with Google 
-// 954332897984-6eccprh5acm455775mb2sb6fms70pr5n.apps.googleusercontent.com
-const googleLoginBtn = document.getElementById("googleLoginBtn");
 
 
-function onSignIn(googleUser) {
-    var profile = googleUser.getBasicProfile();
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-  }
-
-
-
-
-
-
-
-
-
-
-if (googleLoginBtn) {
-    googleLoginBtn.addEventListener("click", async function() {
-        if (!web3auth) {
-            console.error("❌ Web3Auth is not initialized yet.");
-            alert("Web3Auth is not ready yet. Please try again in a moment.");
-            return;
-        }
-        try {
-            const provider = await web3auth.connect();
-            console.log("✅ Web3Auth provider:", provider);
-            authSystem.currentUser = "web3authUser";
-            document.getElementById('auth-link').textContent = 'Log Out';
-            document.getElementById('brandName').textContent = "Web3Auth User";
-            document.getElementById('statusNav').classList.remove('d-none');
-            bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-        } catch (error) {
-            console.error("❌ Error logging in with Web3Auth:", error);
-            alert("Login failed. Please try again.");
-        }
-    });
-}
-  // Event listener for user icon click
-//   document.getElementById('userIcon').addEventListener('click', function() {
-//     const dropdown = document.getElementById('userDropdown');
-//     dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-// });
-
-// // Event listener for logout link
-// document.getElementById('logoutLink').addEventListener('click', function() {
-//     authSystem.logout();
-//     // Additional logout logic here
-// });
 // Local Login Form
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
         const password = document.getElementById('loginPassword').value;
         authSystem.login(phoneOrEmail, password).then(result => {
-           
             if (result.success) {
                 window.localStorage.setItem('user', JSON.stringify(result.user));
                 window.location.reload(); // Reload the webpage after successful login
-               // window.localStorage.setItem('user', JSON.stringify(result.user));
-            
-               // document.getElementById('inboxBtn').href = `/messaging/inbox?id=${result.user}`;
-               // document.getElementById('auth-link').textContent = 'Log Out';
-               // document.getElementById('brandName').textContent = result.user.id;
-                //document.getElementById('statusNav').classList.remove('d-none');
-                //document.getElementById("userStars").textContent = "★".repeat(result.stars);
-               // bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-              
-                
-
-              
             } else {
                 alert(result.message);
             }
@@ -195,40 +145,22 @@ if (loginForm) {
     });
 }
 
-function getCsrfToken() {
-    const name = 'csrftoken';
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(name + '='))
-        ?.split('=')[1];
-    return cookieValue;
-}
 
+//Logout button
 document.getElementById('logout-link').addEventListener('click', async function(e) {
     e.preventDefault();
-
     try {
-        // if (authSystem.currentUser === "web3authUser") {
-        //     if (web3auth) {
-        //         await web3auth.logout();
-        //         console.log("✅ Web3Auth Logged Out");
-        //     }
-        // }
         authSystem.logout();
-
-        // Notify backend (Django) to clear server-side session
-        const csrfToken = getCsrfToken(); // or store it from step 2
+        window.localStorage.removeItem('user');
+        const csrfToken = getCsrfToken(); 
         await fetch('/api/logout/', {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'X-CSRFToken': csrfToken,
             }
-        });
-        window.location.reload();
-       // document.getElementById('auth-link').textContent = 'Log In';
-      //  document.getElementById('brandName').textContent = 'Blumaps';
-       // document.getElementById('statusNav').classList.add('d-none');
+        }).then( window.location.reload()).catch(()=>alert("Logout failed. Please try again."));
+    
     } catch (error) {
         console.error("❌ Error during logout:", error);
         alert("Logout failed. Please try again.");

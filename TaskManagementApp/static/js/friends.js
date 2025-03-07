@@ -13,7 +13,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log(data); // Log the data to see its structure
+                console.log('check',data.friends); // Log the data to see its structure
                 const friendsListContent = document.getElementById("friendsListContent");
                 friendsListContent.innerHTML = ""; // Clear existing content
                 
@@ -21,12 +21,13 @@
                 const friends = data.friends; // Access the friends property
                 
                 if (Array.isArray(friends)) { // Check if friends is an array
+                    
                     if (friends.length === 0) {
                         friendsListContent.innerHTML = "<p>No friends added yet.</p>"; // No friends case
                     } else {
                         friends.forEach(friend => {
-                            const listItem = document.createElement("p");
-                            listItem.textContent = friend.name; // Adjust based on your data structure
+                            const listItem = document.createElement("span");
+                            listItem.textContent = friend; // Adjust based on your data structure
                             friendsListContent.appendChild(listItem);
                         });
                     }

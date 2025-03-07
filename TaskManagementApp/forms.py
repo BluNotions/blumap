@@ -18,11 +18,11 @@ class TaskForm(forms.ModelForm):
 
 
 class SignupForm(UserCreationForm):
-    verification_type = forms.ChoiceField(choices=[
-        ('email', 'Email'),
-        ('sms', 'SMS'),
-        ('call', 'Call'),
-    ])
+    # verification_type = forms.ChoiceField(choices=[
+    #     ('email', 'Email'),
+    #     ('sms', 'SMS'),
+    #     ('call', 'Call'),
+    # ])
     phone_number = forms.CharField(max_length=15, required=False)
 
     class Meta:
@@ -34,7 +34,7 @@ class SignupForm(UserCreationForm):
         # Check if the UserProfile already exists
         profile, created = UserProfile.objects.get_or_create(user=user)
         profile.phone_number = self.cleaned_data['phone_number']
-        profile.verification_type = self.cleaned_data['verification_type']
+        # profile.verification_type = self.cleaned_data['verification_type']
         
         if commit:
             user.save()
