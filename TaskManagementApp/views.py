@@ -16,6 +16,7 @@ from django.core.mail import send_mail  # Import send_mail
 from django.shortcuts import render
 from django.urls import reverse
 import requests  # Import requests to make HTTP requests
+from django.db import models
 
 
 
@@ -135,8 +136,16 @@ def get_existing_data(request):
     try:
         if category:
             if category == 'Private':
+                # Get the list of friends for the current user
+                friends = Friend.objects.filter(
+                    models.Q(user1=user) | models.Q(user2=user)
+                ).values_list('user1', 'user2')
+
+                # Flatten the list of friend IDs
+                friend_ids = [friend for pair in friends for friend in pair if friend != user.id]
+
                 # Filter locations where the user is friends with the creator
-                data = Locations.objects.filter(category=category, created_by__in=user.friends.all()).values('name', 'latitude', 'longitude', 'category', 'description')
+                data = Locations.objects.filter(category=category, created_by__in=friend_ids).values('name', 'latitude', 'longitude', 'category', 'description')
             else:
                 data = Locations.objects.filter(category=category).values('name', 'latitude', 'longitude', 'category', 'description')
         else:
