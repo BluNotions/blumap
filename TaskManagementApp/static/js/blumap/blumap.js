@@ -231,12 +231,16 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
     button.addEventListener('click', function() {
       canAddMarker = false;
       const category = this.getAttribute('data-category');
+    
+      
       clearMarkers();
       fetch(`/get_existing_data/?category=${category}`)
         .then(response => response.json())
         .then(data => {
+         
           console.log(data); // Log the data to see its structure
-          data.filter(item => item.category === category).forEach(item => {
+         
+          data.forEach(item => {
             const location = [item.longitude, item.latitude];
             placeMarker(location, item.category, item.name, item.description, item.email, item.phone);
           });
@@ -268,7 +272,8 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
     const latitude = document.getElementById('latitude').value;
     const longitude = document.getElementById('longitude').value;
     const category = document.getElementById('category').value;
-    const data = { title, latitude, longitude, description, category };
+    const username = JSON.parse(window.localStorage.getItem('user')).username;
+    const data = { title, latitude, longitude, description, category, username };
     fetch('/save_location/', {
       method: 'POST',
       headers: {

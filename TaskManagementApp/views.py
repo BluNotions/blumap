@@ -77,7 +77,7 @@ def save_location(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         print(f"Received data: {data}")  # Log the received data
-        name = data.get('name', 'Unknown Name')  # Default to 'Unknown Name'
+        name = data.get('username', 'Unknown Name')  # Default to 'Unknown Name'
         email = data.get('email', 'unknown@example.com')  # Default to a placeholder email
         phone_number = data.get('phone_number', '000-000-0000')  # Default to a placeholder phone number
         lat = data.get('latitude', 0.0)  # Default to 0.0 for latitude
@@ -137,15 +137,22 @@ def get_existing_data(request):
         if category:
             if category == 'Private':
                 # Get the list of friends for the current user
-                friends = Friend.objects.filter(
-                    models.Q(user1=user) | models.Q(user2=user)
-                ).values_list('user1', 'user2')
+                friends = Friend.objects.filter(user2=user.id).values_list('user1__username', flat=True)
+                
+               # friends = Friend.objects.filter(user1=user).values_list('user2', flat=True)
+                # friends = Friend.objects.filter(
+                # models.Q(user1=user.id) | models.Q(user2=user.id)  # Filter on username
+                # ).values_list('user1__username', 'user2__username')  # Get usernames
 
-                # Flatten the list of friend IDs
-                friend_ids = [friend for pair in friends for friend in pair if friend != user.id]
-
+                # Flatten the list of friend usernames
+                # friends_names = [friend for pair in friends for friend in pair if friend != user.username]
                 # Filter locations where the user is friends with the creator
-                data = Locations.objects.filter(category=category, created_by__in=friend_ids).values('name', 'latitude', 'longitude', 'category', 'description')
+                locations = Locations.objects.filter(category=category).values('name', 'latitude', 'longitude', 'category', 'description')
+           
+           
+                data = locations.filter(name__in=friends).values('name', 'latitude', 'longitude', 'category', 'description')
+           
+           
             else:
                 data = Locations.objects.filter(category=category).values('name', 'latitude', 'longitude', 'category', 'description')
         else:

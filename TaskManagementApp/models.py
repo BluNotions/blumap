@@ -76,6 +76,7 @@ class LocationInterest(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     interest = models.TextField()
+    need = models.CharField(max_length=100)
 
     def __str__(self):
         return self.interest

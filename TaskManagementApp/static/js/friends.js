@@ -4,6 +4,7 @@
     document.getElementById("friendsListBtn").addEventListener("click", function(e) {
         e.preventDefault();
         user_id = JSON.parse(window.localStorage.getItem('user')).id
+       
         // Fetch the list of friends from the backend
         fetch('friend-request/friends/'+user_id+'/') // Adjust the endpoint as necessary
             .then(response => {
