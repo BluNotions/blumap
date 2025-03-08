@@ -97,6 +97,7 @@
   <div id="loadingAnimation" style="display: none;">
     <p>Loading...</p> <!-- You can replace this with a spinner or any loading animation -->
   </div>
+  
   <!-- NGO Registration/Login Modal -->
 <div class="modal fade" id="ngoAuthModal" tabindex="-1" aria-labelledby="ngoAuthModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -204,7 +205,10 @@
               I confirm that I have read, consent and agree to Blumaps's Terms of Use and Privacy Policy.
             </label>
           </div>
-          <button type="submit" class="btn btn-primary w-100">Log In</button>
+          <button type="submit" class="btn btn-primary w-100" id="loginSubmitBtn">
+            Log In
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+          </button>
         </form>
         <div class="d-flex justify-content-between mt-3">
           <a href="#" class="text-decoration-none" style="color: #aaa;">Forgot password?</a>
@@ -266,8 +270,5 @@
   </div>
 </div>
 </div>
+
 </body>
-<script src="{% static 'js/scripts.js' %}"></script>
-<script src="{% static 'js/authentic.js' %}"></script>
-<script src="{% static 'js/blumap.js' %}"></script>
-<script src="{% static 'js/friends.js' %}"></script>

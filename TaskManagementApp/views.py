@@ -16,6 +16,7 @@ from django.core.mail import send_mail  # Import send_mail
 from django.shortcuts import render
 from django.urls import reverse
 import requests  # Import requests to make HTTP requests
+from django.db import models
 
 
 
@@ -76,7 +77,7 @@ def save_location(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         print(f"Received data: {data}")  # Log the received data
-        name = data.get('name', 'Unknown Name')  # Default to 'Unknown Name'
+        name = data.get('username', 'Unknown Name')  # Default to 'Unknown Name'
         email = data.get('email', 'unknown@example.com')  # Default to a placeholder email
         phone_number = data.get('phone_number', '000-000-0000')  # Default to a placeholder phone number
         lat = data.get('latitude', 0.0)  # Default to 0.0 for latitude
@@ -95,21 +96,21 @@ def save_location(request):
         resolved_date = data.get('resolved_date')  # Optional field
 
         location = Locations(
-            Name=name,
-            Email=email,
-            Phone_Number=phone_number,
-            Latitude=lat,
-            Longitude=lng,
-            GeoHash=geohash,
-            Description=description,
-            Category=category,
-            Status=status,
-            Priority=priority,
-            Tags=tags, 
-            Attachments=attachments,
-            Created_By=created_by,
-            Updated_By=updated_by,
-            Resolved_Date=resolved_date
+            name=name,
+            email=email,
+            phone_number=phone_number,
+            latitude=lat,
+            longitude=lng,
+            geohash=geohash,
+            description=description,
+            category=category,
+            status=status,
+            priority=priority,
+            tags=tags, 
+            attachments=attachments,
+            created_by=created_by,
+            updated_by=updated_by,
+            resolved_date=resolved_date
         )
         
         # Validate the model instance
@@ -129,8 +130,37 @@ def get_location_interests(request):
     return JsonResponse(data, safe=False)
 
 def get_existing_data(request):
-    data = Locations.objects.values('name', 'latitude', 'longitude', 'category','description')
-    return JsonResponse(list(data), safe=False)
+    category = request.GET.get('category')  # Get the category from the request
+    user = request.user  # Get the currently logged-in user
+
+    try:
+        if category:
+            if category == 'Private':
+                # Get the list of friends for the current user
+                friends = Friend.objects.filter(user2=user.id).values_list('user1__username', flat=True)
+                
+               # friends = Friend.objects.filter(user1=user).values_list('user2', flat=True)
+                # friends = Friend.objects.filter(
+                # models.Q(user1=user.id) | models.Q(user2=user.id)  # Filter on username
+                # ).values_list('user1__username', 'user2__username')  # Get usernames
+
+                # Flatten the list of friend usernames
+                # friends_names = [friend for pair in friends for friend in pair if friend != user.username]
+                # Filter locations where the user is friends with the creator
+                locations = Locations.objects.filter(category=category).values('name', 'latitude', 'longitude', 'category', 'description')
+           
+           
+                data = locations.filter(name__in=friends).values('name', 'latitude', 'longitude', 'category', 'description')
+           
+           
+            else:
+                data = Locations.objects.filter(category=category).values('name', 'latitude', 'longitude', 'category', 'description')
+        else:
+            data = Locations.objects.values('name', 'latitude', 'longitude', 'category', 'description')
+        
+        return JsonResponse(list(data), safe=False)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 def set_cookie(request):
     response = HttpResponse("Cookie has been set!")

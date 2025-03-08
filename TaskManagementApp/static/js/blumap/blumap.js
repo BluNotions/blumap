@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceptCookies = document.getElementById('accept-cookies');
     acceptCookies.addEventListener('click', () => {
         document.cookie = 'cookiesAccepted=true; max-age=' + (60 * 60 * 24 * 365) + '; path=/';
-        getLocation = true; // ✅ Sync the state
+        getLocation = true; // âœ… Sync the state
         document.getElementById('cookieConsentBanner').style.display = 'none';
         requestLocation();
     });
@@ -231,12 +231,16 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
     button.addEventListener('click', function() {
       canAddMarker = false;
       const category = this.getAttribute('data-category');
+    
+      
       clearMarkers();
-      fetch('/get_existing_data/')
+      fetch(`/get_existing_data/?category=${category}`)
         .then(response => response.json())
         .then(data => {
+        
           console.log(data); // Log the data to see its structure
-          data.filter(item => item.category === category).forEach(item => {
+        
+          data.forEach(item => {
             const location = [item.longitude, item.latitude];
             placeMarker(location, item.category, item.name, item.description, item.email, item.phone);
           });
@@ -251,4 +255,42 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
         bootstrap.Offcanvas.getInstance(offcanvasViewEl).hide();
       }
     });
+  });
+
+
+  document.getElementById('locationForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const title = document.getElementById('title').value;
+    const description = document.getElementById('description').value;
+    const combinedText = title + " " + description;
+    const toxicity = await checkToxicity(combinedText);
+    console.log("Toxicity score:", toxicity);
+    if (toxicity >= 0.7) {
+      alert("Your submission contains inappropriate content. Please revise your text.");
+      return;
+    }
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
+    const category = document.getElementById('category').value;
+    const username = JSON.parse(window.localStorage.getItem('user')).username;
+    const data = { title, latitude, longitude, description, category, username };
+    fetch('/save_location/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken':getCsrfToken()
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(responseData => {
+      console.log('Success:', responseData);
+      placeMarker([longitude, latitude], category, title, description);
+    })
+    .catch(error => console.error('Error:', error));
+    bootstrap.Modal.getInstance(document.getElementById('dataModal')).hide();
+    this.reset();
   });
