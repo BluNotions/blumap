@@ -60,6 +60,9 @@ class AuthSystem {
     async login(email, password) {
         // Show loading animation
         document.getElementById('loadingAnimation').style.display = 'block'; // Show loading animation
+         // Disable the button
+    
+    
         try {
             const response = await fetch('/api/login/', {
                 method: 'POST',

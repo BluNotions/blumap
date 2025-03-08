@@ -469,3 +469,12 @@ p{ /* not the best solution , will need to refactor signup form to adjust this *
   display: flex;
   flex-direction: column;
 }
+
+.loadingAnimation{
+  display:none;
+width:100vw;
+height:100vh;
+background-color: #002D62;
+z-index: 10;
+
+}

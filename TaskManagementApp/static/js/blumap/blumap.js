@@ -237,9 +237,9 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
       fetch(`/get_existing_data/?category=${category}`)
         .then(response => response.json())
         .then(data => {
-         
+        
           console.log(data); // Log the data to see its structure
-         
+        
           data.forEach(item => {
             const location = [item.longitude, item.latitude];
             placeMarker(location, item.category, item.name, item.description, item.email, item.phone);
