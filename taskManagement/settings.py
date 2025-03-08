@@ -7,13 +7,13 @@ GOOGLE_MAPS_API_KEY='AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0'
 DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'your-smtp-server'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your@email.com'
-# EMAIL_HOST_PASSWORD = 'your-email-password'
-# DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'your-smtp-server'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your@email.com'
+EMAIL_HOST_PASSWORD = 'your-email-password'
+DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -140,15 +140,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collected f
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = True
 
 CSRF_USE_SESSIONS = False
 
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
 
-# SESSION_COOKIE_DOMAIN = '.blumaps.com'
+SESSION_COOKIE_DOMAIN = '.blumaps.com'
 
-# CSRF_COOKIE_DOMAIN = '.blumaps.com'
+CSRF_COOKIE_DOMAIN = '.blumaps.com'
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
