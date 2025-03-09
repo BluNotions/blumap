@@ -115,51 +115,44 @@
       font-size: 0.75rem;
       margin-left: 0.5rem;
     }
-
-
-     /* Monitoring Banner Styles */
-     .monitoring-banner {
-        background: linear-gradient(90deg, 
-            rgba(0, 39, 102, 0.3) 0%, 
-            rgba(0, 247, 255, 0.4) 50%, 
-            rgba(0, 39, 102, 0.3) 100%);
-        padding: 12px 20px;
-        border-radius: 8px;
-        margin-bottom: 1.5rem;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid var(--neon-accent);
-        animation: pulseGlow 2s infinite;
+    /* Monitoring Banner Styles */
+    .monitoring-banner {
+      background: linear-gradient(90deg, 
+          rgba(0, 39, 102, 0.3) 0%, 
+          rgba(0, 247, 255, 0.4) 50%, 
+          rgba(0, 39, 102, 0.3) 100%);
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--neon-accent);
+      animation: pulseGlow 2s infinite;
     }
-
     .monitoring-banner::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 200%;
-        height: 100%;
-        background: linear-gradient(90deg,
-            transparent 25%,
-            rgba(0, 247, 255, 0.1) 50%,
-            transparent 75%);
-        animation: shimmer 3s infinite;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(90deg,
+          transparent 25%,
+          rgba(0, 247, 255, 0.1) 50%,
+          transparent 75%);
+      animation: shimmer 3s infinite;
     }
-
     .monitoring-banner i {
-        margin-right: 10px;
-        color: var(--neon-accent);
+      margin-right: 10px;
+      color: var(--neon-accent);
     }
-
     @keyframes pulseGlow {
-        0%, 100% { box-shadow: 0 0 5px rgba(0, 247, 255, 0.2); }
-        50% { box-shadow: 0 0 15px rgba(0, 247, 255, 0.4); }
+      0%, 100% { box-shadow: 0 0 5px rgba(0, 247, 255, 0.2); }
+      50% { box-shadow: 0 0 15px rgba(0, 247, 255, 0.4); }
     }
-
     @keyframes shimmer {
-        100% { transform: translateX(100%); }
+      100% { transform: translateX(100%); }
     }
-
   </style>
 </head>
 <body>
@@ -176,14 +169,20 @@
   <div class="container">
     <h1 class="text-center mb-4">Inbox</h1>
     
-    <!-- Conversation List -->
-    <div class="conversation-list" id="conversationList">
-      {% for conversation in conversations %}
-        <div class="conversation-item" data-user="{{ conversation.user.username }}">
-          <div class="username">{{ conversation.user.username }}</div>
-          <div class="latest-message">{{ conversation.latest_message }}</div>
+    <!-- New Friends List Section -->
+    <div class="row">
+      <div class="col-md-4">
+        <h2>Friends</h2>
+        <div class="friends-list" id="friendsList">
+          <!-- Friends will be dynamically loaded here -->
         </div>
-      {% endfor %}
+      </div>
+      <div class="col-md-8">
+        <!-- Conversation List -->
+        <div class="conversation-list" id="conversationList">
+          <!-- Conversations will be dynamically loaded here -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -245,16 +244,33 @@
 
     // Strict filter for dirty words
     function containsDirtyWords(text) {
-      // Update this list with words you want to block
       const bannedWords = [
         "fuck", "shit", "damn", "bitch", "asshole", "crap", "dick", "piss", "pussy", "cock",
-  "whore", "slut", "bastard", "motherfucker", "cunt", "dildo", "wanker", "twat", "fag",
-  "nigger", "retard", "chink", "spic", "kike", "dyke", "coon", "gook", "tranny", "queer",
-  "beyonce", "kanyewest", "taylorswift", "elonmusk", "kimkardashian", "justinbieber",
-  "drake", "rihanna", "leomessi", "cristianoronaldo", "sex", "penis", "vagina", "boobs", "anal", "blowjob", "clitoris", "orgasm", "masturbate",
-  "porn", "ejaculate", "condom", "dildo", "viagra", "allah", "jesus", "buddha", "hindu", "torah", "quran", "bible", "mosque", "synagogue",
-  "church", "atheist", "jihad", "halal", "kosher", "crusade" ];
+        "whore", "slut", "bastard", "motherfucker", "cunt", "dildo", "wanker", "twat", "fag",
+        "nigger", "retard", "chink", "spic", "kike", "dyke", "coon", "gook", "tranny", "queer",
+        "beyonce", "kanyewest", "taylorswift", "elonmusk", "kimkardashian", "justinbieber",
+        "drake", "rihanna", "leomessi", "cristianoronaldo", "sex", "penis", "vagina", "boobs",
+        "anal", "blowjob", "clitoris", "orgasm", "masturbate", "porn", "ejaculate", "condom",
+        "dildo", "viagra", "allah", "jesus", "buddha", "hindu", "torah", "quran", "bible",
+        "mosque", "synagogue", "church", "atheist", "jihad", "halal", "kosher", "crusade"
+      ];
       return bannedWords.some(word => text.toLowerCase().includes(word));
+    }
+
+    // Function to get a cookie by name
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
   </script>
 
@@ -288,23 +304,15 @@
     
     // Helper function to add a message after checking its toxicity.
     async function addMessage(container, sender, text) {
-      const toxicityScore = await checkToxicity(text);
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('chat-message', sender === "You" ? 'outgoing' : 'incoming');
-      
-      // If message is toxic based on Perspective API, or contains banned words, flag it.
-      if (toxicityScore > 0.7 || containsDirtyWords(text)) {
-        messageDiv.innerHTML = `<strong>${sender}:</strong> ${text} <span class="badge bg-danger">Toxic/Blocked</span>`;
-      } else {
-        messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      }
+      messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
       container.appendChild(messageDiv);
     }
     
     // Load conversation history when a conversation item is clicked.
     document.querySelectorAll('.conversation-item').forEach(item => {
       item.addEventListener('click', async function() {
-        currentConversationElement = this;
         const user = this.getAttribute('data-user');
         document.getElementById('modalUserName').textContent = user;
         const conversationContent = document.getElementById('conversationContent');
@@ -318,33 +326,51 @@
       });
     });
     
-    // Send button functionality: check the message for both toxicity and dirty words before sending.
+    // Send button functionality: check the message for toxicity and banned words.
     document.getElementById('modalSendButton').addEventListener('click', async function() {
       const modalInput = document.getElementById('modalMessageInput');
       const messageText = modalInput.value.trim();
-      
-      // Block message if it contains banned words.
+      const conversationId = '1'; // Replace with actual conversation ID logic
+
       if (containsDirtyWords(messageText)) {
         alert("Your message contains prohibited language. Please revise your message.");
         return;
       }
       
-      if (messageText && currentConversationElement) {
+      if (messageText) {
         const toxicityScore = await checkToxicity(messageText);
         if (toxicityScore > 0.7) {
           alert("Your message appears to be toxic. Please revise your message.");
           return;
         }
-        const user = document.getElementById('modalUserName').textContent;
+        
         const conversationContent = document.getElementById('conversationContent');
         await addMessage(conversationContent, "You", messageText);
         modalInput.value = '';
         conversationContent.scrollTop = conversationContent.scrollHeight;
-        if (!conversationHistories[user]) {
-          conversationHistories[user] = [];
+        const modalUserNameText = document.getElementById('modalUserName').textContent;
+          console.log(modalUserNameText);
+        // Send the message to the server using the updated endpoint
+        const response = await fetch('/messaging/conversation/1/send/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // 'X-CSRFToken': getCookie('csrftoken'),
+          },
+          body: JSON.stringify({
+            sender_username: JSON.parse(window.localStorage.getItem('user')).username,
+            recipient_username: modalUserNameText, //document.getElementById('modalUserName').value, //JSON.parse(window.localStorage.getItem('user')).username,
+            text: messageText
+        }),
+        });
+
+        if (response.ok) {
+          const responseData = await response.json();
+          // Optionally handle the server response
+          await addMessage(conversationContent, "Other Party", responseData.responseText || "Message received.");
+        } else {
+          console.error("Failed to send message:", response.statusText);
         }
-        conversationHistories[user].push({ sender: "You", text: messageText });
-        currentConversationElement.querySelector('.latest-message').textContent = messageText;
       }
     });
 
@@ -356,21 +382,20 @@
 
     // Load conversations based on user ID from URL
     async function loadConversations() {
-      const userId = getUrlParameter('id'); // Assuming the parameter is named 'id'
-      if (userId) {
-        // Fetch conversations for the user (replace with your actual API endpoint)
-        const response = await fetch(`/api/conversations?userId=${userId}`);
+      const username = JSON.parse(window.localStorage.getItem('user')).email; //getUrlParameter('id');
+      if (username) {
+        const response = await fetch(`/messaging/conversations/user/${username}/`);
         if (response.ok) {
           const conversations = await response.json();
           const conversationList = document.getElementById('conversationList');
-          conversationList.innerHTML = ''; // Clear existing conversations
+          conversationList.innerHTML = '';
           conversations.forEach(convo => {
             const item = document.createElement('div');
             item.classList.add('conversation-item');
-            item.setAttribute('data-user', convo.username);
+            item.setAttribute('data-user', convo.participants.join(', '));
             item.innerHTML = `
-              <div class="username">${convo.username}</div>
-              <div class="latest-message">${convo.latestMessage}</div>
+              <div class="username">${convo.participants.join(', ')}</div>
+              <div class="latest-message">${convo.latest_message}</div>
             `;
             conversationList.appendChild(item);
           });
@@ -380,8 +405,60 @@
       }
     }
 
-    // Call loadConversations on page load
-    window.onload = loadConversations;
+    // Load friends for the user
+    async function loadFriends() {
+      const user_id = JSON.parse(window.localStorage.getItem('user')).id;
+      fetch('/friend-request/friends/' + user_id + '/')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const friendsListContent = document.getElementById("friendsList");
+          friendsListContent.innerHTML = "";
+          const friends = data.friends;
+          if (Array.isArray(friends)) {
+            if (friends.length === 0) {
+              friendsListContent.innerHTML = "<p>No friends added yet.</p>";
+            } else {
+              friends.forEach(friend => {
+                const listItem = document.createElement("button");
+                listItem.textContent = friend;
+                listItem.addEventListener('click', async function() {
+                  const conversationContent = document.getElementById('conversationContent');
+                  conversationContent.innerHTML = '';
+                  const history = conversationHistories[friend] || [];
+                  for (const msg of history) {
+                    await addMessage(conversationContent, msg.sender, msg.text);
+                  }
+                  const conversationModal = new bootstrap.Modal(document.getElementById('conversationModal'));
+                  document.getElementById('modalUserName').textContent = friend;
+                  conversationModal.show();
+                });
+                friendsListContent.appendChild(listItem);
+              });
+            }
+          } else {
+            console.error('Expected an array but got:', friends);
+            friendsListContent.innerHTML = "<p>Error: Unexpected data format.</p>";
+          }
+          
+          const friendsListSidebar = document.getElementById("friendsListSidebar");
+          if (friendsListSidebar) {
+            friendsListSidebar.classList.remove("d-none");
+          } 
+        })
+        .catch(error => {
+          console.error('Error fetching friends:', error);
+        });
+    }
+
+    window.onload = function() {
+      loadConversations();
+      loadFriends();
+    };
   </script>
 </body>
 </html>

@@ -140,15 +140,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collected f
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 
 CSRF_USE_SESSIONS = False
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 
-SESSION_COOKIE_DOMAIN = '.blumaps.com'
+# SESSION_COOKIE_DOMAIN = '.blumaps.com'
 
-CSRF_COOKIE_DOMAIN = '.blumaps.com'
+# CSRF_COOKIE_DOMAIN = '.blumaps.com'
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

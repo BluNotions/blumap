@@ -114,3 +114,65 @@ document.addEventListener('DOMContentLoaded', () => {
         loadInbox();
     }
 });
+
+// Function to load friends for the user
+async function loadFriends() {
+  user_id = JSON.parse(window.localStorage.getItem('user')).id
+   
+   // Fetch the list of friends from the backend
+   fetch('/friend-request/friends/'+user_id+'/') // Adjust the endpoint as necessary
+       .then(response => {
+           if (!response.ok) {
+               throw new Error('Network response was not ok');
+           }
+           return response.json();
+       })
+       .then(data => {
+           console.log('check',data.friends); // Log the data to see its structure
+           const friendsListContent = document.getElementById("friendsList");
+           friendsListContent.innerHTML = ""; // Clear existing content
+           
+           // Access the friends array from the response
+           const friends = data.friends; // Access the friends property
+           
+           if (Array.isArray(friends)) { // Check if friends is an array
+               
+               if (friends.length === 0) {
+                   friendsListContent.innerHTML = "<p>No friends added yet.</p>"; // No friends case
+               } else {
+                   friends.forEach(friend => {
+                       const listItem = document.createElement("button");
+                       listItem.textContent = friend; // Adjust based on your data structure
+                       listItem.addEventListener('click', async function() {
+                           // Load conversation with the clicked friend
+                           const conversationContent = document.getElementById('conversationContent');
+                           conversationContent.innerHTML = ''; // Clear existing messages
+                           const history = conversationHistories[friend] || [];
+                           for (const msg of history) {
+                               await addMessage(conversationContent, msg.sender, msg.text);
+                           }
+                           const conversationModal = new bootstrap.Modal(document.getElementById('conversationModal'));
+                           document.getElementById('modalUserName').textContent = friend; // Set the modal user name
+                           conversationModal.show(); // Show the modal
+                       });
+                       friendsListContent.appendChild(listItem);
+                   });
+               }
+           } else {
+               console.error('Expected an array but got:', friends);
+               friendsListContent.innerHTML = "<p>Error: Unexpected data format.</p>";
+           }
+           
+           document.getElementById("friendsListSidebar").classList.remove("d-none");
+       })
+       .catch(error => {
+           console.error('Error fetching friends:', error);
+       });
+}
+
+// Call loadFriends on page load
+window.onload = function() {
+  loadConversations();
+  loadFriends();
+};
+
