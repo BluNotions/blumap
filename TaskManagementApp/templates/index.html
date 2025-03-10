@@ -5,6 +5,33 @@
   <h1 class="professional-heading">Mapping Needs & Ideas</h1>
 </header>
 
+<!-- Sidebar for Desktop Controls (Draggable) -->
+<div class="sidebar d-none d-lg-block" id="sidebar">
+  <div class="mb-4">
+    <h5>Add</h5>
+    <button class="btn btn-professional btn-add control-add mb-2" id="zoom-community" data-category="Community">
+      Community<br><small>Urgent Need</small>
+    </button>
+    <button class="btn btn-professional btn-add control-add mb-2" id="zoom-business" data-category="Commerce">
+      Commerce<br><small>Ideas & Wants</small>
+    </button>
+    <button class="btn btn-professional btn-add control-add" id="zoom-inner-circle" data-category="Private">
+      Private<br><small>Family & Friends</small>
+    </button>
+  </div>
+  <div>
+    <h5>View</h5>
+    <button class="btn btn-professional btn-view control-view" id="zoom-community-2" data-category="Community">
+      Community Needs
+    </button>
+    <button class="btn btn-professional btn-view control-view" id="zoom-business-2" data-category="Commerce">
+      Business Ideas
+    </button>
+    <button class="btn btn-professional btn-view control-view" id="zoom-inner-circle-2" data-category="Private">
+      Private Interest
+    </button>
+  </div>
+</div>
 
 <!-- Modal for Adding Need Data -->
 <div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
