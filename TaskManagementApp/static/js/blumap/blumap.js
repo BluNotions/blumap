@@ -149,7 +149,7 @@ function positionMap(userLocation) {
       const message = document.getElementById('helpMessage').value;
       // Store the recipient when the popup is opened instead of trying to get it from the button
       const recipient = document.getElementById('helpModal').getAttribute('data-current-recipient');
-      alert(recipient)
+      
       if (!message.trim()) return;
 
       try {
@@ -323,7 +323,7 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
       return response.json();
     })
     .then(responseData => {
-      console.log('Success:', responseData);
+     // console.log('Success:', responseData);
       placeMarker([longitude, latitude], name, category, title, description);
     })
     .catch(error => console.error('Error:', error));
