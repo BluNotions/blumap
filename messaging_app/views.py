@@ -1,19 +1,22 @@
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+import requests
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from django.urls import path
 from .models import Conversation, Message
 
-# OPTIONAL: if you want to do server-side toxicity checks with Perspective
-import requests
-
-PERSPECTIVE_API_KEY = "YOUR_PERSPECTIVE_API_KEY"
+# OPTIONAL: Uncomment and set your Perspective API key if you want server-side toxicity checks.
+# PERSPECTIVE_API_KEY = "YOUR_PERSPECTIVE_API_KEY"
 
 def check_toxicity(text):
     """
-    Server-side check using Google's Perspective API.
+    Check text toxicity using Google's Perspective API.
+    If no API key is provided, simply returns 0.0.
     """
+    if not globals().get("PERSPECTIVE_API_KEY"):
+        return 0.0
     url = f"https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key={PERSPECTIVE_API_KEY}"
     payload = {
         "comment": {"text": text},
@@ -25,152 +28,285 @@ def check_toxicity(text):
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         response.raise_for_status()
         data = response.json()
-        return data["attributeScores"]["TOXICITY"]["summaryScore"]["value"]
-    except:
-        return 0.0  # fallback if API fails
+        return data.get("attributeScores", {}).get("TOXICITY", {}).get("summaryScore", {}).get("value", 0.0)
+    except Exception:
+        return 0.0
 
 def contains_dirty_words(text):
     """
-    A stricter filter for banned words, same as your client-side.
+    Checks if the text contains any banned words.
     """
     banned_words = [
-        "fuck","shit","damn","bitch","asshole","crap","dick","piss","pussy","cock",
-        "whore","slut","bastard","motherfucker","cunt","dildo","wanker","twat","fag",
-        "nigger","retard","chink","spic","kike","dyke","coon","gook","tranny","queer",
-        "beyonce","kanyewest","taylorswift","elonmusk","kimkardashian","justinbieber",
-        "drake","rihanna","leomessi","cristianoronaldo","sex","penis","vagina","boobs",
-        "anal","blowjob","clitoris","orgasm","masturbate","porn","ejaculate","condom",
-        "dildo","viagra","allah","jesus","buddha","hindu","torah","quran","bible",
-        "mosque","synagogue","church","atheist","jihad","halal","kosher","crusade"
+        "fuck", "shit", "damn", "bitch", "asshole", "crap", "dick", "piss",
+        "pussy", "cock", "whore", "slut", "bastard", "motherfucker", "cunt",
+        "dildo", "wanker", "twat", "fag", "nigger", "retard", "chink", "spic",
+        "kike", "dyke", "coon", "gook", "tranny", "queer", "beyonce", "kanyewest",
+        "taylorswift", "elonmusk", "kimkardashian", "justinbieber", "drake",
+        "rihanna", "leomessi", "cristianoronaldo", "sex", "penis", "vagina",
+        "boobs", "anal", "blowjob", "clitoris", "orgasm", "masturbate", "porn",
+        "ejaculate", "condom", "dildo", "viagra", "allah", "jesus", "buddha",
+        "hindu", "torah", "quran", "bible", "mosque", "synagogue", "church",
+        "atheist", "jihad", "halal", "kosher", "crusade"
     ]
     lower_text = text.lower()
-    for w in banned_words:
-        if w in lower_text:
-            return True
-    return False
+    return any(word in lower_text for word in banned_words)
+
+def send_message_to_conversation(conversation, sender, text):
+    """
+    Helper function to create a message in a conversation.
+    Performs toxicity checking and marks the message accordingly.
+    """
+    toxicity_score = check_toxicity(text)
+    is_toxic = toxicity_score > 0.7
+    is_blocked = is_toxic or contains_dirty_words(text)
+    message = Message.objects.create(
+        conversation=conversation,
+        sender=sender,
+        text=text,
+        is_toxic=is_toxic,
+        blocked_for_toxicity=is_blocked
+    )
+    return message, toxicity_score, is_blocked
 
 @csrf_exempt
 def create_conversation(request):
     """
-    Called when user clicks "Help" on the main map page:
-    1) Check if conversation already exists (if you want to limit to 1-to-1).
-    2) If not, create it.
-    3) Create a "Hello, I'd like to help" message.
+    Creates a new conversation between two users and sends an initial message.
+    Expected JSON body:
+      {
+          "sender_username": "user1",
+          "recipient_username": "user2",
+          "message": "Optional initial message text"
+      }
     """
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
         data = json.loads(request.body)
-        # data might contain 'sender_id' or 'sender_email' and 'recipient_id' or 'recipient_email'
-        sender_email = data.get('sender_email')
-        recipient_email = data.get('recipient_email')
-        
-        # Make sure we have both users
-        try:
-            sender = User.objects.get(email=sender_email)
-            recipient = User.objects.get(email=recipient_email)
-        except User.DoesNotExist:
-            return JsonResponse({"error": "User(s) not found"}, status=400)
-        
-        # If you want to limit to 1-to-1, check if a conversation already exists
-        conversation = Conversation.objects.filter(participants=sender).filter(participants=recipient).first()
-        
-        if not conversation:
-            conversation = Conversation.objects.create()
-            conversation.participants.add(sender, recipient)
-            conversation.save()
-        
-        # Create a default message in that conversation
-        default_text = "Hi! I saw your need on Blumaps. I'd like to help."
-        toxicity_score = check_toxicity(default_text)
-        is_blocked = (toxicity_score > 0.7) or contains_dirty_words(default_text)
-        message_obj = Message.objects.create(
-            conversation=conversation,
-            sender=sender,
-            text=default_text,
-            is_toxic=(toxicity_score > 0.7),
-            blocked_for_toxicity=is_blocked
-        )
-        return JsonResponse({
-            "success": True,
-            "conversation_id": conversation.id,
-            "message_id": message_obj.id
-        })
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-def inbox_view(request):
-    """
-    Renders your inbox.html template, possibly with conversation list pre-fetched.
-    """
-    if request.method == 'GET':
-        # Retrieve the 'id' parameter from the query string
-        user_id = request.GET.get('id')
+    sender_username = data.get('sender_username')
+    recipient_username = data.get('recipient_username')
+    message_text = data.get('message', "Hi! I'd like to help.")
 
-        if not user_id:
-            return JsonResponse({"error": "User ID is required"}, status=400)
+    if not sender_username or not recipient_username:
+        return JsonResponse({"error": "Missing sender_username or recipient_username"}, status=400)
 
-        # Get the user by the provided ID (assuming it's an email or user ID)
-        try:
-            user = User.objects.get(email=user_id)  # Adjust if using a different identifier
-        except User.DoesNotExist:
-            return JsonResponse({"error": "User not found"}, status=404)
-        # Get all conversations for this user
-        user_conversations = Conversation.objects.filter(participants=user).order_by('-created_at')
+    try:
+        sender = User.objects.get(username=sender_username)
+        recipient = User.objects.get(username=recipient_username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User(s) not found"}, status=400)
 
-        # Preload the last message, etc. if you want
-        context = {
-            "conversations": user_conversations
-        }
-        return render(request, "inbox.html", context)
+    # Check if a conversation already exists between the two users.
+    conversation = Conversation.objects.filter(participants=sender).filter(participants=recipient).first()
+    if not conversation:
+        conversation = Conversation.objects.create()
+        conversation.participants.add(sender, recipient)
+        conversation.save()
+
+    message, toxicity_score, is_blocked = send_message_to_conversation(conversation, sender, message_text)
+    return JsonResponse({
+        "success": True,
+        "conversation_id": conversation.id,
+        "message_id": message.id,
+        "toxicity_score": toxicity_score,
+        "blocked_for_toxicity": is_blocked
+    })
 
 @csrf_exempt
-def send_message(request):
+def get_conversation(request, conversation_id):
     """
-    AJAX POST to send a new message in a conversation. 
-    We'll check toxicity server-side, too.
-    """
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        conversation_id = data.get('conversation_id')
-        sender_id = data.get('sender_id')
-        text = data.get('text', '').strip()
-        
-        if not conversation_id or not sender_id:
-            return JsonResponse({"error": "Missing conversation_id or sender_id"}, status=400)
-        
-        conversation = get_object_or_404(Conversation, id=conversation_id)
-        sender = get_object_or_404(User, id=sender_id)
-        
-        if sender not in conversation.participants.all():
-            return JsonResponse({"error": "User not in conversation"}, status=403)
-        
-        toxicity_score = check_toxicity(text)
-        is_blocked = (toxicity_score > 0.7) or contains_dirty_words(text)
-        
-        msg = Message.objects.create(
-            conversation=conversation,
-            sender=sender,
-            text=text,
-            is_toxic=(toxicity_score > 0.7),
-            blocked_for_toxicity=is_blocked
-        )
-        return JsonResponse({
-            "success": True,
-            "message_id": msg.id,
-            "blocked_for_toxicity": is_blocked,
-            "toxicity_score": toxicity_score
-        })
-    return JsonResponse({"error": "Invalid request method"}, status=405)
-
-def get_conversation_messages(request, conversation_id):
-    """
-    Returns the messages in a conversation as JSON, for your 
-    JS to load into the conversation modal, etc.
+    Retrieves a conversation and its messages.
+    Only participants of the conversation can access it.
     """
     conversation = get_object_or_404(Conversation, id=conversation_id)
+    # Optionally, check if request.user is in conversation.participants here.
     if request.user not in conversation.participants.all():
         return JsonResponse({"error": "You are not part of this conversation"}, status=403)
     
-    msgs = conversation.messages.order_by('timestamp').values(
+    messages = conversation.messages.order_by('timestamp').values(
         'id', 'sender__username', 'text', 'timestamp',
-        'is_toxic','blocked_for_toxicity'
+        'is_toxic', 'blocked_for_toxicity'
     )
-    return JsonResponse(list(msgs), safe=False)
+    return JsonResponse({
+        "conversation_id": conversation.id,
+        "messages": list(messages)
+    })
+
+@csrf_exempt
+def list_user_conversations(request, user_id):
+    """
+    Lists all conversations for a specific user (identified by email).
+    """
+    try:
+        user = User.objects.get(email=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+    conversations = Conversation.objects.filter(participants=user).order_by('-created_at')
+    conversations_data = []
+    for convo in conversations:
+        latest_msg = convo.messages.last()
+        conversations_data.append({
+            "id": convo.id,
+            "participants": [participant.username for participant in convo.participants.all()],
+            "latest_message": latest_msg.text if latest_msg else ""
+        })
+    return JsonResponse(conversations_data, safe=False)
+
+@csrf_exempt
+def send_message(request, conversation_id):
+    """
+    Sends a new message in an existing conversation or creates a new conversation if it doesn't exist.
+    Expected JSON body:
+      {
+          "sender_username": "user1",
+          "recipient_username": "user2",
+          "text": "Message text"
+      }
+    """
+    if request.method != 'POST':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    sender_username = data.get('sender_username')
+    recipient_username = data.get('recipient_username')
+    text = data.get('text', '').strip()
+
+    if not sender_username or not recipient_username or not text:
+        return JsonResponse({"error": "Missing sender_username, recipient_username, or text"}, status=400)
+
+    try:
+        sender = User.objects.get(username=sender_username)
+        recipient = User.objects.get(username=recipient_username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User(s) not found"}, status=400)
+
+    # Check if a conversation already exists between the two users.
+    conversation = Conversation.objects.filter(participants=sender).filter(participants=recipient).first()
+    if not conversation:
+        conversation = Conversation.objects.create()
+        conversation.participants.add(sender, recipient)
+        conversation.save()
+
+    message, toxicity_score, is_blocked = send_message_to_conversation(conversation, sender, text)
+    return JsonResponse({
+        "success": True,
+        "conversation_id": conversation.id,
+        "message_id": message.id,
+        "toxicity_score": toxicity_score,
+        "blocked_for_toxicity": is_blocked
+    })
+
+def inbox_view(request):
+    """
+    Renders the inbox.html template with the user's conversations.
+    The user is identified by the query parameter 'id' (user email).
+    """
+    if request.method != 'GET':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    user_email = request.GET.get('id')
+    if not user_email:
+        return JsonResponse({"error": "User email is required"}, status=400)
+
+    try:
+        user = User.objects.get(email=user_email)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+    conversations = Conversation.objects.filter(participants=user).order_by('-created_at')
+    context = {"conversations": conversations}
+    return render(request, "inbox.html", context)
+
+@csrf_exempt
+def get_conversation_history(request, current_user, other_user):
+    """
+    Retrieves the conversation history between two users.
+    Returns messages in chronological order.
+    """
+    if request.method != 'GET':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        user1 = User.objects.get(username=current_user)
+        user2 = User.objects.get(username=other_user)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "One or both users not found"}, status=404)
+
+    # Find conversation between these users
+    conversation = Conversation.objects.filter(participants=user1).filter(participants=user2).first()
+    
+    if not conversation:
+        return JsonResponse([], safe=False)
+
+    # Get all messages from the conversation
+    messages = conversation.messages.order_by('timestamp').values(
+        'sender__username',
+        'text',
+        'timestamp',
+        'is_toxic',
+        'blocked_for_toxicity'
+    )
+
+    return JsonResponse(list(messages), safe=False)
+
+@csrf_exempt
+def get_or_create_conversation(request):
+    """
+    Gets an existing conversation between two users or creates a new one.
+    Expected JSON body:
+      {
+          "participant1": "username1",
+          "participant2": "username2"
+      }
+    Returns:
+      {
+          "conversation_id": id,
+          "created": boolean
+      }
+    """
+    if request.method != 'POST':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    participant1 = data.get('participant1')
+    participant2 = data.get('participant2')
+
+    if not participant1 or not participant2:
+        return JsonResponse({"error": "Both participants are required"}, status=400)
+
+    try:
+        user1 = User.objects.get(username=participant1)
+        user2 = User.objects.get(username=participant2)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "One or both users not found"}, status=404)
+
+    # Try to find existing conversation
+    conversation = Conversation.objects.filter(participants=user1).filter(participants=user2).first()
+    
+    created = False
+    if not conversation:
+        # Create new conversation if none exists
+        conversation = Conversation.objects.create()
+        conversation.participants.add(user1, user2)
+        conversation.save()
+        created = True
+
+    return JsonResponse({
+        "conversation_id": conversation.id,
+        "created": created
+    })
+
+# URL patterns for routing these views

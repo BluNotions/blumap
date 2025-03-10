@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 
 class Conversation(models.Model):
@@ -16,6 +13,22 @@ class Conversation(models.Model):
     def __str__(self):
         participant_names = ", ".join(p.username for p in self.participants.all())
         return f"Conversation among [{participant_names}]"
+
+    class Meta:
+        ordering = ['-created_at']  # Most recent conversations first
+
+    def send_message(self, recipient_username, sender_username, text):
+        # Find or create the conversation
+        recipient = User.objects.get(username=recipient_username)
+        sender = User.objects.get(username=sender_username)
+
+        # Create the conversation if it doesn't exist
+        self.participants.add(sender, recipient)
+
+        # Create and save the message
+        message = Message(conversation=self, sender=sender, text=text)
+        message.save()
+        return message
 
 class Message(models.Model):
     """
@@ -42,3 +55,6 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message from {self.sender.username} at {self.timestamp}"
+
+    class Meta:
+        ordering = ['timestamp']  # Messages ordered by time in ascending order
