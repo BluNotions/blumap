@@ -153,6 +153,18 @@
     @keyframes shimmer {
       100% { transform: translateX(100%); }
     }
+    /* Friends List Styles */
+    .friends-list .btn {
+      transition: all 0.3s ease;
+      background: var(--glass-bg);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .friends-list .btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: var(--neon-accent);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
@@ -280,109 +292,122 @@
   <script>
     AOS.init({ duration: 1000 });
     
-    // Dummy conversation histories for each user
-    const conversationHistories = {
-      "Alice": [
-        { sender: "Alice", text: "Hello, welcome to Blunotions support." },
-        { sender: "You", text: "Hi Alice, I'm having trouble logging in." },
-        { sender: "Alice", text: "I can help with that. Have you tried resetting your password?" }
-      ],
-      "Jay": [
-        { sender: "Bob", text: "How can I assist you today?" },
-        { sender: "You", text: "I'm confused about the new interface." },
-        { sender: "Bob", text: "Let me walk you through the changes." }
-      ],
-      "Charlie": [
-        { sender: "Charlie", text: "Let me know if you have any questions." },
-        { sender: "You", text: "Everything looks good so far, thanks." },
-        { sender: "Charlie", text: "Great! I'm here if you need anything." }
-      ]
-    };
-
     // Variable to track the currently selected conversation item
     let currentConversationElement = null;
     
     // Helper function to add a message after checking its toxicity.
     async function addMessage(container, sender, text) {
+      console.log(sender)
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('chat-message', sender === "You" ? 'outgoing' : 'incoming');
       messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
       container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
     }
-    
-    // Load conversation history when a conversation item is clicked.
-    document.querySelectorAll('.conversation-item').forEach(item => {
-      item.addEventListener('click', async function() {
-        const user = this.getAttribute('data-user');
-        document.getElementById('modalUserName').textContent = user;
-        const conversationContent = document.getElementById('conversationContent');
-        conversationContent.innerHTML = '';
-        const history = conversationHistories[user] || [];
-        for (const msg of history) {
-          await addMessage(conversationContent, msg.sender, msg.text);
-        }
-        const conversationModal = new bootstrap.Modal(document.getElementById('conversationModal'));
-        conversationModal.show();
-      });
-    });
-    
-    // Send button functionality: check the message for toxicity and banned words.
-    document.getElementById('modalSendButton').addEventListener('click', async function() {
-      const modalInput = document.getElementById('modalMessageInput');
-      const messageText = modalInput.value.trim();
-      const conversationId = '1'; // Replace with actual conversation ID logic
 
-      if (containsDirtyWords(messageText)) {
-        alert("Your message contains prohibited language. Please revise your message.");
+    // Add message sending functionality
+    async function sendMessage() {
+      const messageInput = document.getElementById('modalMessageInput');
+      const text = messageInput.value.trim();
+      const recipient = document.getElementById('modalUserName').textContent;
+      
+      if (!text) return;
+
+      // Check for toxicity and banned words
+      const toxicityScore = await checkToxicity(text);
+      if (toxicityScore > 0.7 || containsDirtyWords(text)) {
+        alert('Your message contains inappropriate content. Please revise and try again.');
         return;
       }
-      
-      if (messageText) {
-        const toxicityScore = await checkToxicity(messageText);
-        if (toxicityScore > 0.7) {
-          alert("Your message appears to be toxic. Please revise your message.");
-          return;
-        }
-        
-        const conversationContent = document.getElementById('conversationContent');
-        await addMessage(conversationContent, "You", messageText);
-        modalInput.value = '';
-        conversationContent.scrollTop = conversationContent.scrollHeight;
-        const modalUserNameText = document.getElementById('modalUserName').textContent;
-          console.log(modalUserNameText);
-        // Send the message to the server using the updated endpoint
-        const response = await fetch('/messaging/conversation/1/send/', {
+
+      try {
+        // First, get or create conversation ID
+        const currentUser = JSON.parse(window.localStorage.getItem('user')).username;
+        const conversationResponse = await fetch('/messaging/conversation/get-or-create/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRFToken': getCookie('csrftoken'),
+            'X-CSRFToken': getCookie('csrftoken')
           },
           body: JSON.stringify({
-            sender_username: JSON.parse(window.localStorage.getItem('user')).username,
-            recipient_username: modalUserNameText, //document.getElementById('modalUserName').value, //JSON.parse(window.localStorage.getItem('user')).username,
-            text: messageText
-        }),
+            participant1: currentUser,
+            participant2: recipient
+          })
+        });
+
+        if (!conversationResponse.ok) {
+          throw new Error('Failed to get conversation ID');
+        }
+
+        const { conversation_id } = await conversationResponse.json();
+
+        // Now send the message with the correct conversation ID
+        const response = await fetch(`/messaging/conversation/${conversation_id}/send/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({
+            recipient_username: recipient,
+            text: text,
+            sender_username: currentUser
+          })
         });
 
         if (response.ok) {
-          const responseData = await response.json();
-          // Optionally handle the server response
-          await addMessage(conversationContent, "Other Party", responseData.responseText || "Message received.");
+          const conversationContent = document.getElementById('conversationContent');
+          await addMessage(conversationContent, "You", text);
+          messageInput.value = '';
+          
+          // Refresh the conversations list to show the latest message
+          loadConversations();
         } else {
-          console.error("Failed to send message:", response.statusText);
+          throw new Error('Failed to send message');
         }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Failed to send message. Please try again.');
       }
-    });
-
-    // Function to get URL parameters
-    function getUrlParameter(name) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(name);
     }
 
-    // Load conversations based on user ID from URL
+    // Add event listeners for message sending
+    window.onload = function() {
+      loadConversations();
+      loadFriends();
+
+      // Add send button click handler
+      document.getElementById('modalSendButton').addEventListener('click', sendMessage);
+
+      // Add enter key handler for message input
+      document.getElementById('modalMessageInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    };
+
+    // Add this new function to fetch conversation history
+    async function fetchConversationHistory(otherUser) {
+      try {
+        const currentUser = JSON.parse(window.localStorage.getItem('user')).username;
+        const response = await fetch(`/messaging/conversation/history/${currentUser}/${otherUser}/`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch conversation history');
+        }
+      
+       // console.log(response.json());
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching conversation history:', error);
+        return [];
+      }
+    }
+
+    // Update the conversation item click handler in loadConversations function
     async function loadConversations() {
-      const username = JSON.parse(window.localStorage.getItem('user')).email; //getUrlParameter('id');
+      const username = JSON.parse(window.localStorage.getItem('user')).email;
       if (username) {
         const response = await fetch(`/messaging/conversations/user/${username}/`);
         if (response.ok) {
@@ -392,11 +417,34 @@
           conversations.forEach(convo => {
             const item = document.createElement('div');
             item.classList.add('conversation-item');
-            item.setAttribute('data-user', convo.participants.join(', '));
+            item.setAttribute('data-user', convo.participants[0]);
             item.innerHTML = `
               <div class="username">${convo.participants.join(', ')}</div>
               <div class="latest-message">${convo.latest_message}</div>
             `;
+            
+            // Updated click event listener
+            item.addEventListener('click', async function() {
+              const user = this.getAttribute('data-user');
+              document.getElementById('modalUserName').textContent = user;
+              const conversationContent = document.getElementById('conversationContent');
+              conversationContent.innerHTML = '';
+              
+              // Fetch and display conversation history
+              const history = await fetchConversationHistory(user);
+              if (history.length === 0) {
+                conversationContent.innerHTML = "<p>No conversation history available.</p>";
+              } else {
+                for (const msg of history) {
+                 const username = JSON.parse(window.localStorage.getItem('user')).username;
+                 console.log(msg)
+                  await addMessage(conversationContent,msg.sender__username === username ? "You" : msg.sender__username, msg.text);
+                }
+              }
+              
+              const conversationModal = new bootstrap.Modal(document.getElementById('conversationModal'));
+              conversationModal.show();
+            });
             conversationList.appendChild(item);
           });
         } else {
@@ -405,7 +453,7 @@
       }
     }
 
-    // Load friends for the user
+    // Update the friends list click handler similarly
     async function loadFriends() {
       const user_id = JSON.parse(window.localStorage.getItem('user')).id;
       fetch('/friend-request/friends/' + user_id + '/')
@@ -425,14 +473,24 @@
             } else {
               friends.forEach(friend => {
                 const listItem = document.createElement("button");
+                listItem.classList.add('btn', 'btn-outline-light', 'mb-2', 'w-100', 'text-start');
                 listItem.textContent = friend;
                 listItem.addEventListener('click', async function() {
                   const conversationContent = document.getElementById('conversationContent');
                   conversationContent.innerHTML = '';
-                  const history = conversationHistories[friend] || [];
-                  for (const msg of history) {
-                    await addMessage(conversationContent, msg.sender, msg.text);
+                  
+                  // Fetch and display conversation history
+                  const history = await fetchConversationHistory(friend);
+                  if (history.length === 0) {
+                    conversationContent.innerHTML = "<p>No conversation history available.</p>";
+                  } else {
+                    const username = JSON.parse(window.localStorage.getItem('user')).username;
+                    console.log(username)
+                    for (const msg of history) {
+                      await addMessage(conversationContent, msg.sender__username === username ? "You" : msg.sender__username, msg.text);
+                    }
                   }
+                  
                   const conversationModal = new bootstrap.Modal(document.getElementById('conversationModal'));
                   document.getElementById('modalUserName').textContent = friend;
                   conversationModal.show();
@@ -454,11 +512,6 @@
           console.error('Error fetching friends:', error);
         });
     }
-
-    window.onload = function() {
-      loadConversations();
-      loadFriends();
-    };
   </script>
 </body>
 </html>

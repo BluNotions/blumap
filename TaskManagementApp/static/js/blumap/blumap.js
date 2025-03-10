@@ -93,12 +93,12 @@ function positionMap(userLocation) {
   // Improved marker and control functionality
   let canAddMarker = false;
   let markers = [];
-  function placeMarker(location, category, title = "Unnamed", description = "No details provided.", email = "Not provided", phone) {
+  function placeMarker(location, category, username, title = "Unnamed", description = "No details provided.", email = "Not provided", phone) {
       const popupContent = `
           <strong style="color: black;">${title}</strong>
           <p style="color: black;">${description}</p>
           <div style="margin-top: 10px;">
-              <button class="btn btn-primary btn-sm popup-help" data-recipient="${phone}" data-email="${email}" data-phone="${phone}">Help</button>
+              <button class="btn btn-primary btn-sm popup-help" data-recipient="${username}" data-email="${email}" data-phone="${phone}">Help</button>
           </div>
       `;
       const marker = new mapboxgl.Marker().setLngLat(location).addTo(map);
@@ -124,12 +124,12 @@ function positionMap(userLocation) {
   // Delegate click event on document to handle dynamic help buttons
   document.addEventListener('click', function(event) {
       if (event.target.classList.contains('popup-help')) {
-          // Optionally retrieve data attributes:
           const recipient = event.target.getAttribute('data-recipient');
           const email = event.target.getAttribute('data-email');
           const phone = event.target.getAttribute('data-phone');
-          // You can use these details if needed for further logic
-
+          
+          // Store the recipient information on the modal itself
+          document.getElementById('helpModal').setAttribute('data-current-recipient', recipient);
           showModal();
       }
   });
@@ -145,24 +145,59 @@ function positionMap(userLocation) {
   });
 
   // Handle "Send" button click using Fetch API
-  document.getElementById('sendHelp').addEventListener('click', function() {
+  document.getElementById('sendHelp').addEventListener('click', async function(event) {
       const message = document.getElementById('helpMessage').value;
-      fetch('/messaging/send_message/', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ text: message })
-      })
-      .then(response => response.json())
-      .then(data => {
-          alert('Message sent successfully!');
-          hideModal();
-          window.location.href = 'messaging/inbox'; // Adjust the URL as needed
-      })
-      .catch(error => {
-          alert('There was an error sending your message.');
-      });
+      // Store the recipient when the popup is opened instead of trying to get it from the button
+      const recipient = document.getElementById('helpModal').getAttribute('data-current-recipient');
+      alert(recipient)
+      if (!message.trim()) return;
+
+      try {
+          // First, get or create conversation ID
+          const currentUser = JSON.parse(window.localStorage.getItem('user')).username;
+          const conversationResponse = await fetch('/messaging/conversation/get-or-create/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCsrfToken()
+              },
+              body: JSON.stringify({
+                  participant1: currentUser,
+                  participant2: recipient
+              })
+          });
+
+          if (!conversationResponse.ok) {
+              throw new Error('Failed to get conversation ID');
+          }
+
+          const { conversation_id } = await conversationResponse.json();
+
+          // Send the message with the conversation ID
+          const response = await fetch(`/messaging/conversation/${conversation_id}/send/`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCsrfToken()
+              },
+              body: JSON.stringify({
+                  recipient_username: recipient,
+                  text: message,
+                  sender_username: currentUser
+              })
+          });
+
+          if (response.ok) {
+              alert('Message sent successfully!');
+              hideModal();
+              window.location.href = '/messaging/inbox';
+          } else {
+              throw new Error('Failed to send message');
+          }
+      } catch (error) {
+          console.error('Error sending message:', error);
+          alert('Failed to send message. Please try again.');
+      }
   });
 
   // Handle "Go to Inbox" button click
@@ -207,6 +242,7 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
           placeMarker(
             coordinates,
             category,
+             currentUser.username,
             "New Need",
             "No details provided.",
             currentUser.email,
@@ -242,7 +278,7 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
         
           data.forEach(item => {
             const location = [item.longitude, item.latitude];
-            placeMarker(location, item.category, item.name, item.description, item.email, item.phone);
+            placeMarker(location, item.category,item.name, item.name, item.description, item.email, item.phone);
           });
         })
         .catch(error => console.error('Error fetching data:', error));
@@ -288,7 +324,7 @@ if (!window.localStorage.getItem('user') && !JSON.parse(window.localStorage.getI
     })
     .then(responseData => {
       console.log('Success:', responseData);
-      placeMarker([longitude, latitude], category, title, description);
+      placeMarker([longitude, latitude], name, category, title, description);
     })
     .catch(error => console.error('Error:', error));
     bootstrap.Modal.getInstance(document.getElementById('dataModal')).hide();

@@ -226,4 +226,87 @@ def inbox_view(request):
     context = {"conversations": conversations}
     return render(request, "inbox.html", context)
 
+@csrf_exempt
+def get_conversation_history(request, current_user, other_user):
+    """
+    Retrieves the conversation history between two users.
+    Returns messages in chronological order.
+    """
+    if request.method != 'GET':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        user1 = User.objects.get(username=current_user)
+        user2 = User.objects.get(username=other_user)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "One or both users not found"}, status=404)
+
+    # Find conversation between these users
+    conversation = Conversation.objects.filter(participants=user1).filter(participants=user2).first()
+    
+    if not conversation:
+        return JsonResponse([], safe=False)
+
+    # Get all messages from the conversation
+    messages = conversation.messages.order_by('timestamp').values(
+        'sender__username',
+        'text',
+        'timestamp',
+        'is_toxic',
+        'blocked_for_toxicity'
+    )
+
+    return JsonResponse(list(messages), safe=False)
+
+@csrf_exempt
+def get_or_create_conversation(request):
+    """
+    Gets an existing conversation between two users or creates a new one.
+    Expected JSON body:
+      {
+          "participant1": "username1",
+          "participant2": "username2"
+      }
+    Returns:
+      {
+          "conversation_id": id,
+          "created": boolean
+      }
+    """
+    if request.method != 'POST':
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    participant1 = data.get('participant1')
+    participant2 = data.get('participant2')
+
+    if not participant1 or not participant2:
+        return JsonResponse({"error": "Both participants are required"}, status=400)
+
+    try:
+        user1 = User.objects.get(username=participant1)
+        user2 = User.objects.get(username=participant2)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "One or both users not found"}, status=404)
+
+    # Try to find existing conversation
+    conversation = Conversation.objects.filter(participants=user1).filter(participants=user2).first()
+    
+    created = False
+    if not conversation:
+        # Create new conversation if none exists
+        conversation = Conversation.objects.create()
+        conversation.participants.add(user1, user2)
+        conversation.save()
+        created = True
+
+    return JsonResponse({
+        "conversation_id": conversation.id,
+        "created": created
+    })
+
 # URL patterns for routing these views
