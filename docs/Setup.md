@@ -10,6 +10,11 @@ Navigate to Project Directory
 cd blumap
 ```
 
+### Environment Setup
+1. Download the `.env` file from [Google Drive](https://drive.google.com/file/d/1B3n7fwCBBT-6f5ZreddaWYOQYyE5dUha/view?usp=drive_link)
+2. Place the `.env` file in the root directory of the project
+
+### Install and Configure
 Install Dependencies
 ```bash
 pip install -r requirements.txt
