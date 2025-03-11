@@ -16,11 +16,15 @@ if os.getenv('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'github-actions',
+            'NAME': 'github_actions',
             'USER': 'postgres',
             'PASSWORD': 'postgres',
             'HOST': 'localhost',
-            'PORT': '5432'
+            'PORT': '5432',
+            'OPTIONS': {
+                'connect_timeout': 10,  # Connection timeout in seconds
+                'options': '-c statement_timeout=30000',  # Statement timeout (30 seconds)
+            },
         }
     }
 else:
@@ -33,8 +37,8 @@ else:
             'HOST': os.environ.get('DATABASES_HOST'),
             'PORT': os.environ.get('DATABASES_PORT'),
             'OPTIONS': {
-                'connect_timeout': 10,  # Connection timeout in seconds
-                'options': '-c statement_timeout=30000',  # Statement timeout (30 seconds)
+                'connect_timeout': 10,
+                'options': '-c statement_timeout=30000',
             },
         }
     }
