@@ -202,7 +202,8 @@ function positionMap(userLocation) {
 
   // Handle "Go to Inbox" button click
   document.getElementById('goInbox').addEventListener('click', function() {
-      window.location.href = '/messaging/inbox'; // Adjust the URL as needed
+    const user_email = JSON.parse(window.localStorage.getItem('user')).email  
+    window.location.href = '/messaging/inbox?id='+user_email; // Adjust the URL as needed
   });
 
   document.querySelectorAll('.control-add').forEach(button => {

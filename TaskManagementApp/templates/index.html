@@ -5,6 +5,8 @@
   <h1 class="professional-heading">Mapping Needs & Ideas</h1>
 </header>
 
+
+{% if user.is_authenticated %}
 <!-- Sidebar for Desktop Controls (Draggable) -->
 <div class="sidebar d-none d-lg-block" id="sidebar">
   <div class="mb-4">
@@ -147,12 +149,11 @@
     View Need/Idea
   </button>
 </div>
-
 <!-- Map Container with Full Screen Toggle -->
 <div class="container my-4 position-relative" id="mapContainer">
   <div id="map"></div>
 </div>
-
+{% endif %}
 <!-- 3 Button Model Section -->
 <section id="about-section" class="container">
   <div class="text-center mb-4">

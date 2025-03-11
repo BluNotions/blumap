@@ -1,27 +1,27 @@
- ## Blumaps Dev Overview
+## Blumaps Dev Overview
 
- ### Folder structure
-    ```bash
-      blumap        _________Overview.md
-        -docs-----|________Setup.md
-    
-        -mesageing_app-----
-       
-        -staticcfiles-----
-      
-        -taskManagement-----
-      
-        -TaskManangmentApp-----
+### Folder Structure
 
-     - .env
-     - .gitignore
-     - blumap
-     - db.sqlite3
-     - manage.py
-     - python
-     - README.md
-     - requirements.txt
-     - U2.pem
-
-     ```
-     
+```bash
+blumap
+├── docs
+│   ├── Overview.md
+│   ├── Setup.md
+│
+├── messaging_app
+│
+├── static_files
+│
+├── task_management
+│
+├── TaskManagementApp
+│
+├── .env
+├── .gitignore
+├── blumap
+├── db.sqlite3
+├── manage.py
+├── python
+├── README.md
+├── requirements.txt
+├── U2.pem

@@ -4,16 +4,17 @@ from pathlib import Path
 
 GOOGLE_MAPS_API_KEY='AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0'
 
-DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'your-smtp-server'
+# mlsn.956b6946c4a542d7d345f0b08ce80b20f1b21b4d36911dddf727a4215795e6cc
+
+EMAIL_HOST = 'smtp.mailersend.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your@email.com'
-EMAIL_HOST_PASSWORD = 'your-email-password'
-DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
+EMAIL_HOST_USER = 'MS_Sm352O@trial-vywj2lp899pg7oqz.mlsender.net'
+EMAIL_HOST_PASSWORD ='mssp.FBwc9aQ.3zxk54vnkv1ljy6v.LfboMLV'
+DEFAULT_FROM_EMAIL='MS_Sm352O@trial-vywj2lp899pg7oqz.mlsender.net'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

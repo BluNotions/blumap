@@ -50,12 +50,14 @@
     </div>
   </footer>
 
-  <script src="{% static 'js/scripts.js' %}"></script>
+ 
   <script src="{% static 'js/authentic.js' %}"></script>
+  {% if user.is_authenticated %}
+  <script src="{% static 'js/scripts.js' %}"></script>
   <script src="{% static 'js/blumap/blumap.js' %}"></script>
   <script src="{% static 'js/friends.js' %}"></script>
   <script src="{% static 'js/toxicityCheck.js' %}"></script>
  
-
+  {% endif %}
 </body>
 </html>
