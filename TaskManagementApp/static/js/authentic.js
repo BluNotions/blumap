@@ -135,6 +135,15 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        document.getElementById('loadingAnimation').style.display = 'block'; // Show loading animation
+
+        const button = document.getElementById('loginSubmitBtn');
+
+        
+        button.disabled = true;
+        const modalElement = document.getElementById('authModal');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.hide();
         const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
         const password = document.getElementById('loginPassword').value;
         authSystem.login(phoneOrEmail, password).then(result => {
@@ -143,29 +152,47 @@ if (loginForm) {
                 window.location.reload(); // Reload the webpage after successful login
             } else {
                 alert(result.message);
+                button.disabled = false;
+                document.getElementById('loadingAnimation').style.display = 'none'; 
+                modal.show(); 
             }
         });
     });
 }
 
-
+if(JSON.parse(window.localStorage.getItem('user')) !== null){
 //Logout button
 document.getElementById('logout-link').addEventListener('click', async function(e) {
     e.preventDefault();
     try {
-        authSystem.logout();
+       
         window.localStorage.removeItem('user');
-        const csrfToken = getCsrfToken(); 
+        const csrfToken = await getCsrfToken();
         await fetch('/api/logout/', {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'X-CSRFToken': csrfToken,
             }
-        }).then( window.location.reload()).catch(()=>alert("Logout failed. Please try again."));
+        }).then(()=>{
+            authSystem.logout();
+            window.location.reload()
+        }).catch(()=>alert("Logout failed. Please try again."));
     
     } catch (error) {
         console.error("❌ Error during logout:", error);
         alert("Logout failed. Please try again.");
     }
 });
+}
+function showLoading(button) {
+  button.classList.add('loading');
+  button.disabled = true;
+  button.querySelector('.spinner-border').classList.remove('d-none');
+}
+
+function hideLoading(button) {
+  button.classList.remove('loading');
+  button.disabled = false;
+  button.querySelector('.spinner-border').classList.add('d-none');
+}

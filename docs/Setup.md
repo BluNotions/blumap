@@ -1,40 +1,33 @@
- ## Blumaps Dev Setup
+## Blumaps Dev Setup
 
- ### Clone Repo
+### Clone Repository
+```bash
+git clone https://github.com/BluNotions/blumap.git
+```
 
- ```bash
- git clone <repo>
+Navigate to Project Directory
+```bash
+cd blumap
+```
 
- ```
+Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
+Apply Migrations
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
-  ```bash
- cd blumap
+Run on Local Development Server
+Server will run at http://localhost:8000
+```bash
+python manage.py runserver
+```
 
- ```
-
-  ```bash
- pip install requirements
-
- ```
-
-  ```bash
- python makemigrations migrate
-
- ```
-
-  ```bash
- python manage.py migrate
-
- ```
-### Run on local dev (http://localhost:8000)
-  ```bash
- python manage.py runserver
-
- ```
-
- ### Run tests
-  ```bash
- python manage.py tests
-
- ```
+Run Tests
+```bash
+python manage.py test
+```
