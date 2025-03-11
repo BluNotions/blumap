@@ -402,3 +402,41 @@ def list_friends(request, user_id):
     user = get_object_or_404(User, id=user_id)
     friends = Friend.objects.filter(user1=user).values_list('user2__username', flat=True)
     return JsonResponse({'friends': list(friends)})
+
+@csrf_exempt
+def google_login_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+
+            if not email:
+                return JsonResponse({'success': False, 'message': 'Email is required'}, status=400)
+
+            try:
+                # Try to find the user by email
+                user_profile = UserProfile.objects.get(user__email=email)
+                user = user_profile.user
+                
+                # Log the user in
+                login(request, user)
+                
+                # Prepare profile data to return
+                profile_data = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'phone_number': user_profile.phone_number,
+                }
+                return JsonResponse({'success': True, 'user': profile_data})
+                
+            except UserProfile.DoesNotExist:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'No user found with this email. Please register first.'
+                }, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)

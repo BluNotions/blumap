@@ -34,14 +34,33 @@ window.onload = () => {
   };
 
   function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    var profile = response.credential.getBasicProfile();
-    console.log('ID: ' + profile.getId());
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail());
-    window.localStorage.setItem('user', JSON.stringify(response));
-                window.location.reload(); // Reload the webpage after successful login
+    // Decode the JWT token
+    const responsePayload = jwt_decode(response.credential);
+    
+    // Make request to our backend Google login endpoint
+    fetch('/api/google-login/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ email: responsePayload.email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Store the user data and reload
+            window.localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.reload();
+        } else {
+            // Handle error - user might need to register first
+            alert(data.message || 'Login failed. Please register if you haven\'t already.');
+        }
+    })
+    .catch(error => {
+        console.error('Error during Google login:', error);
+        alert('Login failed. Please try again.');
+    });
   }
 
 
