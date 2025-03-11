@@ -5,6 +5,7 @@ from .views import login_view
 from .views import get_csrf_token
 from .views import accept_friend_request
 from .views import check_user
+from .views import google_login_view
 
 urlpatterns = [
     # Frontend Endpoints
@@ -27,6 +28,7 @@ urlpatterns = [
    # Backend API Endpoints
     path('save_location/', views.save_location, name='save_location'),
     path('api/login/', login_view, name='login'),
+    path('api/google-login/', google_login_view, name='google-login'),
     path('api/logout/', logout_view, name='logout'),
     path('api/csrf/', get_csrf_token, name='csrf-token'),
     path('api/check_user/', check_user, name='check_user'),

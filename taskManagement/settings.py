@@ -1,30 +1,65 @@
 import os
+from django.conf import settings
 from pathlib import Path
+from dotenv import load_dotenv
 
+
+load_dotenv()  # Load environment variables from .env file
 
 GOOGLE_MAPS_API_KEY='AIzaSyC7BWgCzP-RbEa0GiDaBDuDnG5L32c7bi0'
+# Access environment variables using os.environ
+domain = os.environ.get('DOMAIN')
+map_token = os.environ.get('MAP_ACCESS_TOKEN')
 
-# DEFAULT_FROM_EMAIL='tdreyer62@gmail.com'
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Database settings
+if os.getenv('GITHUB_WORKFLOW'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'github-actions',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432'
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get('DATABASES_ENGINE'),
+            'NAME': os.environ.get('DATABASES_NAME'),
+            'USER': os.environ.get('DATABASES_USER'),
+            'PASSWORD': os.environ.get('DATABASES_PASSWORD'),
+            'HOST': os.environ.get('DATABASES_HOST'),
+            'PORT': os.environ.get('DATABASES_PORT'),
+            'OPTIONS': {
+                'connect_timeout': 10,  # Connection timeout in seconds
+                'options': '-c statement_timeout=30000',  # Statement timeout (30 seconds)
+            },
+        }
+    }
 
-# mlsn.956b6946c4a542d7d345f0b08ce80b20f1b21b4d36911dddf727a4215795e6cc
-
-EMAIL_HOST = 'smtp.mailersend.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'MS_Sm352O@trial-vywj2lp899pg7oqz.mlsender.net'
-EMAIL_HOST_PASSWORD ='mssp.FBwc9aQ.3zxk54vnkv1ljy6v.LfboMLV'
-DEFAULT_FROM_EMAIL='MS_Sm352O@trial-vywj2lp899pg7oqz.mlsender.net'
+# Email settings
+if os.getenv('GITHUB_WORKFLOW'):
+    DEFAULT_FROM_EMAIL='blunotions@gmail.com'
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_HOST = os.environ.get('EMAIL_HOST')
+    EMAIL_PORT = os.environ.get('EMAIL_PORT')
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS') == 'True'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')mhr(jqjluqws2r6s=%_@598n5c0b=g+d002_inew9%8-y$2m-'
+SECRET_KEY =os.environ.get('BLUMAP_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.blumaps.com',
@@ -78,20 +113,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'taskManagement.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'blumap_db',
-        'USER': 'blumapdbmaster',
-        'PASSWORD': '2025BlumapDBmaster#',
-        'HOST': 'blumap-database-1.cfdjwarrwgrc.eu-west-2.rds.amazonaws.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'connect_timeout': 10,  # Connection timeout in seconds
-            'options': '-c statement_timeout=30000',  # Statement timeout (30 seconds)
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'blumap_db',
+#         'USER': 'blumapdbmaster',
+#         'PASSWORD': '2025BlumapDBmaster#',
+#         'HOST': 'blumap-database-1.cfdjwarrwgrc.eu-west-2.rds.amazonaws.com',
+#         'PORT': '5432',
+#         'OPTIONS': {
+#             'connect_timeout': 10,  # Connection timeout in seconds
+#             'options': '-c statement_timeout=30000',  # Statement timeout (30 seconds)
+#         },
+#     }
+# }
 
 
 # Password validation
@@ -141,15 +176,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # This is where collected f
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 
 CSRF_USE_SESSIONS = False
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 
-SESSION_COOKIE_DOMAIN = '.blumaps.com'
+# SESSION_COOKIE_DOMAIN = '.blumaps.com'
 
-CSRF_COOKIE_DOMAIN = '.blumaps.com'
+# CSRF_COOKIE_DOMAIN = '.blumaps.com'
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
