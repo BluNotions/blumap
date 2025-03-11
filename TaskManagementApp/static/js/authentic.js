@@ -34,14 +34,33 @@ window.onload = () => {
   };
 
   function handleCredentialResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-    var profile = response.credential.getBasicProfile();
-    console.log('ID: ' + profile.getId());
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail());
-    window.localStorage.setItem('user', JSON.stringify(response));
-                window.location.reload(); // Reload the webpage after successful login
+    // Decode the JWT token
+    const responsePayload = jwt_decode(response.credential);
+    
+    // Make request to our backend Google login endpoint
+    fetch('/api/google-login/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ email: responsePayload.email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Store the user data and reload
+            window.localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.reload();
+        } else {
+            // Handle error - user might need to register first
+            alert(data.message || 'Login failed. Please register if you haven\'t already.');
+        }
+    })
+    .catch(error => {
+        console.error('Error during Google login:', error);
+        alert('Login failed. Please try again.');
+    });
   }
 
 
@@ -58,23 +77,26 @@ class AuthSystem {
     }
 
     async login(email, password) {
-        // Show loading animation
-        document.getElementById('loadingAnimation').style.display = 'block'; // Show loading animation
-         // Disable the button
-    
+        // Show loading animation and disable login button
+        const loadingAnimation = document.getElementById('loadingAnimation');
+        const loginButton = document.querySelector('#loginForm button[type="submit"]');
+        
+        if (loadingAnimation) loadingAnimation.style.display = 'block';
+        if (loginButton) loginButton.disabled = true;
     
         try {
             const response = await fetch('/api/login/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken() // Function to get CSRF token
+                    'X-CSRFToken': getCsrfToken()
                 },
                 body: JSON.stringify({ identifier: email, password })
             });
 
-            // Hide loading animation
-            document.getElementById('loadingAnimation').style.display = 'none'; // Hide loading animation
+            // Hide loading animation and re-enable button
+            if (loadingAnimation) loadingAnimation.style.display = 'none';
+            if (loginButton) loginButton.disabled = false;
 
             const data = await response.json();
             if (!response.ok) {
@@ -86,7 +108,7 @@ class AuthSystem {
             return { success: true, user: data.user, stars: data.stars, isNGO: data.isNGO };
         } catch (error) {
             // Hide loading animation
-            document.getElementById('loadingAnimation').style.display = 'none'; // Hide loading animation
+            if (loadingAnimation) loadingAnimation.style.display = 'none'; // Hide loading animation
             console.error('Login error:', error);
             return { success: false, message: 'An error occurred during login' };
         }
@@ -135,15 +157,6 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        document.getElementById('loadingAnimation').style.display = 'block'; // Show loading animation
-
-        const button = document.getElementById('loginSubmitBtn');
-
-        
-        button.disabled = true;
-        const modalElement = document.getElementById('authModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.hide();
         const phoneOrEmail = document.getElementById('loginPhoneOrEmail').value;
         const password = document.getElementById('loginPassword').value;
         authSystem.login(phoneOrEmail, password).then(result => {
@@ -152,47 +165,29 @@ if (loginForm) {
                 window.location.reload(); // Reload the webpage after successful login
             } else {
                 alert(result.message);
-                button.disabled = false;
-                document.getElementById('loadingAnimation').style.display = 'none'; 
-                modal.show(); 
             }
         });
     });
 }
 
-if(JSON.parse(window.localStorage.getItem('user')) !== null){
+
 //Logout button
 document.getElementById('logout-link').addEventListener('click', async function(e) {
     e.preventDefault();
     try {
-       
+        authSystem.logout();
         window.localStorage.removeItem('user');
-        const csrfToken = await getCsrfToken();
+        const csrfToken = getCsrfToken(); 
         await fetch('/api/logout/', {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'X-CSRFToken': csrfToken,
             }
-        }).then(()=>{
-            authSystem.logout();
-            window.location.reload()
-        }).catch(()=>alert("Logout failed. Please try again."));
+        }).then( window.location.reload()).catch(()=>alert("Logout failed. Please try again."));
     
     } catch (error) {
         console.error("❌ Error during logout:", error);
         alert("Logout failed. Please try again.");
     }
 });
-}
-function showLoading(button) {
-  button.classList.add('loading');
-  button.disabled = true;
-  button.querySelector('.spinner-border').classList.remove('d-none');
-}
-
-function hideLoading(button) {
-  button.classList.remove('loading');
-  button.disabled = false;
-  button.querySelector('.spinner-border').classList.add('d-none');
-}

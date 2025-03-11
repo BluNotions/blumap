@@ -226,7 +226,7 @@ def signup(request):
             # Validate reCAPTCHA
             recaptcha_response = request.POST.get('g-recaptcha-response')
             data = {
-                'secret': '6LczS-wqAAAAANlshDRij_CxeqUK25Qsua1d3I_4',  # Replace with your secret key
+                'secret': '6Lf1i_EqAAAAADJ8MEPguKiiEo_Sb2peq36RcMxO',  # Replace with your secret key
                 'response': recaptcha_response
             }
             response = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
