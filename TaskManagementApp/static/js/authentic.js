@@ -170,14 +170,14 @@ if (loginForm) {
     });
 }
 
-
+if(JSON.parse(window.localStorage.getItem('user')) !== null){
 //Logout button
 document.getElementById('logout-link').addEventListener('click', async function(e) {
     e.preventDefault();
     try {
         authSystem.logout();
         window.localStorage.removeItem('user');
-        const csrfToken = getCsrfToken(); 
+        const csrfToken = getCsrfToken();
         await fetch('/api/logout/', {
             method: 'POST',
             credentials: 'include',
@@ -191,3 +191,5 @@ document.getElementById('logout-link').addEventListener('click', async function(
         alert("Logout failed. Please try again.");
     }
 });
+
+}
