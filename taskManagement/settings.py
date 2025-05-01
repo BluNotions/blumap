@@ -64,6 +64,7 @@ SECRET_KEY =os.environ.get('BLUMAP_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.blumaps.com',
@@ -185,6 +186,9 @@ CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 
 SESSION_COOKIE_SECURE =False
+# SESSION_COOKIE_DOMAIN = 'locahost:8000'
+
+# CSRF_COOKIE_DOMAIN = 'localhost:8000'
 
 # SESSION_COOKIE_DOMAIN = '.blumaps.com'
 
